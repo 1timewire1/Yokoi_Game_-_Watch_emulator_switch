@@ -7,6 +7,12 @@ background_*.t3s
 console_*.png
 console_*.t3s
 
+# The patterns above match by filename anywhere in the tree (meant for
+# generated per-game rompack-pipeline output), which would otherwise also
+# swallow gfx2x_open_source/ - the checked-in David & John art source, not
+# generated output. Re-include it explicitly.
+!gfx2x_open_source/**
+
 romfs/gfx/*
 !romfs/gfx/.gitkeep
 build/*
