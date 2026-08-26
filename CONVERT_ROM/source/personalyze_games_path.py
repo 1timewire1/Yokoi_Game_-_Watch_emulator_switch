@@ -1,0 +1,1379 @@
+
+resolution_up = [400, 240]
+resolution_down = [320, 240]
+demi_resolution_up = [200, 240]
+
+games_path = {
+              "ball" :
+                    { "ref" : "ac-01"
+                    , "display_name" : "Ball"
+                    , "manufacturer" : 0
+                    , "Rom" : r'.\rom\decompress\gnw_ball\ac-01'
+                    , "Visual" : [r'.\rom\decompress\gnw_ball\gnw_ball.svg'] # list of screen visual
+                    , "Background" :[r'.\rom\decompress\gnw_ball\Background2NS.png']
+                    , "transform_visual" : [[[2242, 121, 121], [1449, 69, 88]]]
+                    , "date" : "1980-04-28"
+                    , "console" : r'.\rom\decompress\gnw_ball\gnw_ball.png'
+                    , "background_in_front" : True
+                }
+              
+            , "Flagman" :
+                    { "ref" : "fl-02"
+                    , "display_name" : "Flagman"
+                    , "manufacturer" : 0
+                    , "Rom" : r'.\rom\decompress\gnw_flagman\fl-02'
+                    , "Visual" : [r'.\rom\decompress\gnw_flagman\gnw_flagman.svg'] # list of screen visual
+                    #, "transform_visual" : [[[1266, 28, 18], [835, 8, 32]]]}
+                    , "transform_visual" : [[[1266, 28, 18], [900, 8, 32]]]
+                    , "date" : "1980-06-05"
+                    , "console" : r'.\rom\decompress\gnw_flagman\gnw_flagman.png'
+                }
+                              
+            , "Vermin" :
+                    { "ref" : "mt-03"
+                    , "display_name" : "Vermin"
+                    , "manufacturer" : 0
+                    , "Rom" : r'.\rom\decompress\gnw_vermin\mt-03'
+                    , "Visual" : [r'.\rom\decompress\gnw_vermin\gnw_vermin.svg'] # list of screen visual
+                    , "Background" :[r'.\rom\decompress\gnw_vermin\Background2NS.png']
+                    , "transform_visual" : [[[2329, 145, 184], [1505, 88, 125]]]
+                    , "date" : "1980-07-10"
+                    , "console" : r'.\rom\decompress\gnw_vermin\gnw_vermin.png'
+                    , "background_in_front" : True                    
+                    }
+              
+            , "Fire" :
+                    { "ref" : "rc-04"
+                    , "display_name" : "Fire"
+                    , "manufacturer" : 0
+                    , "Rom" : r'.\rom\decompress\gnw_fires\rc-04'
+                    , "Visual" : [r'.\rom\decompress\gnw_fires\gnw_fires.svg'] # list of screen visual
+                    , "Background" :[r'.\rom\decompress\gnw_fires\Background2NS.png']
+                    , "transform_visual" : [[[2300, 150, 150], [1510, 125, 93]]]
+                    , "date" : "1980-07-31"
+                    , "console" : r'.\rom\decompress\gnw_fires\gnw_fires.png'
+                    , "background_in_front" : True
+                    }
+              
+            , "Judge" :
+                    { "ref" : "ip-05"
+                    , "display_name" : "Judge"
+                    , "manufacturer" : 0
+                    , "Rom" : r'.\rom\decompress\gnw_judge\ip-05'
+                    , "Visual" : [r'.\rom\decompress\gnw_judge\gnw_judge.svg'] # list of screen visual
+                    , "transform_visual" : [[[2359, 176, 183], [1548, 90, 166]]]
+                    , "date" : "1980-10-04"
+                    , "console" : r'.\rom\decompress\gnw_judge\gnw_judge.png'
+                    }
+                      
+            , "Manhole" :
+                    { "ref" : "MH_06"
+                    , "display_name" : "Manhole"
+                    , "manufacturer" : 0
+                    , "Rom" : r'.\rom\decompress\gnw_manholeg\mh-06'
+                    , "Visual" : [r'.\rom\decompress\gnw_manholeg\gnw_manholeg.svg'] # list of screen visual
+                    , "Background" :[r'.\rom\decompress\gnw_manholeg\BackgroundNSM.png']
+                    , "transform_visual" : [[[2396, 200, 160], [1607, 140, 130]]]
+                    , "date" : "1981-01-27"
+                    , "console" : r'.\rom\decompress\gnw_manholeg\gnw_manholeg.png'
+                    , "background_in_front" : True 
+                    }
+              
+            , "Helmet" :
+                    { "ref" : "cn-17"
+                    , "display_name" : "Helmet"
+                    , "manufacturer" : 0
+                    , "Rom" : r'.\rom\decompress\gnw_helmet\cn-17'
+                    , "Visual" : [r'.\rom\decompress\gnw_helmet\gnw_helmet.svg'] # list of screen visual
+                    , "Background" :[r'.\rom\decompress\gnw_helmet\BackgroundNS.png']
+                    , "transform_visual" : [[[1145, 86, 101], [747, 58, 66]]]
+                    , "date" : "1981-02-21"
+                    , "console" : r'.\rom\decompress\gnw_helmet\gnw_helmet.png'
+                    , "background_in_front" : True 
+                    }
+              
+            , "Lion" :
+                    { "ref" : "LN_08"
+                    , "display_name" : "Lion"
+                    , "manufacturer" : 0
+                    , "Rom" : r'.\rom\decompress\gnw_lion\ln-08'
+                    , "Visual" : [r'.\rom\decompress\gnw_lion\gnw_lion.svg'] # list of screen visual
+                    , "Background" :[r'.\rom\decompress\gnw_lion\BackgroundNS.png']
+                    , "transform_visual" : [[[2361, 146, 179], [1627, 145, 145]]]
+                    , "date" : "1981-04-27"
+                    , "console" : r'.\rom\decompress\gnw_lion\gnw_lion.png'
+                    , "background_in_front" : True 
+                    }
+              
+            , "Parachute" :
+                    { "ref" : "pr-21"
+                    , "display_name" : "Parachute"
+                    , "manufacturer" : 0
+                    , "Rom" : r'.\rom\decompress\gnw_pchute\pr-21'
+                    , "Visual" : [r'.\rom\decompress\gnw_pchute\gnw_pchute.svg'] # list of screen visual
+                    , "Background" :[r'.\rom\decompress\gnw_pchute\BackgroundNS.png']
+                    , "transform_visual" : [[[1026, 25, 38], [699, 44, 40]]]
+                    , "date" : "1981-06-16"
+                    , "console" : r'.\rom\decompress\gnw_pchute\gnw_pchute.png'
+                    , "background_in_front" : True
+                    }
+              
+            , "octopus" :
+                    { "ref" : "OC_22"
+                    , "display_name" : "Octopus"
+                    , "manufacturer" : 0
+                    , "Rom" : r'.\rom\decompress\gnw_octopus\oc-22'
+                    , "Visual" : [r'.\rom\decompress\gnw_octopus\gnw_octopus.svg'] # list of screen visual
+                    , "Background" :[r'.\rom\decompress\gnw_octopus\BackgroundNS.png']
+                    , "transform_visual" : [[[1026, 25, 38], [699, 44, 40]]]
+                    , "date" : "1981-07-16"
+                    , "console" : r'.\rom\decompress\gnw_octopus\gnw_octopus.png'
+                    , "background_in_front" : True
+                    }
+              
+             , "Popeye" :
+                    { "ref" : "PP-23"
+                    , "display_name" : "Popeye"
+                    , "manufacturer" : 0
+                    , "Rom" : r'.\rom\decompress\gnw_popeye\pp-23'
+                    , "Visual" : [r'.\rom\decompress\gnw_popeye\gnw_popeye.svg'] # list of screen visual
+                    , "Background" :[r'.\rom\decompress\gnw_popeye\BackgroundNS.png']
+                    , "transform_visual" : [[[1317, 46, 48], [904, 60, 62]]]
+                    , "date" : "1981-08-05"
+                    , "console" : r'.\rom\decompress\gnw_popeye\gnw_popeye.png'
+                    , "background_in_front" : True
+                    }
+              
+            , "Chef" :
+                    { "ref" : "fp-24"
+                    , "display_name" : "Chef"
+                    , "manufacturer" : 0
+                    , "Rom" : r'.\rom\decompress\gnw_chef\fp-24'
+                    , "Visual" : [r'.\rom\decompress\gnw_chef\gnw_chef.svg'] # list of screen visual
+                    , "Background" :[r'.\rom\decompress\gnw_chef\BackgroundNS.png']
+                    , "transform_visual" : [[[1282, 17, 14], [831, 23, 9]]]
+                    , "date" : "1981-09-08"
+                    , "console" : r'.\rom\decompress\gnw_chef\gnw_chef.png'
+                    , "background_in_front" : True 
+                    }
+              
+             , "Mickey_Mouse" :
+                    { "ref" : "MC_25"
+                    , "display_name" : "Mickey Mouse"
+                    , "manufacturer" : 0
+                    , "Rom" : r'.\rom\decompress\gnw_mmouse\mc-25'
+                    , "Visual" : [r'.\rom\decompress\gnw_mmouse\gnw_mmouse.svg'] # list of screen visual
+                    , "Background" :[r'.\rom\decompress\gnw_mmouse\BackgroundNS.png']
+                    , "transform_visual" : [[[1405, 70, 90], [906, 60, 50]]]
+                    , "date" : "1981-10-09"
+                    , "console" : r'.\rom\decompress\gnw_mmouse\gnw_mmouse.png'
+                    , "background_in_front" : True
+                    }
+              
+             , "Egg" :
+                    { "ref" : "EG_26"
+                    , "display_name" : "Egg"
+                    , "manufacturer" : 0
+                    , "Rom" : r'.\rom\decompress\gnw_egg\mc-25'
+                    , "Visual" : [r'.\rom\decompress\gnw_egg\gnw_egg.svg'] # list of screen visual
+                    , "Background" :[r'.\rom\decompress\gnw_egg\BackgroundNS.png']
+                    , "transform_visual" : [[[1415, 75, 95], [901, 55, 50]]]
+                    , "date" : "1981-10-09"
+                    , "console" : r'.\rom\decompress\gnw_egg\gnw_egg.png'
+                    , "background_in_front" : True
+                    }
+              
+            , "Fire_wide_screen" :
+                    { "ref" : "fr-27"
+                    , "display_name" : "Fire"
+                    , "manufacturer" : 0
+                    , "Rom" : r'.\rom\decompress\gnw_fire\fr-27'
+                    , "Visual" : [r'.\rom\decompress\gnw_fire\gnw_fire.svg'] # list of screen visual
+                    , "Background" : [r'.\rom\decompress\gnw_fire\BackgroundNS.png']
+                    , "transform_visual" : [[[1315, 26, 44], [875, 40, 39]]]
+                    , "date" : "1981-12-04"
+                    , "console" : r'.\rom\decompress\gnw_fire\gnw_fire.png'
+                    , "background_in_front" : True
+                    }
+              
+            , "Turtle_Bridge" :
+                    { "ref" : "tl-28"
+                    , "display_name" : "Turtle Bridge"
+                    , "manufacturer" : 0
+                    , "Rom" : r'.\rom\decompress\gnw_tbridge\tl-28'
+                    , "Visual" : [r'.\rom\decompress\gnw_tbridge\gnw_tbridge.svg'] # list of screen visual
+                    , "Background" : [r'.\rom\decompress\gnw_tbridge\BackgroundNS.png']
+                    , "alpha_bright" : 1.2
+                    , "fond_bright" : 1.3
+                    , "transform_visual" : [[[1286, 22, 51], [875, 53, 20]]]
+                    , "date" : "1982-02-01"
+                    , "console" : r'.\rom\decompress\gnw_tbridge\gnw_tbridge.png'
+                    }
+              
+            , "Fire_Attack" :
+                    { "ref" : "id-29"
+                    , "display_name" : "Fire Attack"
+                    , "manufacturer" : 0
+                    , "Rom" : r'.\rom\decompress\gnw_fireatk\id-29'
+                    , "Visual" : [r'.\rom\decompress\gnw_fireatk\gnw_fireatk.svg'] # list of screen visual
+                    , "Background" : [r'.\rom\decompress\gnw_fireatk\BackgroundNS.png']
+                    , "alpha_bright" : 1.1
+                    , "fond_bright" : 1.2
+                    , "shadow" : False
+                    , "transform_visual" : [[[1350, 62, 67], [885, 50, 54]]]
+                    , "date" : "1982-03-26"
+                    , "console" : r'.\rom\decompress\gnw_fireatk\gnw_fireatk.png'
+                    }
+              
+            , "Snoopy_Tennis" :
+                { "ref" : "sp-30"
+                , "display_name" : "Snoopy Tennis"
+                , "manufacturer" : 0
+                , "Rom" : r'.\rom\decompress\gnw_stennis\sp-30'
+                , "Visual" : [r'.\rom\decompress\gnw_stennis\gnw_stennis.svg'] # list of screen visual
+                , "Background" : [r'.\rom\decompress\gnw_stennis\BackgroundNS.png']
+                , "transform_visual" : [[[1294, 42, 39], [883, 49, 63]]]
+                , "date" : "1982-04-28"
+                , "console" : r'.\rom\decompress\gnw_stennis\gnw_stennis.png'
+                , "background_in_front" : True 
+                }
+
+            ,"Oil_Panic" :
+                { "ref" : "op-51"
+                , "display_name" : "Oil Panic"
+                , "date" : "1982-05-28"
+                , "manufacturer" : 0
+                , "Rom" : r'.\rom\decompress\gnw_opanic\op-51'
+                , "Visual" : [r'.\rom\decompress\gnw_opanic\gnw_opanic_top.svg'
+                                , r'.\rom\decompress\gnw_opanic\gnw_opanic_bottom.svg'] # list of screen visual
+                , "Background" :[r'.\rom\decompress\gnw_opanic\Screen-TopNS.png'
+                                , r'.\rom\decompress\gnw_opanic\Screen-BottomNS.png']
+                , "size_visual" : [resolution_up, [330, 240]]
+                , "alpha_bright" : 1.2
+                , "fond_bright" : 1.3
+                , "transform_visual" : [[[1349, 33, 22], [899, 24, 58]], [[1371, 46, 51], [878, -18, 79]]]
+                , "console" : r'.\rom\decompress\gnw_opanic\gnw_opanic.png'
+                }
+              
+            ,"Donkey_kong" :
+                { "ref" : "dk-52"
+                , "display_name" : "Donkey Kong"
+                , "date" : "1982-06-03"
+                , "manufacturer" : 0
+                , "Rom" : r'.\rom\decompress\gnw_dkong\dk-52'
+                , "Visual" : [r'.\rom\decompress\gnw_dkong\gnw_dkong_top.svg'
+                                , r'.\rom\decompress\gnw_dkong\gnw_dkong_bottom.svg'] # list of screen visual
+                , "Background" :[r'.\rom\decompress\gnw_dkong\Screen-TopNS.png'
+                                , r'.\rom\decompress\gnw_dkong\Screen-BottomNS.png']
+                , "size_visual" : [[330, 240], [330, 240]]
+                , "transform_visual" : [[[1339, 16, 27], [870, 18, 35]], [[1319, 8, 15], [854, 11, 26]]]
+                , "console" : r'.\rom\decompress\gnw_dkong\gnw_dkong.png'
+                }
+
+            , "Donkey_Kong_JR" :
+                { "ref" : "dj-101"
+                , "display_name" : "Donkey Kong JR"
+                , "manufacturer" : 0
+                , "Rom" : r'.\rom\decompress\gnw_dkjr\dj-101'
+                , "Visual" : [r'.\rom\decompress\gnw_dkjr\gnw_dkjr.svg'] # list of screen visual
+                , "Background" :[r'.\rom\decompress\gnw_dkjr\BackgroundNS.png']
+                , "transform_visual" : [[[1216, 1, 6], [798, 5, -5]]]
+                , "date" : "1982-10-26"
+                , "console" : r'.\rom\decompress\gnw_dkjr\gnw_dkjr.png'
+                , "background_in_front" : True
+                }
+              
+            ,"Mickey_Donald" :
+                { "ref" : "dm-53"
+                , "display_name" : "Mickey Donald"
+                , "date" : "1982-11-12"
+                , "manufacturer" : 0
+                , "Rom" : r'.\rom\decompress\gnw_mickdon\dm-53_565'
+                , "Visual" : [r'.\rom\decompress\gnw_mickdon\gnw_mickdon_top.svg'
+                                , r'.\rom\decompress\gnw_mickdon\gnw_mickdon_bottom.svg'] # list of screen visual
+                , "Background" :[r'.\rom\decompress\gnw_mickdon\Screen-TopNS.png'
+                                , r'.\rom\decompress\gnw_mickdon\Screen-BottomNS.png']
+                , "size_visual" : [[350, 240], [350, 240]]
+                , "transform_visual" : [[[1288, -8, 0], [844, 1, 26]], [[1273, -24, 1], [802, 13, -28]]]
+                , "console" : r'.\rom\decompress\gnw_mickdon\gnw_mickdon.png'
+                }
+              
+            ,"Green_House" :
+                    { "ref" : "GH_54"
+                    , "display_name" : "Green House"
+                    , "date" : "1982-12-06"
+                    , "manufacturer" : 0
+                    , "Rom" : r'.\rom\decompress\gnw_ghouse\gh-54'
+                    , "Visual" : [r'.\rom\decompress\gnw_ghouse\gnw_ghouse_top.svg'
+                                    , r'.\rom\decompress\gnw_ghouse\gnw_ghouse_bottom.svg'] # list of screen visual
+                    , "Background" :[r'.\rom\decompress\gnw_ghouse\Screen-TopNS.png'
+                                    , r'.\rom\decompress\gnw_ghouse\Screen-BottomNS.png']
+                    , "size_visual" : [[360, 240], [360, 240]]
+                    , "transform_visual" : [[[1330, 16+6, 18+6], [886, 28, 41]], [[1329, 16, 17], [864, 14, 33]]]
+                    , "console" : r'.\rom\decompress\gnw_ghouse\gnw_ghouse.png'
+                    , "background_in_front" : True
+                }
+
+            ,"Donkey_Kong_2" :
+                { "ref" : "jr-55"
+                , "display_name" : "Donkey Kong 2"
+                , "date" : "1983-03-07"
+                , "manufacturer" : 0
+                , "Rom" : r'.\rom\decompress\gnw_dkong2\jr-55_560'
+                , "Visual" : [r'.\rom\decompress\gnw_dkong2\gnw_dkong2_top.svg'
+                                , r'.\rom\decompress\gnw_dkong2\gnw_dkong2_bottom.svg'] # list of screen visual
+                , "Background" :[r'.\rom\decompress\gnw_dkong2\Screen-TopNS.png'
+                                , r'.\rom\decompress\gnw_dkong2\Screen-BottomNS.png']
+                , "size_visual" : [[344, 240], [344, 240]]
+                , "transform_visual" : [[[1319, 0, 23], [827, 15, -5]], [[1314, 8, 10], [825, 3, 5]]]
+                , "console" : r'.\rom\decompress\gnw_dkong2\gnw_dkong2.png'
+                , "background_in_front" : True 
+                }
+              
+            ,"Mario_Bros" :
+                { "ref" : "mw-56"
+                , "display_name" : "Mario Bros"
+                , "date" : "1983-03-14"
+                , "manufacturer" : 0
+                , "Rom" : r'.\rom\decompress\gnw_mario\mw-56'
+                , "Visual" : [r'.\rom\decompress\gnw_mario\rework\gnw_mario_left.svg'
+                                , r'.\rom\decompress\gnw_mario\rework\gnw_mario_right.svg'] # list of screen visual
+                , "Background" :[r'.\rom\decompress\gnw_mario\rework\Screen-LeftNS.png'
+                                , r'.\rom\decompress\gnw_mario\rework\Screen-RightNS.png']
+                , "size_visual" : [[234, 240], [234, 240]]
+                , "2_in_one_screen" : True
+                , "shadow" : False
+                , "transform_visual" : [[[1248, 17, 17], [782, 6, 0]], [[1217, 1, 2], [785, 3+10, 6-10]]]
+                , "console" : r'.\rom\decompress\gnw_mario\Backdrop_2.png'
+                , "background_in_front" : True
+                }
+              
+            , "Mario_Cement_Factory_panorama" :
+                    { "ref" : "cm-72"
+                    , "display_name" : "Mario Cement Factory"
+                    , "date" : "1983-04-28"
+                    , "manufacturer" : 0
+                    , "Rom" : r'.\rom\decompress\gnw_mariocmt\cm-72.program'
+                    , "Visual" : [r'.\rom\decompress\gnw_mariocmt\gnw_mariocmt.svg'] # list of screen visual
+                    , "Melody_Rom" : r'.\rom\decompress\gnw_mariocmt\cm-72.melody'
+                    , "Background" : [r'.\rom\decompress\gnw_mariocmt\background2.png']
+                    , "mask" : True
+                    , "transform_visual" : [[[2074, -74, -80], [1240, -56, -80]]]
+                    , "console" : r'.\rom\decompress\gnw_mariocmt\gnw_mariocmt.png'
+                }
+              
+            , "Mario_Cement_Factory" :
+                { "ref" : "ml-102"
+                    , "display_name" : "Mario Cement Factory"
+                    , "manufacturer" : 0
+                    , "Rom" : r'.\rom\decompress\gnw_mariocm\ml-102_577'
+                    , "Visual" : [r'.\rom\decompress\gnw_mariocm\gnw_mariocm.svg'] # list of screen visual
+                    , "Background" : [r'.\rom\decompress\gnw_mariocm\BackgroundNS.png']
+                    , "transform_visual" : [[[1227, 8, 3], [816, 25, -7]]]
+                    , "date" : "1983-06-16"
+                    , "console" : r'.\rom\decompress\gnw_mariocm\gnw_mariocm.png'
+                    , "background_in_front" : True
+                }
+
+            ,"Rain_Shower" :
+                { "ref" : "lp-57"
+                    , "display_name" : "Rain Shower"
+                    , "date" : "1983-08-10"
+                    , "manufacturer" : 0
+                    , "Rom" : r'.\rom\decompress\gnw_rshower\lp-57'
+                    , "Visual" : [r'.\rom\decompress\gnw_rshower\gnw_rshower_left.svg'
+                                    , r'.\rom\decompress\gnw_rshower\gnw_rshower_right.svg'] # list of screen visual
+                    , "Background" :[r'.\rom\decompress\gnw_rshower\Screen-LeftNS.png'
+                                    , r'.\rom\decompress\gnw_rshower\Screen-RightNS.png']
+                    , "size_visual" : [[200, 240], [200, 240]]
+                    , "2_in_one_screen" : True
+                    , "shadow" : False
+                    , "alpha_bright" : 1.3
+                    , "fond_bright" : 1.3
+                    , "transform_visual" : [[[1280, 19, 47], [855, 47, 19]], [[1300, 48, 38], [853, 65, 12]]]
+                    , "console" : r'.\rom\decompress\gnw_rshower\gnw_rshower.png'
+                }
+              
+            , "Manhole_wide_screen" :
+                { "ref" : "NH_103"
+                    , "display_name" : "Manhole"
+                    , "manufacturer" : 0
+                    , "Rom" : r'.\rom\decompress\gnw_manhole\nh-103'
+                    , "Visual" : [r'.\rom\decompress\gnw_manhole\gnw_manhole.svg'] # list of screen visual
+                    , "Background" : [r'.\rom\decompress\gnw_manhole\BackgroundNS.png']
+                    , "transform_visual" : [[[1290, 37, 36], [900, 56, 45]]]
+                    , "date" : "1983-08-24"
+                    , "console" : r'.\rom\decompress\gnw_manhole\gnw_manhole.png'
+                    , "background_in_front" : True 
+                }
+              
+            , "Snoopy_Table_Top" :
+                { "ref" : "sm-91"
+                , "display_name" : "Snoopy"
+                , "date" : "1983-08-30"
+                , "manufacturer" : 0
+                , "Rom" : r'.\rom\decompress\gnw_snoopyp\sm-91.program'
+                , "Visual" : [r'.\rom\decompress\gnw_snoopyp\gnw_snoopyp.svg'] # list of screen visual
+                , "Melody_Rom" : r'.\rom\decompress\gnw_snoopyp\sm-91.melody'
+                , "Background" : [r'.\rom\decompress\gnw_snoopyp\Background.png']
+                , "mask" : True
+                , "transform_visual" : [[[1328, 0, 0], [703, -9, -9]]]
+                , "console" : r'.\rom\decompress\gnw_snoopyp\gnw_snoopyp.png'
+                }
+
+            , "Popeye_Table_Top" :
+                    { "ref" : "PG_92"
+                    , "display_name" : "Popeye"
+                    , "date" : "1983-08-30"
+                    , "manufacturer" : 0
+                    , "Rom" : r'.\rom\decompress\gnw_popeyep\pg-92.program'
+                    , "Visual" : [r'.\rom\decompress\gnw_popeyep\gnw_popeyep.svg'] # list of screen visual
+                    , "Melody_Rom" : r'.\rom\decompress\gnw_popeyep\pg-92.melody'
+                    , "Background" : [r'.\rom\decompress\gnw_popeyep\Background.png']
+                    , "mask" : True
+                    , "transform_visual" : [[[1328, 0, 0], [721, 0, 0]]]
+                    , "console" : r'.\rom\decompress\gnw_popeyep\gnw_popeyep.png'
+            }
+              
+            , "Donkey_Kong_Circus" :
+                    { "ref" : "dc-95"
+                    , "display_name" : "Donkey Kong Circus"
+                    , "date" : "1983-09-06"
+                    , "manufacturer" : 0
+                    , "Rom" : r'.\rom\decompress\gnw_mmousep\dc-95.program'
+                    , "Visual" : [r'.\rom\decompress\gnw_dkcirc\gnw_dkcirc.svg'] # list of screen visual
+                    , "Melody_Rom" : r'.\rom\decompress\gnw_mmousep\dc-95.melody'
+                    , "Background" : [r'.\rom\decompress\gnw_dkcirc\Background.png']
+                    , "mask" : True
+                    , "transform_visual" : [[[1620, 42, 25], [880, 37, 34]]]
+                    , "console" : r'.\rom\decompress\gnw_dkcirc\gnw_dkcirc.png'
+                }
+              
+            , "DK_JR_panorama" :
+                    { "ref" : "cj-93"
+                    , "display_name" : "Donkey Kong JR"
+                    , "date" : "1983-10-07"
+                    , "manufacturer" : 0
+                    , "Rom" : r'.\rom\decompress\gnw_dkjrp\cj-93.program'
+                    , "Visual" : [r'.\rom\decompress\gnw_dkjrp\gnw_dkjrp.svg'] # list of screen visual
+                    , "Melody_Rom" : r'.\rom\decompress\gnw_dkjrp\cj-93.melody'
+                    , "Background" : [r'.\rom\decompress\gnw_dkjrp\Background.png']
+                    , "mask" : True
+                    , "transform_visual" : [[[1650, 0, 0], [886, 0, 0]]]
+                    , "console" : r'.\rom\decompress\gnw_dkjrp\gnw_dkjrp.png'
+                }
+              
+              
+            ,"Life_Boat" :
+                    { "ref" : "tc-58"
+                    , "display_name" : "Life Boat"
+                    , "date" : "1983-10-25"
+                    , "manufacturer" : 0
+                    , "Rom" : r'.\rom\decompress\gnw_lboat\tc-58'
+                    , "Visual" : [r'.\rom\decompress\gnw_lboat\rework\gnw_lboat_left.svg'
+                                    , r'.\rom\decompress\gnw_lboat\rework\gnw_lboat_right.svg'] # list of screen visual
+                    , "Background" :[r'.\rom\decompress\gnw_lboat\rework\Screen-LeftNS.png'
+                                    , r'.\rom\decompress\gnw_lboat\rework\Screen-RightNS.png']
+                    , "size_visual" : [[234, 240], [234, 240]]
+                    , "2_in_one_screen" : True
+                    , "shadow" : False
+                    , "alpha_bright" : 1.2
+                    , "transform_visual" : [[[1244, 18, 12], [836, 39, 21]], [[1273, 32, 27], [882, 86, 20]]]
+                    , "console" : r'.\rom\decompress\gnw_lboat\gnw_lboat.png'
+                }
+              
+            , "Mario_Bombs_Away" :
+                    { "ref" : "tb-94"
+                    , "display_name" : "Mario Bombs Away"
+                    , "date" : "1983-11-10"
+                    , "manufacturer" : 0
+                    , "Rom" : r'.\rom\decompress\gnw_mbaway\tb-94.program'
+                    , "Visual" : [r'.\rom\decompress\gnw_mbaway\gnw_mbaway.svg'] # list of screen visual
+                    , "Melody_Rom" : r'.\rom\decompress\gnw_mbaway\tb-94.melody'
+                    , "Background" : [r'.\rom\decompress\gnw_mbaway\background.png']
+                    , "mask" : True
+                    , "transform_visual" : [[[1650, 0, 0], [886, 0, 0]]]
+                    , "console" : r'.\rom\decompress\gnw_mbaway\gnw_mbaway.png'
+                }
+              
+            ,"Pinball" :
+                    { "ref" : "PB_59"
+                    , "display_name" : "Pinball"
+                    , "date" : "1983-12-02"
+                    , "manufacturer" : 0
+                    , "Rom" : r'.\rom\decompress\gnw_pinball\pb-59.program'
+                    , "Visual" : [r'.\rom\decompress\gnw_pinball\gnw_pinball_top.svg'
+                                    , r'.\rom\decompress\gnw_pinball\gnw_pinball_bottom.svg'] # list of screen visual
+                    , "Melody_Rom" : r'.\rom\decompress\gnw_pinball\pb-59.melody'
+                    , "Background" : [r'.\rom\decompress\gnw_pinball\Screen-TopNS.png'
+                                    , r'.\rom\decompress\gnw_pinball\Screen-BottomNS.png']
+                    , "size_visual" : [[326, 240], [326, 240]]
+                    , "transform_visual" : [[[1425, 64, 65], [928, 31, 80]], [[1438, 71, 71], [955, 31, 108]]]
+                    , "console" : r'.\rom\decompress\gnw_pinball\gnw_pinball.png'
+                }
+              
+            , "Mickey_Mouse_panorama" :
+                    { "ref" : "dc-95"
+                    , "display_name" : "Mickey Mouse"
+                    , "date" : "1984-02-XX"
+                    , "manufacturer" : 0
+                    , "Rom" : r'.\rom\decompress\gnw_mmousep\dc-95.program'
+                    , "Visual" : [r'.\rom\decompress\gnw_mmousep\gnw_mmousep.svg'] # list of screen visual
+                    , "Melody_Rom" : r'.\rom\decompress\gnw_mmousep\dc-95.melody'
+                    , "Background" : [r'.\rom\decompress\gnw_mmousep\Backgroundnew.png']
+                    , "mask" : True
+                    , "transform_visual" : [[[1701, 34, 41], [984, 50, 22]]]
+                    , "console" : r'.\rom\decompress\gnw_mmousep\gnw_mmousep.png'
+                }
+              
+            , "crab_grab" :
+                    { "ref" : "ud-202"
+                    , "display_name" : "Crab Grab"
+                    , "date" : "1984-02-07"
+                    , "manufacturer" : 0
+                    , "Rom" : r'.\rom\decompress\gnw_cgrab\ud-202'
+                    , "Visual" : [r'.\rom\decompress\gnw_cgrab\rework\gnw_cgrab_up.svg'
+                                  , r'.\rom\decompress\gnw_cgrab\rework\gnw_cgrab_down.svg'] # up = 48% / down = 52%
+                    , "Background" :[r'.\rom\decompress\gnw_cgrab\rework\background_up.png'
+                                     , r'.\rom\decompress\gnw_cgrab\rework\background_down.png']
+                    , "size_visual" : [resolution_down, resolution_down]
+                    , "color_segment" : True
+                    , "shadow" : False
+                    , "alpha_bright" : 1
+                    , "fond_bright" : 1.3
+                    , "transform_visual" : [[[1003, 31, 31], [819-3, -26+3, 0]], [[1003, 31, 31], [906-20-22-4, 4, 22]]]
+                    , "console" : r'.\rom\decompress\gnw_cgrab\gnw_cgrab.png'
+            }
+              
+            , "Spitball_Sparky" :
+                    { "ref" : "bu-201"
+                    , "display_name" : "Spitball Sparky"
+                    , "date" : "1984-02-21"
+                    , "manufacturer" : 0
+                    , "Rom" : r'.\rom\decompress\gnw_ssparky\bu-201'
+                    , "Visual" : [r'.\rom\decompress\gnw_ssparky\rework\gnw_ssparky_up.svg'
+                                    , r'.\rom\decompress\gnw_ssparky\rework\gnw_ssparky_down.svg'] # up = 48% / down = 52%
+                    , "Background" :[r'.\rom\decompress\gnw_ssparky\rework\background_up.png'
+                                    , r'.\rom\decompress\gnw_ssparky\rework\background_down.png']
+                    , "size_visual" : [resolution_down, resolution_down]
+                    , "color_segment" : True
+                    , "shadow" : False
+                    , "alpha_bright" : 1
+                    , "fond_bright" : 1.3
+                    , "transform_visual" : [[[1003, -32, -34], [864-10, -16+10, 0]], [[1003, -32, -34], [864-10, 0, -17+10]]]
+                    , "console" : r'.\rom\decompress\gnw_ssparky\gnw_ssparky.png'
+            }
+              
+             , "boxing" :
+                    { "ref" : "BX_301"
+                    , "display_name" : "Boxing"
+                    , "date" : "1984-07-31"
+                    , "manufacturer" : 0
+                    , "Rom" : r'.\rom\decompress\gnw_boxing\bx-301_744.program'
+                    , "Visual" : [r'.\rom\decompress\gnw_boxing\gnw_boxing.svg']
+                    , "Melody_Rom" : r'.\rom\decompress\gnw_boxing\bx-301_744.melody'
+                    , "Background" :[r'.\rom\decompress\gnw_boxing\BackgroundNS.png']
+                    , "transform_visual" : [[[2291, -33, -23], [663, -36, -31]]]
+                    , "console" : r'.\rom\decompress\gnw_boxing\gnw_boxing.png'
+            }
+              
+            , "Donkey_Kong_3" :
+                    { "ref" : "ak-302"
+                    , "display_name" : "Donkey Kong 3"
+                    , "date" : "1984-08-20"
+                    , "manufacturer" : 0
+                    , "Rom" : r'.\rom\decompress\gnw_dkong3\ak-302.program'
+                    , "Visual" : [r'.\rom\decompress\gnw_dkong3\gnw_dkong3.svg']
+                    , "Melody_Rom" : r'.\rom\decompress\gnw_dkong3\ak-302.melody'
+                    , "Background" :[r'.\rom\decompress\gnw_dkong3\BackgroundNS.png']
+                    , "transform_visual" : [[[2400, 36, 17], [724, -22, 16]]]
+                    , "console" : r'.\rom\decompress\gnw_dkong3\gnw_dkong3.png'
+                    , "background_in_front" : True 
+            }
+            
+            , "Donkey_Kong_hockey" :
+                    { "ref" : "hk-303"
+                    , "display_name" : "Donkey Kong hockey"
+                    , "date" : "1984-11-13"
+                    , "manufacturer" : 0
+                    , "Rom" : r'.\rom\decompress\gnw_dkhockey\hk-303.program'
+                    , "Visual" : [r'.\rom\decompress\gnw_dkhockey\gnw_dkhockey.svg']
+                    , "Melody_Rom" : r'.\rom\decompress\gnw_dkhockey\hk-303.melody'
+                    , "Background" :[r'.\rom\decompress\gnw_dkhockey\BackgroundNS.png']
+                    , "transform_visual" : [[[2460, 65, 48], [800, 40, 30]]]
+                    , "console" : r'.\rom\decompress\gnw_dkhockey\gnw_dkhockey.png'
+                    , "background_in_front" : True 
+                }
+                           
+            ,"black_jack" :
+                    { "ref" : "BJ-60"
+                    , "display_name" : "Black Jack"
+                    , "date" : "1985-02-15"
+                    , "manufacturer" : 0
+                    , "Rom" : r'.\rom\decompress\gnw_bjack\BJ-60.program'
+                    , "Visual" : [r'.\rom\decompress\gnw_bjack\gnw_bjack_top.svg'
+                                    , r'.\rom\decompress\gnw_bjack\gnw_bjack_bottom.svg'] # list of screen visual
+                    , "Melody_Rom" : r'.\rom\decompress\gnw_bjack\BJ-60.melody'
+                    , "Background" :[r'.\rom\decompress\gnw_bjack\Screen-TopNS.png'
+                                    , r'.\rom\decompress\gnw_bjack\Screen-BottomNS.png']
+                    , "transform_visual" : [[[1355, 33, 26], [898, 33, 48]], [[1346, 18, 32], [891, 4, 70]]]
+                    , "size_visual" : [ resolution_up, [336, 240]]
+                    , "console" : r'.\rom\decompress\gnw_bjack\gnw_bjack.png'
+                }
+              
+            , "Tropical_Fish" :
+                    { "ref" : "tf-104"
+                    , "display_name" : "Tropical Fish"
+                    , "manufacturer" : 0
+                    , "Rom" : r'.\rom\decompress\gnw_tfish\tf-104'
+                    , "Visual" : [r'.\rom\decompress\gnw_tfish\gnw_tfish.svg'] # list of screen visual
+                    , "Background" : [r'.\rom\decompress\gnw_tfish\BackgroundNS.png']
+                    , "transform_visual" : [[[1260, 4, 35], [885, 44, 42]]]
+                    , "date" : "1985-07-08"
+                    , "console" : r'.\rom\decompress\gnw_tfish\gnw_tfish.png'
+                }
+              
+            , "Squish" :
+                    { "ref" : "mg-61"
+                    , "display_name" : "Squish"
+                    , "date" : "1986-04-XX"
+                    , "manufacturer" : 0
+                    , "Rom" : r'.\rom\decompress\gnw_squish\mg-61'
+                    , "Visual" : [r'.\rom\decompress\gnw_squish\gnw_squish_top.svg'
+                                    , r'.\rom\decompress\gnw_squish\gnw_squish_bottom.svg'] # list of screen visual
+                    , "Background" : [r'.\rom\decompress\gnw_squish\Screen-TopNS.png'
+                                    , r'.\rom\decompress\gnw_squish\Screen-BottomNS.png']
+                    , "transform_visual" : [[[1373, 42, 35], [896, 29, 50]], [[1357, 22, 39], [896, 20, 59]]]
+                    , "size_visual" : [resolution_up, [360, 240]]
+                    , "console" : r'.\rom\decompress\gnw_squish\gnw_squish.png'
+                    , "background_in_front" : True
+                }
+
+            , "Super_Mario_Bros_cristal_screen" :
+                    { "ref" : "ym-801"
+                    , "display_name" : "Super Mario Bros (Cristal Screen)"
+                    , "manufacturer" : 0
+                    , "Rom" : r'.\rom\decompress\gnw_smb\ym-801.program'
+                    , "Melody_Rom" : r'.\rom\decompress\gnw_smb\ym-801.melody'
+                    , "Visual" : [r'.\rom\decompress\gnw_smb\gnw_smb.svg'] # list of screen visual
+                    , "Background" : [r'.\rom\decompress\gnw_smb\BackgroundNS.png']
+                    , "size_visual" : [[400, 260]]
+                    , "transform_visual" : [[[1266, 28, 18], [835, 8, 32]]]
+                    , "shadow" : False
+                    , "alpha_bright" : 1.2
+                    , "date" : "1986-06-25"
+                    , "console" : r'.\rom\decompress\gnw_smb\gnw_smb.png'
+                    , "camera" : True
+                }
+                            
+            , "Ice_Climber_cristal_screen" :
+                    { "ref" : "dr-802"
+                    , "display_name" : "Climber (Cristal Screen)"
+                    , "date" : "1986-11-19"
+                    , "manufacturer" : 0
+                    , "Rom" : r'.\rom\decompress\gnw_climber\dr-802.program'
+                    , "Visual" : [r'.\rom\decompress\gnw_climber\gnw_climber.svg'] # list of screen visual
+                    , "Melody_Rom" : r'.\rom\decompress\gnw_climber\dr-802.melody'
+                    , "Background" : [r'.\rom\decompress\gnw_climber\ClimberCCNS.png']
+                    , "transform_visual" : [[[1321, 52, 44], [861, 27, 30]]]             
+                    , "size_visual" : [[400, 250]]
+                    , "console" : r'.\rom\decompress\gnw_climber\gnw_climber.png'
+                    , "camera" : True
+                }
+
+            ,"Balloon_Fight_cristal_screen" :
+                    { "ref" : "BF_107"
+                    , "display_name" : "Balloon Fight (Cristal Screen)"
+                    , "date" : "1986-11-19"
+                    , "manufacturer" : 0
+                    , "Rom" : r'.\rom\decompress\gnw_bfight\bf-803.program'
+                    , "Visual" : [r'.\rom\decompress\gnw_bfight\gnw_bfight.svg'] # list of screen visual
+                    , "Melody_Rom" : r'.\rom\decompress\gnw_bfight\bf-803.melody'
+                    , "Background" : [r'.\rom\decompress\gnw_bfight\BackgroundNS.png']
+                    , "transform_visual" : [[[1281, 25, 32], [917, 56, 60]]]
+                    , "console" : r'.\rom\decompress\gnw_bfight\gnw_bfight.png'
+                    , "camera" : True
+                }
+              
+            , "bomb_sweeper" :
+                    { "ref" : "bd-62"
+                    , "display_name" : "Bomb Sweeper"
+                    , "date" : "1987-06-XX"
+                    , "manufacturer" : 0
+                    , "Rom" : r'.\rom\decompress\gnw_bsweep\bd-62.program'
+                    , "Visual" : [r'.\rom\decompress\gnw_bsweep\rework\gnw_bsweep_top.svg'
+                                    , r'.\rom\decompress\gnw_bsweep\rework\gnw_bsweep_bottom.svg'] # list of screen visual
+                    , "Melody_Rom" : r'.\rom\decompress\gnw_bsweep\bd-62.melody'
+                    , "Background" :[r'.\rom\decompress\gnw_bsweep\Screen-TopNS.png'
+                                    , r'.\rom\decompress\gnw_bsweep\Screen-BottomNS.png']
+                    , "transform_visual" : [[[1490, 116, 78], [986, 78, 91]], [[1478, 102, 80], [937, 37, 83]]]
+                    , "size_visual" : [ resolution_up, [344, 240]]
+                    , "console" : r'.\rom\decompress\gnw_bsweep\gnw_bsweep.png'
+                }
+              
+            ,"Safe_Buster" :
+                    { "ref" : "jb-63"
+                    , "display_name" : "Safe Buster"
+                    , "date" : "1988-01-XX"
+                    , "manufacturer" : 0
+                    , "Rom" : r'.\rom\decompress\gnw_sbuster\jb-63.program'
+                    , "Visual" : [r'.\rom\decompress\gnw_sbuster\gnw_sbuster_top.svg'
+                                    , r'.\rom\decompress\gnw_sbuster\gnw_sbuster_bottom.svg'] # list of screen visual
+                    , "Melody_Rom" : r'.\rom\decompress\gnw_sbuster\jb-63.melody'
+                    , "Background" :[r'.\rom\decompress\gnw_sbuster\Screen-TopNS.png'
+                                    , r'.\rom\decompress\gnw_sbuster\Screen-BottomNS.png']
+                    , "size_visual" : [ [330, 240], [340, 240]]
+                    , "transform_visual" : [[[1463, 84, 83], [938, 31, 90]], [[1448, 81, 71], [957, 34, 106]]]
+                    , "console" : r'.\rom\decompress\gnw_sbuster\gnw_sbuster.png'
+                }
+              
+              
+            , "Super_Mario_Bros" :
+                    { "ref" : "ym-801"
+                    , "display_name" : "Super Mario Bros"
+                    , "manufacturer" : 0
+                    , "Rom" : r'.\rom\decompress\gnw_smbn\ym-801.program'
+                    , "Melody_Rom" : r'.\rom\decompress\gnw_smbn\ym-801.melody'
+                    , "Visual" : [r'.\rom\decompress\gnw_smbn\rework\gnw_smbn.svg'] # list of screen visual
+                    , "Background" : [r'.\rom\decompress\gnw_smbn\rework\BackgroundNS.png']
+                    , "size_visual" : [[400, 260]]
+                    , "transform_visual" : [[[1266, 28, 18], [835, 8, 32]]]
+                    , "shadow" : False
+                    , "alpha_bright" : 1.2
+                    , "date" : "1988-03-XX"
+                    , "console" : r'.\rom\decompress\gnw_smbn\gnw_smbn.png'
+                }
+
+            , "Ice_Climber" :
+                    { "ref" : "dr-802"
+                    , "display_name" : "Climber"
+                    , "date" : "1988-03-XX"
+                    , "manufacturer" : 0
+                    , "Rom" : r'.\rom\decompress\gnw_climber\dr-802.program'
+                    , "Visual" : [r'.\rom\decompress\gnw_climbern\gnw_climbern.svg'] # list of screen visual
+                    , "Melody_Rom" : r'.\rom\decompress\gnw_climber\dr-802.melody'
+                    , "Background" : [r'.\rom\decompress\gnw_climbern\BackgroundNS.png']
+                    , "transform_visual" : [[[1321, 52, 44], [861, 27, 30]]]             
+                    , "size_visual" : [[400, 250]]
+                    , "console" : r'.\rom\decompress\gnw_climbern\gnw_climbern.png'
+                }    
+
+            ,"Balloon_Fight" :
+                    { "ref" : "BF_107"
+                    , "display_name" : "Balloon Fight"
+                    , "date" : "1988-03-XX"
+                    , "manufacturer" : 0
+                    , "Rom" : r'.\rom\decompress\gnw_bfightn\bf-803.program'
+                    , "Visual" : [r'.\rom\decompress\gnw_bfightn\gnw_bfightn.svg'] # list of screen visual
+                    , "Melody_Rom" : r'.\rom\decompress\gnw_bfightn\bf-803.melody'
+                    , "Background" : [r'.\rom\decompress\gnw_bfightn\BackgroundNS.png']
+                    , "transform_visual" : [[[1281, 25, 32], [917, 56, 60]]]
+                    , "console" : r'.\rom\decompress\gnw_bfightn\gnw_bfightn.png'
+                }
+              
+            ,"Zelda" :
+                    { "ref" : "zl-65"
+                    , "display_name" : "Zelda"
+                    , "date" : "1988-08-XX"
+                    , "manufacturer" : 0
+                    , "Rom" : r'.\rom\decompress\gnw_zelda\zl-65.program'
+                    , "Visual" : [r'.\rom\decompress\gnw_zelda\rework\gnw_zelda_top.svg'
+                                    , r'.\rom\decompress\gnw_zelda\rework\gnw_zelda_bottom.svg'] # list of screen visual
+                    , "Melody_Rom" : r'.\rom\decompress\gnw_zelda\zl-65.melody'
+                    , "Background" : [r'.\rom\decompress\gnw_zelda\rework\Screen-TopNS.png'
+                                    , r'.\rom\decompress\gnw_zelda\rework\Screen-BottomNS.png']
+                    , "size_visual" : [resolution_up, [340, 240]]
+                    , "transform_visual" : [[[1393, 38, 44], [933, 36, 80]], [[1393, 46, 51], [915, 36, 62]]]
+                    , "shadow" : True
+                    , "console" : r'.\rom\decompress\gnw_zelda\gnw_zelda.png'
+                }
+              
+            ,"Gold_Cliff" :
+                    { "ref" : "mv-64"
+                    , "display_name" : "Gold Cliff"
+                    , "date" : "1988-10-XX"
+                    , "manufacturer" : 0
+                    , "Rom" : r'.\rom\decompress\gnw_gcliff\mv-64.program'
+                    , "Visual" : [r'.\rom\decompress\gnw_gcliff\gnw_gcliff_top.svg'
+                                    , r'.\rom\decompress\gnw_gcliff\gnw_gcliff_bottom.svg'] # list of screen visual
+                    , "Melody_Rom" : r'.\rom\decompress\gnw_gcliff\mv-64.melody'
+                    , "Background" :[r'.\rom\decompress\gnw_gcliff\Screen-TopNS.png'
+                                    , r'.\rom\decompress\gnw_gcliff\Screen-BottomNS.png']
+                    , "transform_visual" : [[[1360, 31, 33], [890, 33, 40]], [[1348, 32, 20], [870, 10, 43]]]
+                    , "size_visual" : [ [340, 240], [340, 240]]
+                    , "console" : r'.\rom\decompress\gnw_gcliff\gnw_gcliff.png'
+                }
+              
+            , "Mario_the_Juggle" :
+                    { "ref" : "mb-108"
+                    , "display_name" : "Mario the Juggler"
+                    , "manufacturer" : 0
+                    , "date" : "1991-10-XX"
+                    , "Rom" : r'.\rom\decompress\gnw_mariotj\mb-108.program'
+                    , "Visual" : [r'.\rom\decompress\gnw_mariotj\gnw_mariotj.svg'] # list of screen visual
+                    , "Melody_Rom" : r'.\rom\decompress\gnw_mariotj\mb-108.melody'
+                    , "Background" : [r'.\rom\decompress\gnw_mariotj\BackgroundNSm.png']
+                    , "transform_visual" : [[[1410, 67, 53], [960, 54, 52]]]
+                    , "console" : r'.\rom\decompress\gnw_mariotj\gnw_mariotj.png'
+                }
+              
+              
+            , "Clever_Chicken" :
+                    { "ref" : "cc-38v"
+                    , "manufacturer" : 1
+                    , "display_name" : "Clever Chicken"
+                    , "Rom" : r'.\rom\decompress\trdivadv\0029_235d'
+                    , "Visual" : [r'.\rom\decompress\trclchick\trclchick.svg']
+                    , "Background" : [r'.\rom\decompress\trclchick\Background.png']
+                    , "transform_visual" : [[[923,16,4],[1097,18,0]]]
+                    , "date" : "1983-01-01"
+                    , "console" : r'.\rom\decompress\trclchick\trclchick.png'
+                }
+              
+              
+            , "Diver_s_Adventure" :
+                    { "ref" : "da-37"
+                    , "manufacturer" : 1
+                    , "display_name" : "Diver's Adventure"
+                    , "Rom" : r'.\rom\decompress\trdivadv\0029_235d'
+                    , "Visual" : [r'.\rom\decompress\trdivadv\trdivadv.svg']
+                    , "Background" : [r'.\rom\decompress\trdivadv\BackgroundNS.png']
+                    , "transform_visual" : [[[1531,10,9],[1087,0,1]]]
+                    , "date" : "1983-01-01"
+                    , "console" : r'.\rom\decompress\trdivadv\trdivadv.png'
+                }
+              
+              
+              
+            , "Shuttle_Voyage" :
+                    { "ref" : "mg-8"
+                    , "manufacturer" : 1
+                    , "display_name" : "Shuttle Voyage"
+                    , "Rom" : r'.\rom\decompress\trshutvoy\0019_238e'
+                    , "Visual" : [r'.\rom\decompress\trshutvoy\trshutvoy.svg']
+                    , "Background" : [r'.\rom\decompress\trshutvoy\BackgroundNS.png']
+                    , "transform_visual" : [[[2264,0,0],[1640,0,0]]]
+                    , "date" : "1983-01-01"
+                    , "console" : r'.\rom\decompress\trshutvoy\trshutvoy.png'
+                }
+              
+              
+            , "Space_Adventure" :
+                    { "ref" : "sa-12"
+                    , "manufacturer" : 1
+                    , "display_name" : "Space Adventure"
+                    , "Rom" : r'.\rom\decompress\trspacadv\1112_237c.program'
+                    , "Melody_Rom" : r'.\rom\decompress\trspacadv\1112_237c.melody'
+                    , "Visual" : [r'.\rom\decompress\trspacadv\trspacadv.svg']
+                    , "Background" : [r'.\rom\decompress\trspacadv\BackgroundNS.png']
+                    , "transform_visual" : [[[1721,21,0],[1212,0,0]]]
+                    , "date" : "1982-01-01"
+                    , "console" : r'.\rom\decompress\trspacadv\trspacadv.png'
+                }
+              
+            , "Space_Mission_Tronica" :
+                    { "ref" : "sm-11"
+                    , "manufacturer" : 1
+                    , "display_name" : "Space Mission (Tronica)"
+                    , "Rom" : r'.\rom\decompress\trspacmis\0126_228b'
+                    , "Visual" : [r'.\rom\decompress\trspacmis\trspacmis.svg']
+                    , "Background" : [r'.\rom\decompress\trspacmis\BackgroundNS.png']
+                    , "transform_visual" : [[[1242,69,75],[858,68,29]]]
+                    , "date" : "1982-01-01"
+                    , "console" : r'.\rom\decompress\trspacmis\trspacmis.png'
+                }
+              
+            , "Space_Rescue" :
+                    { "ref" : "mg-9"
+                    , "manufacturer" : 1
+                    , "display_name" : "Space Rescue"
+                    , "Rom" : r'.\rom\decompress\trsrescue\0015_224b'
+                    , "Visual" : [r'.\rom\decompress\trsrescue\trsrescue.svg']
+                    , "Background" : [r'.\rom\decompress\trsrescue\Background.png']
+                    , "transform_visual" : [[[1242,49,95],[876,69,46]]]
+                    , "date" : "1982-01-01"
+                    , "console" : r'.\rom\decompress\trsrescue\trsrescue.png'
+                }
+              
+            , "Spider_Tronica" :
+                    { "ref" : "sg-21"
+                    , "manufacturer" : 1
+                    , "display_name" : "Spider (Tronica)"
+                    , "Rom" : r'.\rom\decompress\trspacmis\0126_228b'
+                    , "Visual" : [r'.\rom\decompress\trspider\trspider.svg']
+                    , "Background" : [r'.\rom\decompress\trspider\BackgroundNS.png']
+                    , "transform_visual" : [[[1155,45,12],[795,20,14]]]
+                    , "date" : "1982-01-01"
+                    , "console" : r'.\rom\decompress\trspider\trspider.png'
+                }
+              
+              
+            , "Super_Goal_Keeper_Tronica" :
+                    { "ref" : "sk-10"
+                    , "manufacturer" : 1
+                    , "display_name" : "Super Goal Keeper  (Tronica)"
+                    , "Rom" : r'.\rom\decompress\trsgkeep\0132_238a'
+                    , "Visual" : [r'.\rom\decompress\trsgkeep\trsgkeep.svg']
+                    , "Background" : [r'.\rom\decompress\trsgkeep\BackgroundNS.png']
+                    , "transform_visual" : [[[1090,0,0],[700,0,0]]]
+                    , "date" : "1983-01-01"
+                    , "console" : r'.\rom\decompress\trsgkeep\trsgkeep.png'
+                }
+              
+              
+            , "Thief_in_Garden" :
+                    { "ref" : "tg-18"
+                    , "manufacturer" : 1
+                    , "display_name" : "Thief in Garden"
+                    , "Rom" : r'.\rom\decompress\trshutvoy\0019_238e'
+                    , "Visual" : [r'.\rom\decompress\tigarden\tigarden.svg']
+                    , "Background" : [r'.\rom\decompress\tigarden\Background.png']
+                    , "transform_visual" : [[[2264,0,0],[1640,0,0]]]
+                    , "date" : "1983-01-01"
+                    , "console" : r'.\rom\decompress\tigarden\tigarden.png'
+                }
+              
+            , "Thunder_Ball_Tronica" :
+                    { "ref" : "fr-23"
+                    , "manufacturer" : 1
+                    , "display_name" : "Thunder Ball (Tronica)"
+                    , "Rom" : r'.\rom\decompress\trsrescue\0015_224b'
+                    , "Visual" : [r'.\rom\decompress\trthuball\trthuball.svg']
+                    , "Background" : [r'.\rom\decompress\trthuball\BackgroundNS.png']
+                    , "transform_visual" : [[[1222,59,65],[828,63,4]]]
+                    , "date" : "1983-01-01"
+                    , "console" : r'.\rom\decompress\trthuball\trthuball.png'
+                }
+              
+            , "Nu_pogodi" :
+                    { "ref" : "im-02"
+                    , "manufacturer" : 2
+                    , "display_name" : "Nu, pogodi!"
+                    , "Rom" : r'.\rom\decompress\gnw_mmouse\mc-25'
+                    , "Visual" : [r'.\rom\decompress\nupogodi\nupogodi.svg']
+                    , "Background" : [r'.\rom\decompress\nupogodi\BackgroundNS.png']
+                    , "transform_visual" : [[[1161,0,0],[742,0,0]]]
+                    , "date" : "1983-01-01"
+                    , "console" : r'.\rom\decompress\nupogodi\nupogodi.png'
+                }
+              
+              
+              
+            , "Tayny_okeana" :
+                    { "ref" : "im-03"
+                    , "manufacturer" : 2
+                    , "display_name" : "Tayny okeana"
+                    , "Rom" : r'.\rom\decompress\gnw_octopus\oc-22'
+                    , "Visual" : [r'.\rom\decompress\taynyoke\taynyoke.svg']
+                    , "Background" : [r'.\rom\decompress\taynyoke\BackgroundNS.png']
+                    , "transform_visual" : [[[1195,0,0],[785,0,0]]]
+                    , "date" : "1988-01-01"
+                    , "console" : r'.\rom\decompress\taynyoke\taynyoke.png'
+                }
+              
+            , "Hockey_Elektronika" :
+                    { "ref" : "im-10"
+                    , "manufacturer" : 2
+                    , "display_name" : "Hockey (Elektronika)"
+                    , "Rom" : r'.\rom\decompress\gnw_mmouse\mc-25'
+                    , "Visual" : [r'.\rom\decompress\ehockey\ehockey.svg']
+                    , "Background" : [r'.\rom\decompress\ehockey\BackgroundNS.png']
+                    , "transform_visual" : [[[1380,27,43],[840,0,0]]]
+                    , "date" : "1988-01-01"
+                    , "console" : r'.\rom\decompress\ehockey\ehockey.png'
+                }
+              
+              
+            , "Kosmicheskiy_most" :
+                    { "ref" : "im-09"
+                    , "manufacturer" : 2
+                    , "display_name" : "Kosmicheskiy most"
+                    , "Rom" : r'.\rom\decompress\gnw_fire\fr-27'
+                    , "Visual" : [r'.\rom\decompress\kosmicmt\kosmicmt.svg']
+                    , "Background" : [r'.\rom\decompress\kosmicmt\Background.png']
+                    , "transform_visual" : [[[1327,53,53],[856,30,25]]]
+                    , "date" : "1989-01-01"
+                    , "console" : r'.\rom\decompress\kosmicmt\kosmicmt.png'
+                }
+              
+            , "Razvedchiki_kosmosa" :
+                    { "ref" : "im-13"
+                    , "manufacturer" : 2
+                    , "display_name" : "Razvedchiki kosmosa"
+                    , "Rom" : r'.\rom\decompress\rkosmosa\im-13.bin'
+                    , "Visual" : [r'.\rom\decompress\rkosmosa\rkosmosa.svg']
+                    , "Background" : [r'.\rom\decompress\rkosmosa\BackgroundNS.png']
+                    , "transform_visual" : [[[1161,0,0],[742,0,0]]]
+                    , "date" : "1989-01-01"
+                    , "console" : r'.\rom\decompress\rkosmosa\rkosmosa.png'
+                }
+              
+            , "Biathlon" :
+                    { "ref" : "im-19"
+                    , "manufacturer" : 2
+                    , "display_name" : "Biathlon"
+                    , "Rom" : r'.\rom\decompress\gnw_mmouse\mc-25'
+                    , "Visual" : [r'.\rom\decompress\biathlon\biathlon.svg']
+                    , "Background" : [r'.\rom\decompress\biathlon\BackgroundNS.png']
+                    , "transform_visual" : [[[1330,10,10],[870,4,6]]]
+                    , "date" : "1989-01-01"
+                    , "console" : r'.\rom\decompress\biathlon\biathlon.png'
+                }
+
+            , "Kot_rybolov_Elektronika" :
+                    { "ref" : "im-32"
+                    , "manufacturer" : 2
+                    , "display_name" : "Kot-rybolov (Elektronika)"
+                    , "Rom" : r'.\rom\decompress\gnw_mmouse\mc-25'
+                    , "Visual" : [r'.\rom\decompress\krybolov\krybolov.svg']
+                    , "Background" : [r'.\rom\decompress\krybolov\BackgroundNS.png']
+                    , "transform_visual" : [[[1240,0,0],[820,0,0]]]
+                    , "date" : "1989-01-01"
+                    , "console" : r'.\rom\decompress\krybolov\krybolov.png'
+                }
+              
+            , "Kvaka_zadavaka" :
+                    { "ref" : "im-33"
+                    , "manufacturer" : 2
+                    , "display_name" : "Kvaka-zadavaka"
+                    , "Rom" : r'.\rom\decompress\gnw_mmouse\mc-25'
+                    , "Visual" : [r'.\rom\decompress\kvakazad\kvakazad.svg']
+                    , "Background" : [r'.\rom\decompress\kvakazad\BackgroundNS.png']
+                    , "transform_visual" : [[[1200,0,0],[775,0,0]]]
+                    , "date" : "1989-01-01"
+                    , "console" : r'.\rom\decompress\kvakazad\kvakazad.png'
+                }
+              
+
+            , "Okhota" :
+                    { "ref" : "im-16"
+                    , "manufacturer" : 2
+                    , "display_name" : "Okhota"
+                    , "Rom" : r'.\rom\decompress\gnw_mmouse\mc-25'
+                    , "Visual" : [r'.\rom\decompress\okhota\okhota.svg']
+                    , "Background" : [r'.\rom\decompress\okhota\BackgroundNS.png']
+                    , "transform_visual" : [[[1315,0,5],[900,14,26]]]
+                    , "date" : "1989-01-01"
+                    , "console" : r'.\rom\decompress\okhota\okhota.png'
+                }
+              
+              
+            , "Vesyolye_futbolisty" :
+                    { "ref" : "im-22"
+                    , "manufacturer" : 2
+                    , "display_name" : "Vesyolye futbolisty"
+                    , "Rom" : r'.\rom\decompress\gnw_mmouse\mc-25'
+                    , "Visual" : [r'.\rom\decompress\vfutbol\vfutbol.svg']
+                    , "Background" : [r'.\rom\decompress\vfutbol\BackgroundNS.png']
+                    , "transform_visual" : [[[1255,0,0],[870,4,6]]]
+                    , "date" : "1989-01-01"
+                    , "console" : r'.\rom\decompress\vfutbol\vfutbol.png'
+                }
+              
+            , "Vesyolyy_povar" :
+                    { "ref" : "im-04"
+                    , "manufacturer" : 2
+                    , "display_name" : "Vesyolyy povar"
+                    , "Rom" : r'.\rom\decompress\gnw_chef\fp-24'
+                    , "Visual" : [r'.\rom\decompress\vespovar\vespovar.svg']
+                    , "Background" : [r'.\rom\decompress\vespovar\BackgroundNS.png']
+                    , "transform_visual" : [[[1209,0,0],[798,0,8]]]
+                    , "date" : "1989-01-01"
+                    , "console" : r'.\rom\decompress\vespovar\vespovar.png'
+                }
+              
+            , "Vinni_Pukh_Panorama_Screen" :
+                    { "ref" : "im-12"
+                    , "manufacturer" : 2
+                    , "display_name" : "Vinni-Pukh (Panorama Screen)"
+                    , "Rom" : r'.\rom\decompress\gnw_dkjrp\cj-93.program'
+                    , "Melody_Rom" : r'.\rom\decompress\gnw_dkjrp\cj-93.melody'
+                    , "Visual" : [r'.\rom\decompress\vinnpukh\vinnpukh.svg']
+                    , "Background" : [r'.\rom\decompress\vinnpukh\Background.png']
+                    , "transform_visual" : [[[2048,0,0],[1170,0,0]]]
+                    , "mask" : True
+                    , "date" : "1990-01-01"
+                    , "console" : r'.\rom\decompress\vinnpukh\vinnpukh.png'
+                }
+
+            , "Autoslalom" :
+                    { "ref" : "im-23"
+                    , "manufacturer" : 2
+                    , "display_name" : "Autoslalom"
+                    , "Rom" : r'.\rom\decompress\auslalom\im-23.bin'
+                    , "Visual" : [r'.\rom\decompress\auslalom\auslalom.svg']
+                    , "Background" : [r'.\rom\decompress\auslalom\BackgroundNS.png']
+                    , "transform_visual" : [[[1265,0,0],[910,24,26]]]
+                    , "date" : "1990-01-01"
+                    , "console" : r'.\rom\decompress\auslalom\auslalom.png'
+                }
+            
+            , "Morskaja_ataka" :
+                    { "ref" : "im-51"
+                    , "manufacturer" : 2
+                    , "display_name" : "Morskaja ataka"
+                    , "Rom" : r'.\rom\decompress\gnw_mmouse\mc-25'
+                    , "Visual" : [r'.\rom\decompress\morataka\morataka.svg']
+                    , "Background" : [r'.\rom\decompress\morataka\BackgroundNS.png']
+                    , "transform_visual" : [[[1346,13,23],[900,14,26]]]
+                    , "date" : "1992-01-01"
+                    , "console" : r'.\rom\decompress\morataka\morataka.png'
+                }
+            
+            , "Kosmicheskiy_polyot" :
+                    { "ref" : "im-50"
+                    , "manufacturer" : 2
+                    , "display_name" : "Kosmicheskiy polyot"
+                    , "Rom" : r'.\rom\decompress\gnw_mmouse\mc-25'
+                    , "Visual" : [r'.\rom\decompress\kosmicpt\kosmicpt.svg']
+                    , "Background" : [r'.\rom\decompress\kosmicpt\BackgroundNS.png']
+                    , "transform_visual" : [[[1315,0,5],[900,14,26]]]
+                    , "date" : "1992-01-01"
+                    , "console" : r'.\rom\decompress\kosmicpt\kosmicpt.png'
+                }
+
+              , "Ataka_asteroidov" :
+                    { "ref" : "im-53"
+                    , "manufacturer" : 2
+                    , "display_name" : "Ataka asteroidov"
+                    , "Rom" : r'.\rom\decompress\gnw_mmouse\mc-25'
+                    , "Visual" : [r'.\rom\decompress\atakaast\atakaast.svg']
+                    , "Background" : [r'.\rom\decompress\atakaast\BackgroundNS.png']
+                    , "transform_visual" : [[[1380,30,40],[910,34,16]]]
+                    , "date" : "1992-01-01"
+                    , "console" : r'.\rom\decompress\atakaast\atakaast.png'
+                }
+
+            , "Nochnye_vorishki" :
+                    { "ref" : "im-49"
+                    , "manufacturer" : 2
+                    , "display_name" : "Nochnye vorishki"
+                    , "Rom" : r'.\rom\decompress\gnw_mmouse\mc-25'
+                    , "Visual" : [r'.\rom\decompress\nochnyev\nochnyev.svg']
+                    , "Background" : [r'.\rom\decompress\nochnyev\BackgroundNS.png']
+                    , "transform_visual" : [[[1380,33,27],[920,33,7]]]
+                    , "date" : "1993-01-01"
+                    , "console" : r'.\rom\decompress\nochnyev\nochnyev.png'
+                }
+
+            , "Circus_Elektronika" :
+                    { "ref" : "im-11"
+                    , "manufacturer" : 2
+                    , "display_name" : "Circus (Elektronika)"
+                    , "Rom" : r'.\rom\decompress\gnw_mmouse\mc-25'
+                    , "Visual" : [r'.\rom\decompress\ecircus\ecircus.svg']
+                    , "Background" : [r'.\rom\decompress\ecircus\BackgroundNS.png']
+                    , "transform_visual" : [[[1295,0,0],[858,20,0]]]
+                    , "date" : "1993-01-01"
+                    , "console" : r'.\rom\decompress\ecircus\ecircus.png'
+                }
+              
+            , "Double_Dragon" :
+                    { "ref" : "tddragon"
+                    , "manufacturer" : 3
+                    , "display_name" : "Double Dragon"
+                    , "Rom" : r'.\rom\decompress\tddragon\593'
+                    , "Visual" : [r'.\rom\decompress\tddragon\tddragon.svg']
+                    , "Background" : [r'.\rom\decompress\tddragon\Background.png']
+                    , "transform_visual" : [[[1177,0,0],[850,0,0]]]
+                    , "date" : "1988-01-01"
+                    , "console" : r'.\rom\decompress\tddragon\tddragon.png'
+                }
+              
+            , "Castlevania_II_Simon_s_Quest" :
+                    { "ref" : "tsimquest"
+                    , "manufacturer" : 3
+                    , "display_name" : "Castlevania II - Simon's Quest"
+                    , "Rom" : r'.\rom\decompress\tsimquest\581'
+                    , "Visual" : [r'.\rom\decompress\tsimquest\tsimquest.svg']
+                    , "Background" : [r'.\rom\decompress\tsimquest\Background.png']
+                    , "transform_visual" : [[[1152,0,0],[878,0,0]]]
+                    , "date" : "1988-01-01"
+                    , "console" : r'.\rom\decompress\tsimquest\tsimquest.png'
+                }
+              
+            , "Gauntlet" :
+                    { "ref" : "tgaunt"
+                    , "manufacturer" : 3
+                    , "display_name" : "Gauntlet"
+                    , "Rom" : r'.\rom\decompress\tgaunt\583'
+                    , "Visual" : [r'.\rom\decompress\tgaunt\tgaunt.svg']
+                    , "Background" : [r'.\rom\decompress\tgaunt\Background.png']
+                    , "transform_visual" : [[[2376,0,0],[1790,0,0]]]
+                    , "date" : "1988-01-01"
+                    , "console" : r'.\rom\decompress\tgaunt\tgaunt.png'
+                }
+              
+            , "Ninja_Gaiden" :
+                    { "ref" : "tgaiden"
+                    , "manufacturer" : 3
+                    , "display_name" : "Ninja Gaiden"
+                    , "Rom" : r'.\rom\decompress\tgaiden\m82'
+                    , "Visual" : [r'.\rom\decompress\tgaiden\tgaiden.svg']
+                    , "Background" : [r'.\rom\decompress\tgaiden\bg.png']
+                    , "transform_visual" : [[[1499,0,0],[1080,0,0]]]
+                    , "date" : "1989-01-01"
+                    , "console" : r'.\rom\decompress\tgaiden\tgaiden.png'
+                }
+              
+            , "Golden_Axe" :
+                    { "ref" : "tgoldnaxe"
+                    , "manufacturer" : 3
+                    , "display_name" : "Golden Axe"
+                    , "Rom" : r'.\rom\decompress\tgoldnaxe\m94'
+                    , "Visual" : [r'.\rom\decompress\tgoldnaxe\tgoldnaxe.svg']
+                    , "Background" : [r'.\rom\decompress\tgoldnaxe\Background.png']
+                    , "transform_visual" : [[[1190,0,0],[860,0,0]]]
+                    , "date" : "1989-01-01"
+                    , "console" : r'.\rom\decompress\tgoldnaxe\tgoldnaxe.png'
+                }
+              
+              , "Altered_Beast" :
+                    { "ref" : "taltbeast"
+                    , "manufacturer" : 3
+                    , "display_name" : "Altered Beast"
+                    , "Rom" : r'.\rom\decompress\taltbeast\m88'
+                    , "Visual" : [r'.\rom\decompress\taltbeast\taltbeast.svg']
+                    , "Background" : [r'.\rom\decompress\taltbeast\Background.png']
+                    , "transform_visual" : [[[1177,0,0],[850,0,0]]]
+                    , "date" : "1990-01-01"
+                    , "console" : r'.\rom\decompress\taltbeast\taltbeast.png'
+                }
+              
+            , "Double_Dragon_II_The_Revenge" :
+                    { "ref" : "tddragon2"
+                    , "manufacturer" : 3
+                    , "display_name" : "Double Dragon II - The Revenge"
+                    , "Rom" : r'.\rom\decompress\tddragon2\m84'
+                    , "Visual" : [r'.\rom\decompress\tddragon2\tddragon2.svg']
+                    , "Background" : [r'.\rom\decompress\tddragon2\bg.jpg']
+                    , "transform_visual" : [[[1451,0,0],[1080,0,0]]]
+                    , "date" : "1990-01-01"
+                    , "console" : r'.\rom\decompress\tddragon2\tddragon2.png'
+                }
+              
+            , "Space_Harrier_II" :
+                    { "ref" : "tsharr2"
+                    , "manufacturer" : 3
+                    , "display_name" : "Space Harrier II"
+                    , "Rom" : r'.\rom\decompress\tsharr2\m91'
+                    , "Visual" : [r'.\rom\decompress\tsharr2\tsharr2.svg']
+                    , "Background" : [r'.\rom\decompress\tsharr2\bg.jpg']
+                    , "transform_visual" : [[[1493,0,0],[1080,0,0]]]
+                    , "date" : "1990-01-01"
+                    , "console" : r'.\rom\decompress\tsharr2\tsharr2.png'
+                }
+              
+            , "Strider" :
+                    { "ref" : "tstrider"
+                    , "manufacturer" : 3
+                    , "display_name" : "Strider"
+                    , "Rom" : r'.\rom\decompress\tstrider\m92'
+                    , "Visual" : [r'.\rom\decompress\tstrider\tstrider.svg']
+                    , "Background" : [r'.\rom\decompress\tstrider\Background.png']
+                    , "transform_visual" : [[[1182,0,0],[925,0,0]]]
+                    , "date" : "1990-01-01"
+                    , "console" : r'.\rom\decompress\tstrider\tstrider.png'
+                }
+
+            , "Mega_Man_3" :
+                    { "ref" : "tmegaman3"
+                    , "manufacturer" : 3
+                    , "display_name" : "Mega Man 3"
+                    , "Rom" : r'.\rom\decompress\tmegaman3\ma4'
+                    , "Visual" : [r'.\rom\decompress\tmegaman3\tmegaman3.svg']
+                    , "Background" : [r'.\rom\decompress\tmegaman3\Background.png']
+                    , "transform_visual" : [[[1162,0,0],[867,0,0]]]
+                    , "date" : "1991-01-01"
+                    , "console" : r'.\rom\decompress\tmegaman3\tmegaman3.png'
+                }
+              
+            , "Double_Dragon_III_The_Rosetta_Stone" :
+                    { "ref" : "tddragon3"
+                    , "manufacturer" : 3
+                    , "display_name" : "Double Dragon III - The Rosetta Stone"
+                    , "Rom" : r'.\rom\decompress\tddragon3\ma6'
+                    , "Visual" : [r'.\rom\decompress\tddragon3\tddragon3.svg']
+                    , "Background" : [r'.\rom\decompress\tddragon3\Background.png']
+                    , "transform_visual" : [[[1232,0,0],[890,0,0]]]
+                    , "date" : "1991-01-01"
+                    , "console" : r'.\rom\decompress\tddragon3\tddragon3.png'
+                }
+              
+            , "U_Can_t_Touch_This" :
+                    { "ref" : "tmchammer"
+                    , "manufacturer" : 3
+                    , "display_name" : "MC Hammer - U Can't Touch This"
+                    , "Rom" : r'.\rom\decompress\tmchammer\n63.program'
+                    , "Melody_Rom" : r'.\rom\decompress\tmchammer\n63.melody'
+                    , "Visual" : [r'.\rom\decompress\tmchammer\tmchammer.svg']
+                    , "Background" : [r'.\rom\decompress\tmchammer\Background.png']
+                    , "transform_visual" : [[[1130,0,0],[838,0,0]]]
+                    , "date" : "1991-01-01"
+                    , "console" : r'.\rom\decompress\tmchammer\tmchammer.png'
+                }
+              
+            , "Ninja_Gaiden_III" :
+                    { "ref" : "tgaiden3"
+                    , "manufacturer" : 3
+                    , "display_name" : "Ninja Gaiden III"
+                    , "Rom" : r'.\rom\decompress\tgaiden3\md6'
+                    , "Visual" : [r'.\rom\decompress\tgaiden3\tgaiden3.svg']
+                    , "Background" : [r'.\rom\decompress\tgaiden3\Background.png']
+                    , "transform_visual" : [[[1152,0,0],[888,0,0]]]
+                    , "date" : "1992-01-01"
+                    , "console" : r'.\rom\decompress\tgaiden3\tgaiden3.png'
+                }
+
+            , "Sonic_The_Hedgehog" :
+                    { "ref" : "tsonic"
+                    , "manufacturer" : 3
+                    , "display_name" : "Sonic The Hedgehog"
+                    , "Rom" : r'.\rom\decompress\tsonic\n71.program'
+                    , "Melody_Rom" : r'.\rom\decompress\tsonic\n71.melody'
+                    , "Visual" : [r'.\rom\decompress\tsonic\tsonic.svg']
+                    , "Background" : [r'.\rom\decompress\tsonic\Background.png']
+                    , "transform_visual" : [[[1177,0,0],[850,0,0]]]
+                    , "date" : "1992-01-01"
+                    , "console" : r'.\rom\decompress\tsonic\tsonic.png'
+                }
+              
+            , "Sonic_The_Hedgehog_2" :
+                    { "ref" : "tsonic2"
+                    , "manufacturer" : 3
+                    , "display_name" : "Sonic The Hedgehog 2"
+                    , "Rom" : r'.\rom\decompress\tsonic2\n86.program'
+                    , "Melody_Rom" : r'.\rom\decompress\tsonic2\n86.melody'
+                    , "Visual" : [r'.\rom\decompress\tsonic2\tsonic2.svg']
+                    , "Background" : [r'.\rom\decompress\tsonic2\Background.png']
+                    , "transform_visual" : [[[1180,0,0],[860,0,0]]]
+                    , "date" : "1993-01-01"
+                    , "console" : r'.\rom\decompress\tsonic2\tsonic2.png'
+                }
+              
+            , "Street_Fighter_2" :
+                    { "ref" : "tsfight2"
+                    , "manufacturer" : 3
+                    , "display_name" : "Street Fighter 2"
+                    , "Rom" : r'.\rom\decompress\tsfight2\me1'
+                    , "Visual" : [r'.\rom\decompress\tsfight2\tsfight2.svg']
+                    , "Background" : [r'.\rom\decompress\tsfight2\Background.png']
+                    , "transform_visual" : [[[1177,0,0],[850,0,0]]]
+                    , "date" : "1993-01-01"
+                    , "console" : r'.\rom\decompress\tsfight2\tsfight2.png'
+                }
+              
+              
+            , "Super_Double_Dragon" :
+                    { "ref" : "tsddragon"
+                    , "manufacturer" : 3
+                    , "display_name" : "Super Double Dragon"
+                    , "Rom" : r'.\rom\decompress\tsddragon\mf5'
+                    , "Visual" : [r'.\rom\decompress\tsddragon\tsddragon.svg']
+                    , "Background" : [r'.\rom\decompress\tsddragon\Background.png']
+                    , "transform_visual" : [[[1177,0,0],[850,0,0]]]
+                    , "date" : "1993-01-01"
+                    , "console" : r'.\rom\decompress\tsddragon\tsddragon.png'
+                }
+
+}

@@ -1,0 +1,86 @@
+plugins {
+    id 'com.android.application'
+}
+
+android {
+    namespace 'com.retrovalou.yokoi'
+    compileSdk 34
+
+    buildFeatures {
+        buildConfig true
+    }
+
+    compileOptions {
+        sourceCompatibility JavaVersion.VERSION_17
+        targetCompatibility JavaVersion.VERSION_17
+    }
+
+    defaultConfig {
+        applicationId 'com.retrovalou.yokoi'
+        minSdk 26
+        targetSdk 34
+        versionCode 8
+        versionName '2.3'
+
+        externalNativeBuild {
+            cmake {
+                cppFlags '-std=c++20 -fexceptions -frtti'
+            }
+        }
+
+        ndk {
+            abiFilters 'arm64-v8a'
+        }
+    }
+
+    buildTypes {
+        release {
+            minifyEnabled false
+        }
+    }
+
+    // Build variants:
+    // - embedded: ships with APK assets (gfx2x) + compiled-in ROM metadata.
+    // - rompackOnly: ships without embedded ROMs/assets; requires an external .ykp pack at runtime.
+    flavorDimensions += ['content']
+    productFlavors {
+        // Keep rompackOnly first so Android Studio tends to pick rompackOnlyDebug by default.
+        rompackOnly {
+            dimension 'content'
+            buildConfigField 'boolean', 'EMBEDDED', 'false'
+            externalNativeBuild {
+                cmake {
+                    arguments '-DYOKOI_EMBEDDED_ASSETS=OFF'
+                }
+            }
+        }
+        embedded {
+            dimension 'content'
+            buildConfigField 'boolean', 'EMBEDDED', 'true'
+            externalNativeBuild {
+                cmake {
+                    arguments '-DYOKOI_EMBEDDED_ASSETS=ON'
+                }
+            }
+        }
+    }
+
+    externalNativeBuild {
+        cmake {
+            path 'src/main/cpp/CMakeLists.txt'
+            version '3.22.1'
+        }
+    }
+
+    sourceSets {
+        embedded {
+            // Android/RGDS uses the 2x artwork set.
+            // The generated RGDS metadata (UVs/sizes) expects these textures.
+            assets.srcDirs += ['../../gfx2x']
+        }
+    }
+}
+
+dependencies {
+    implementation 'com.google.android.material:material:1.12.0'
+}

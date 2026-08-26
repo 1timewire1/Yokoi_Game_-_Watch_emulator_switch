@@ -1,0 +1,74 @@
+#include "load_file.h"
+
+#include "gw_pack.h"
+
+// Switch uses the same rgds-style pack/asset conventions as Android (see
+// switch/README.md), so it takes the same branch here.
+#if defined(__ANDROID__) || defined(__SWITCH__)
+    #include "OPEN_SOURCE_ROM_ALL_rgds.h"
+#else
+    #include "OPEN_SOURCE_ROM_ALL.h"
+#endif
+
+
+#if defined(YOKOI_EMBEDDED_ASSETS)
+    #if defined(__ANDROID__) || defined(__SWITCH__)
+        #include "GW_ALL_rgds.h"
+    #else
+        #include "GW_ALL.h"
+    #endif
+#endif
+
+
+const GW_rom* load_game(uint8_t i_game){
+    if (gw_pack::is_loaded()) {
+        if(i_game < gw_pack::game_count()){ return gw_pack::game_at(i_game); }
+        else { return OPEN_SOURCE_list[i_game - gw_pack::game_count()]; }
+    }
+
+#if defined(YOKOI_EMBEDDED_ASSETS)
+    if (i_game < nb_games) { return GW_list[i_game]; }
+    else { return OPEN_SOURCE_list[i_game - nb_games]; }
+#endif
+
+    if(i_game < nb_games_OPEN_SOURCE){ return OPEN_SOURCE_list[i_game];}
+    
+    return nullptr;
+}
+
+std::string get_name(uint8_t i_game){
+    const GW_rom* g = load_game(i_game);
+    return g ? g->name : std::string();
+}
+
+std::string get_ref(uint8_t i_game){
+    const GW_rom* g = load_game(i_game);
+    return g ? g->ref : std::string();
+}
+
+size_t get_nb_name(){
+    if (gw_pack::is_loaded()) {
+        return gw_pack::game_count() + nb_games_OPEN_SOURCE;
+    }
+#if defined(YOKOI_EMBEDDED_ASSETS)
+    return nb_games + nb_games_OPEN_SOURCE;
+#else
+    return nb_games_OPEN_SOURCE;
+#endif
+}
+
+std::string get_path_console_img(uint8_t i_game){
+    const GW_rom* g = load_game(i_game);
+    return g ? g->path_console : std::string();
+}
+
+const uint16_t* get_info_console_img(uint8_t i_game){
+    const GW_rom* g = load_game(i_game);
+    return g ? g->console_info : nullptr;
+}
+
+std::string get_date(uint8_t i_game){
+    const GW_rom* g = load_game(i_game);
+    return g ? g->date : std::string();
+}
+
