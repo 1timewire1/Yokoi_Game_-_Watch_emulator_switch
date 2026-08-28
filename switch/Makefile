@@ -50,7 +50,7 @@ INCLUDES	:=	source ../source ../source/std
 
 APP_TITLE		:=	Yokoi G&W Emulator
 APP_AUTHOR		:=	SenseiFromClubPenguin
-APP_VERSION		:=	1.0.0
+APP_VERSION		:=	1.0.1
 
 #---------------------------------------------------------------------------------
 # options for code generation

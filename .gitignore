@@ -9,9 +9,11 @@ console_*.t3s
 
 # The patterns above match by filename anywhere in the tree (meant for
 # generated per-game rompack-pipeline output), which would otherwise also
-# swallow gfx2x_open_source/ - the checked-in David & John art source, not
-# generated output. Re-include it explicitly.
+# swallow gfx2x_open_source/ and CONVERT_ROM/david_and_john_patch/assets/ -
+# both checked-in David & John art (source, and the standalone patch's own
+# bundled copy), not generated output. Re-include them explicitly.
 !gfx2x_open_source/**
+!CONVERT_ROM/david_and_john_patch/assets/**
 
 romfs/gfx/*
 !romfs/gfx/.gitkeep

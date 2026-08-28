@@ -3,6 +3,7 @@
 #include <algorithm>
 #include <cctype>
 #include <cstdio>
+#include <cstdlib>
 #include <string>
 #include <utility>
 #include <vector>
@@ -67,20 +68,77 @@ int g_settings_selected_row = 0;
 
 // True when this settings screen was opened with ZL+ZR *during gameplay*
 // (switch_menu_open_ingame_settings(), called from main.cpp) rather than with
-// a bare Plus from the game list. Changes what row 3 is (see
-// settings_row_count() below) and what closing the screen does: B resumes
-// the paused game in place instead of returning to the game list.
+// a bare Plus from the game list. Changes what the tail of the row list is
+// (see build_settings_rows() below) and what closing the screen does: B
+// resumes the paused game in place instead of returning to the game list.
 bool g_settings_from_gameplay = false;
 
-// From the game list: Rotation, Background Color, Segments, Console Art,
-// Load State Behavior, Log File, Beta Games. Mid-game instead: the same
-// first three, then a single "Return to Main Menu" action row in place of
-// the last four - none of those apply mid-session (Console Art only takes
-// effect on a game's next (re)load, so it'd be a dead control here; the
-// save-state, logging, and beta-games settings are deliberately list-only
-// per explicit request).
-int settings_row_count() {
-    return g_settings_from_gameplay ? 4 : 7;
+// Custom Background Color / Segments entry (via the on-screen keyboard - see
+// open_background_custom_keyboard()/open_segments_custom_keyboard() below).
+// These are pure UI-navigation state, never persisted: g_settings.background_color/
+// segment_marking_alpha (which ARE persisted, same as always) already carry
+// the actual applied value regardless of how it got set, and bg_color_display()/
+// seg_display() already fall back to showing a raw value that doesn't match
+// any preset - so on the next boot, a genuinely custom stored value still
+// displays correctly without these flags needing to survive a restart. What
+// they *do* need to survive is navigating within the settings screen: with
+// only the applied value to go on, there'd be no way to tell "sitting on the
+// Custom slot with nothing typed yet" (applied value defaults to Light
+// Yellow/Light, per explicit request) apart from "sitting on the Light
+// Yellow/Light preset itself" - see switch_menu_init() for how these seed
+// from the loaded settings at boot.
+bool g_bg_custom_selected = false;
+std::string g_bg_custom_text;  // raw entered hex (no '#'), uppercase; empty = not yet entered
+bool g_seg_custom_selected = false;
+std::string g_seg_custom_text; // raw entered decimal 0-255; empty = not yet entered
+
+// Every row the settings screen can show, in display order. Which of these
+// actually appear varies: BackgroundCustomEntry/SegmentsCustomEntry only show
+// up while their parent row is in Custom mode (see build_settings_rows()),
+// and ConsoleArt/LoadStateBehavior/LogFile/BetaGames vs. ReturnToMenu depend
+// on g_settings_from_gameplay, same as before.
+enum class SettingsRow : uint8_t {
+    Rotation,
+    Background,
+    BackgroundCustomEntry,
+    Segments,
+    SegmentsCustomEntry,
+    ConsoleArt,
+    LoadStateBehavior,
+    LogFile,
+    BetaGames,
+    ReturnToMenu,
+};
+
+// The single source of truth for "what rows exist right now, in what order" -
+// both render_settings_rows() and update_settings_menu() build this fresh
+// each time rather than trusting a cached row count, so they can never
+// disagree about what row index N currently means.
+std::vector<SettingsRow> build_settings_rows() {
+    std::vector<SettingsRow> rows;
+    rows.push_back(SettingsRow::Rotation);
+    rows.push_back(SettingsRow::Background);
+    if (g_bg_custom_selected) rows.push_back(SettingsRow::BackgroundCustomEntry);
+    rows.push_back(SettingsRow::Segments);
+    if (g_seg_custom_selected) rows.push_back(SettingsRow::SegmentsCustomEntry);
+    if (g_settings_from_gameplay) {
+        rows.push_back(SettingsRow::ReturnToMenu);
+    } else {
+        rows.push_back(SettingsRow::ConsoleArt);
+        rows.push_back(SettingsRow::LoadStateBehavior);
+        rows.push_back(SettingsRow::LogFile);
+        rows.push_back(SettingsRow::BetaGames);
+    }
+    return rows;
+}
+
+// Action rows have no adjustable value - Left/Right do nothing, only A does
+// (open the keyboard, or leave the game) - rendered as plain highlighted
+// text spanning the row instead of a label/value pair with < > arrows.
+bool settings_row_is_action(SettingsRow row) {
+    return row == SettingsRow::ReturnToMenu
+        || row == SettingsRow::BackgroundCustomEntry
+        || row == SettingsRow::SegmentsCustomEntry;
 }
 
 // Mirrors Android's SettingsMenu.java 3-preset "Segments" spinner (None/
@@ -111,6 +169,24 @@ int find_seg_preset_index(uint8_t alpha) {
     return 1; // closest-match fallback, same as Android's findClosestSegPresetIndex()
 }
 
+// Exact-match checks (unlike the fallback finders above) - used to seed
+// g_bg_custom_selected/g_seg_custom_selected from the loaded settings at
+// boot (see switch_menu_init()): a value that doesn't match any preset can
+// only have gotten there via a custom entry.
+bool bg_matches_any_preset(uint32_t color) {
+    for (int i = 0; i < NUM_BG_PRESETS; i++) {
+        if (BACKGROUND_PRESETS[i].color == color) return true;
+    }
+    return false;
+}
+
+bool seg_matches_any_preset(uint8_t alpha) {
+    for (int i = 0; i < 3; i++) {
+        if (kSegPresetAlpha[i] == alpha) return true;
+    }
+    return false;
+}
+
 std::string bg_color_display(uint32_t color) {
     for (int i = 0; i < NUM_BG_PRESETS; i++) {
         if (BACKGROUND_PRESETS[i].color == color) return BACKGROUND_PRESETS[i].name;
@@ -127,6 +203,94 @@ std::string seg_display(uint8_t alpha) {
     char buf[16];
     snprintf(buf, sizeof(buf), "%u", (unsigned)alpha);
     return std::string(buf);
+}
+
+// Launches libnx's swkbd applet and blocks until the user confirms or
+// cancels - the standard, simple way to take one-off text input in
+// homebrew; no separate polling/async handling needed since the whole
+// frame loop is already paused on this modal screen anyway. Returns false
+// (leaving `out` untouched) on cancel or failure; true with `out` set to
+// whatever the user typed (which may still need validating) otherwise.
+bool show_keyboard(SwkbdType type, const char* header, const char* guide, const std::string& initial_text,
+                    uint32_t max_len, std::string& out) {
+    SwkbdConfig kbd;
+    if (R_FAILED(swkbdCreate(&kbd, 0))) {
+        return false;
+    }
+    swkbdConfigMakePresetDefault(&kbd);
+    swkbdConfigSetType(&kbd, type);
+    swkbdConfigSetHeaderText(&kbd, header);
+    swkbdConfigSetGuideText(&kbd, guide);
+    swkbdConfigSetStringLenMax(&kbd, max_len);
+    swkbdConfigSetInitialCursorPos(&kbd, 1);
+    if (!initial_text.empty()) {
+        swkbdConfigSetInitialText(&kbd, initial_text.c_str());
+    }
+
+    char buf[32] = {0};
+    const Result rc = swkbdShow(&kbd, buf, sizeof(buf));
+    swkbdClose(&kbd);
+    if (R_FAILED(rc)) {
+        return false; // user cancelled - leave existing state untouched
+    }
+    out = buf;
+    return true;
+}
+
+// Applies (or clears, on invalid input) a Custom Background Color entry.
+// Per explicit spec: invalid input is silently ignored and reset to blank,
+// which is what makes the applied color fall back to Light Yellow (see
+// update_settings_menu()'s Background case) rather than leaving whatever
+// was typed half-applied.
+void open_background_custom_keyboard() {
+    std::string text;
+    if (!show_keyboard(SwkbdType_Normal, "Custom Background Color", "RRGGBB", g_bg_custom_text, 6, text)) {
+        return; // cancelled
+    }
+
+    bool valid = (text.size() == 6);
+    if (valid) {
+        for (unsigned char c : text) {
+            if (!std::isxdigit(c)) { valid = false; break; }
+        }
+    }
+
+    if (valid) {
+        for (char& c : text) c = (char)std::toupper((unsigned char)c);
+        g_bg_custom_text = text;
+        g_settings.background_color = (uint32_t)strtoul(text.c_str(), nullptr, 16);
+    } else {
+        g_bg_custom_text.clear();
+        g_settings.background_color = BACKGROUND_PRESETS[0].color; // Light Yellow
+    }
+    switch_settings_save();
+}
+
+// Same idea as open_background_custom_keyboard(), for the 0-255 Segments
+// value - falls back to the Light preset's alpha (5) on invalid input.
+void open_segments_custom_keyboard() {
+    std::string text;
+    if (!show_keyboard(SwkbdType_NumPad, "Custom Segment Marking", "0-255", g_seg_custom_text, 3, text)) {
+        return; // cancelled
+    }
+
+    bool valid = !text.empty() && text.size() <= 3;
+    if (valid) {
+        for (unsigned char c : text) {
+            if (!std::isdigit(c)) { valid = false; break; }
+        }
+    }
+    const long value = valid ? strtol(text.c_str(), nullptr, 10) : -1;
+    valid = valid && value >= 0 && value <= 255;
+
+    if (valid) {
+        g_seg_custom_text = text;
+        g_settings.segment_marking_alpha = (uint8_t)value;
+    } else {
+        g_seg_custom_text.clear();
+        g_settings.segment_marking_alpha = kSegPresetAlpha[1]; // Light
+    }
+    switch_settings_save();
 }
 
 const char* rotation_label(ScreenRotation r) {
@@ -460,70 +624,102 @@ void select_next_other_group(int dir) {
     }
 }
 
+const char* settings_row_label(SettingsRow row) {
+    switch (row) {
+        case SettingsRow::Rotation:              return "Rotation";
+        case SettingsRow::Background:             return "Game Background Color";
+        case SettingsRow::BackgroundCustomEntry:  return "Enter Custom Color";
+        case SettingsRow::Segments:                return "Segments";
+        case SettingsRow::SegmentsCustomEntry:     return "Enter Custom Value";
+        case SettingsRow::ConsoleArt:               return "Display Single Screen Console Art";
+        case SettingsRow::LoadStateBehavior:        return "Load State Behavior";
+        case SettingsRow::LogFile:                   return "Log File";
+        case SettingsRow::BetaGames:                  return "Tiger / David and John games (Beta)";
+        case SettingsRow::ReturnToMenu:                return "Return to Main Menu";
+    }
+    return "";
+}
+
+// Only called for non-action rows (render_settings_rows() below skips this
+// for action rows, which have no value column at all).
+std::string settings_row_value(SettingsRow row) {
+    switch (row) {
+        case SettingsRow::Rotation:
+            return rotation_label(g_screen_rotation);
+        case SettingsRow::Background:
+            return g_bg_custom_selected
+                ? (g_bg_custom_text.empty() ? std::string("Custom") : ("Custom: #" + g_bg_custom_text))
+                : bg_color_display(g_settings.background_color);
+        case SettingsRow::Segments:
+            return g_seg_custom_selected
+                ? (g_seg_custom_text.empty() ? std::string("Custom") : ("Custom: " + g_seg_custom_text))
+                : seg_display(g_settings.segment_marking_alpha);
+        case SettingsRow::ConsoleArt:
+            return g_hide_console_art ? "Hidden" : "Shown";
+        case SettingsRow::LoadStateBehavior:
+            return load_state_behavior_label(g_load_state_behavior);
+        case SettingsRow::LogFile:
+            return g_log_file_enabled ? "On" : "Off";
+        case SettingsRow::BetaGames:
+            return g_betagames_enabled ? "On" : "Off";
+        default:
+            return "";
+    }
+}
+
 // logical_w/logical_h are already rotation-swapped by the caller (see
 // switch_menu_render()) - this just lays rows out against them like any
 // other menu content.
 void render_settings_rows(int logical_w) {
-    static const char* kRowLabels[7] = {
-        "Rotation", "Game Background Color", "Segments", "Display Single Screen Console Art",
-        "Load State Behavior", "Log File", "Tiger / David and John games (Beta)",
-    };
-
-    const int row_count = settings_row_count();
+    const std::vector<SettingsRow> rows = build_settings_rows();
     const float label_size = 30.0f;
     const float row_h = 56.0f;
     const float start_y = (float)kTopBarH + 48.0f;
     const float label_x = 56.0f;
     const float value_x = (float)logical_w * 0.6f;
 
-    for (int i = 0; i < row_count; i++) {
-        const float y = start_y + i * row_h;
-        const bool sel = (i == g_settings_selected_row);
-        // Row 3 is an action ("Return to Main Menu"), not an adjustable
-        // value, when opened mid-game - draw it as plain highlighted text
-        // spanning the row instead of a label/value pair with < > arrows.
-        const bool action_row = (i == 3) && g_settings_from_gameplay;
-        // Hidden debug mode locks every settings *value* row except Rotation
-        // (row 0) - see g_debug_mode's doc comment in switch_settings.h.
-        // "Return to Main Menu" is a navigation action, not a setting, so
-        // it's excluded here too - it isn't locked by update_settings_menu()
-        // either (row_locked there is also gated on !row3_is_action), this
-        // was purely a rendering miss: it dimmed like a locked row while
-        // still working normally when pressed.
-        const bool locked = g_debug_mode && (i != 0) && !action_row;
+    for (size_t i = 0; i < rows.size(); i++) {
+        const SettingsRow row = rows[i];
+        const float y = start_y + (float)i * row_h;
+        const bool sel = ((int)i == g_settings_selected_row);
+        const bool action_row = settings_row_is_action(row);
+        // Hidden debug mode locks every settings *value* row except Rotation -
+        // see g_debug_mode's doc comment in switch_settings.h. "Return to
+        // Main Menu" is a navigation action, not a setting, so it's excluded
+        // too - it isn't locked by update_settings_menu() either. The two
+        // Custom-entry rows are locked like any other value row, but in
+        // practice can never even be reached under debug mode: Background/
+        // Segments (their parent rows) are themselves locked, so Left/Right
+        // can never select the Custom slot that would make these appear.
+        const bool locked = g_debug_mode && row != SettingsRow::Rotation && row != SettingsRow::ReturnToMenu;
+        // The two Custom-entry rows read as nested under their parent -
+        // indent the label only, keep the selection highlight full-width.
+        const bool nested = (row == SettingsRow::BackgroundCustomEntry) || (row == SettingsRow::SegmentsCustomEntry);
+        const float indent = nested ? 24.0f : 0.0f;
 
         if (sel) {
             switch_ui_draw_rect(label_x - 20.0f, y - 8.0f, (float)logical_w - (label_x - 20.0f) * 2.0f, label_size + 16.0f,
                                  kHighlightR, kHighlightG, kHighlightB, 0.15f);
         }
 
-        const char* label = action_row ? "Return to Main Menu" : kRowLabels[i];
+        const char* label = settings_row_label(row);
         // The longer labels (e.g. "Display Single Screen Console Art") run
         // into the value column at 90/270 (logical_w is portrait-narrow
         // there) - scale this row's label down to fit rather than overlap.
         float this_label_size = label_size;
-        const float max_label_w = value_x - label_x - 20.0f;
+        const float max_label_w = value_x - (label_x + indent) - 20.0f;
         const float label_w = switch_ui_text_width(label, this_label_size);
         if (label_w > max_label_w && max_label_w > 10.0f) {
             this_label_size = std::max(14.0f, label_size * (max_label_w / label_w));
         }
         const float label_alpha = locked ? 0.4f : (sel ? 1.0f : 0.75f);
-        switch_ui_draw_text(label_x, y, this_label_size, kTextR, kTextG, kTextB, label_alpha, label);
+        switch_ui_draw_text(label_x + indent, y, this_label_size, kTextR, kTextG, kTextB, label_alpha, label);
 
         if (action_row) {
             continue;
         }
 
-        std::string value;
-        switch (i) {
-            case 0: value = rotation_label(g_screen_rotation); break;
-            case 1: value = bg_color_display(g_settings.background_color); break;
-            case 2: value = seg_display(g_settings.segment_marking_alpha); break;
-            case 3: value = g_hide_console_art ? "Hidden" : "Shown"; break;
-            case 4: value = load_state_behavior_label(g_load_state_behavior); break;
-            case 5: value = g_log_file_enabled ? "On" : "Off"; break;
-            case 6: value = g_betagames_enabled ? "On" : "Off"; break;
-        }
+        std::string value = settings_row_value(row);
         // Locked rows skip the < > cycle-arrow decoration too - nothing here
         // can actually be changed with Left/Right while debug mode holds.
         if (sel && !locked) value = "< " + value + " >";
@@ -614,6 +810,24 @@ void switch_menu_init() {
     switch_ui_init();
     g_selected_index = switch_get_default_game_index();
     rebuild_sorted_order();
+
+    // A loaded value that doesn't match any preset can only have gotten
+    // there via a custom entry in an earlier session - start the row on the
+    // Custom slot (and pre-fill the entry text) so it reads accurately and
+    // Left/Right doesn't have to cycle all the way around to get back to it.
+    g_bg_custom_selected = !bg_matches_any_preset(g_settings.background_color);
+    if (g_bg_custom_selected) {
+        char buf[8];
+        snprintf(buf, sizeof(buf), "%06X", (unsigned)(g_settings.background_color & 0xFFFFFFu));
+        g_bg_custom_text = buf;
+    }
+    g_seg_custom_selected = !seg_matches_any_preset(g_settings.segment_marking_alpha);
+    if (g_seg_custom_selected) {
+        char buf[8];
+        snprintf(buf, sizeof(buf), "%u", (unsigned)g_settings.segment_marking_alpha);
+        g_seg_custom_text = buf;
+    }
+
     g_menu_active = true;
 }
 
@@ -656,7 +870,15 @@ static void update_betagames_confirm(uint64_t kDown) {
 }
 
 static void update_settings_menu(uint64_t kDown) {
-    const int row_count = settings_row_count();
+    const std::vector<SettingsRow> rows = build_settings_rows();
+    const int row_count = (int)rows.size();
+    if (g_settings_selected_row >= row_count) {
+        // The row list can shrink out from under the current selection - e.g.
+        // Left/Right just left Custom mode on a row above the one selected,
+        // dropping its now-gone Custom-entry row. Land on the new last row
+        // rather than reading out of bounds.
+        g_settings_selected_row = row_count - 1;
+    }
 
     if (kDown & HidNpadButton_Down) {
         g_settings_selected_row = (g_settings_selected_row + 1) % row_count;
@@ -665,42 +887,71 @@ static void update_settings_menu(uint64_t kDown) {
         g_settings_selected_row = (g_settings_selected_row - 1 + row_count) % row_count;
     }
 
-    // Row 3 is an action ("Return to Main Menu") rather than an adjustable
-    // value when opened mid-game - Left/Right have nothing to do there.
-    const bool row3_is_action = (g_settings_selected_row == 3) && g_settings_from_gameplay;
-    // Hidden debug mode locks every row except Rotation (row 0) - see
-    // g_debug_mode's doc comment in switch_settings.h. switch_settings_save()
-    // below also no-ops entirely under debug mode, so even Rotation - the one
-    // row still adjustable here - only ever changes in memory, never on disk.
-    const bool row_locked = g_debug_mode && (g_settings_selected_row != 0);
+    const SettingsRow row = rows[g_settings_selected_row];
+    const bool is_action = settings_row_is_action(row);
+    // Hidden debug mode locks every row except Rotation - see g_debug_mode's
+    // doc comment in switch_settings.h. switch_settings_save() below also
+    // no-ops entirely under debug mode, so even Rotation - the one row still
+    // adjustable here - only ever changes in memory, never on disk.
+    // "Return to Main Menu" is a navigation action, not a setting, so it's
+    // exempted here the same way it's exempted from the dimming in
+    // render_settings_rows().
+    const bool row_locked = g_debug_mode && row != SettingsRow::Rotation && row != SettingsRow::ReturnToMenu;
 
-    if (!row3_is_action && !row_locked && (kDown & (HidNpadButton_Right | HidNpadButton_Left))) {
+    if (!is_action && !row_locked && (kDown & (HidNpadButton_Right | HidNpadButton_Left))) {
         const int dir = (kDown & HidNpadButton_Right) ? 1 : -1;
-        switch (g_settings_selected_row) {
-            case 0:
+        switch (row) {
+            case SettingsRow::Rotation:
                 g_screen_rotation = cycle_rotation(g_screen_rotation, dir);
                 break;
-            case 1: {
-                const int idx = (find_bg_preset_index(g_settings.background_color) + dir + NUM_BG_PRESETS) % NUM_BG_PRESETS;
-                g_settings.background_color = BACKGROUND_PRESETS[idx].color;
+            case SettingsRow::Background: {
+                // One extra slot past the presets for Custom - cycling onto
+                // it doesn't open the keyboard by itself, it just reveals the
+                // BackgroundCustomEntry row below (see build_settings_rows())
+                // for that.
+                int slot = g_bg_custom_selected ? NUM_BG_PRESETS : find_bg_preset_index(g_settings.background_color);
+                slot = (slot + dir + (NUM_BG_PRESETS + 1)) % (NUM_BG_PRESETS + 1);
+                if (slot == NUM_BG_PRESETS) {
+                    g_bg_custom_selected = true;
+                    // No value typed yet this session - default to Light
+                    // Yellow per explicit spec until one is. A remembered
+                    // value from earlier this session is re-applied as-is.
+                    g_settings.background_color = g_bg_custom_text.empty()
+                        ? BACKGROUND_PRESETS[0].color
+                        : (uint32_t)strtoul(g_bg_custom_text.c_str(), nullptr, 16);
+                } else {
+                    g_bg_custom_selected = false;
+                    g_settings.background_color = BACKGROUND_PRESETS[slot].color;
+                }
                 break;
             }
-            case 2: {
-                const int idx = (find_seg_preset_index(g_settings.segment_marking_alpha) + dir + 3) % 3;
-                g_settings.segment_marking_alpha = kSegPresetAlpha[idx];
+            case SettingsRow::Segments: {
+                int slot = g_seg_custom_selected ? 3 : find_seg_preset_index(g_settings.segment_marking_alpha);
+                slot = (slot + dir + 4) % 4;
+                if (slot == 3) {
+                    g_seg_custom_selected = true;
+                    // Defaults to the Light preset's alpha until a value is
+                    // typed, per explicit spec.
+                    g_settings.segment_marking_alpha = g_seg_custom_text.empty()
+                        ? kSegPresetAlpha[1]
+                        : (uint8_t)std::clamp((int)strtol(g_seg_custom_text.c_str(), nullptr, 10), 0, 255);
+                } else {
+                    g_seg_custom_selected = false;
+                    g_settings.segment_marking_alpha = kSegPresetAlpha[slot];
+                }
                 break;
             }
-            case 3:
+            case SettingsRow::ConsoleArt:
                 g_hide_console_art = !g_hide_console_art;
                 break;
-            case 4:
+            case SettingsRow::LoadStateBehavior:
                 g_load_state_behavior = cycle_load_state_behavior(g_load_state_behavior, dir);
                 break;
-            case 5:
+            case SettingsRow::LogFile:
                 g_log_file_enabled = !g_log_file_enabled;
                 debug_log::set_enabled(g_log_file_enabled);
                 break;
-            case 6:
+            case SettingsRow::BetaGames:
                 if (!g_betagames_enabled) {
                     // Turning ON needs confirmation first - don't flip yet,
                     // see update_betagames_confirm(). The trailing
@@ -728,24 +979,36 @@ static void update_settings_menu(uint64_t kDown) {
                     rebuild_sorted_order();
                 }
                 break;
+            default:
+                break;
         }
         switch_settings_save();
     }
 
-    if (row3_is_action && (kDown & HidNpadButton_A)) {
-        // g_menu_active was already true (that's why this screen is even
-        // showing), so the normal game list is what renders next. Unlike the
-        // old direct L+R+Plus-from-gameplay behavior, the game does NOT stay
-        // loaded in the background from here - this is the one place that
-        // actually commits to leaving it (as opposed to just pausing to show
-        // this screen, or resuming via B), so it's the one place that must
-        // save + unload: the game list is never allowed to be reached with
-        // something still loaded, so there's nothing left to lose if the
-        // player quits from hbmenu/HOME (e.g. via a forwarder) afterward.
-        switch_unload_current_game();
-        g_settings_active = false;
-        g_settings_from_gameplay = false;
-        return;
+    if (kDown & HidNpadButton_A) {
+        if (row == SettingsRow::ReturnToMenu) {
+            // g_menu_active was already true (that's why this screen is even
+            // showing), so the normal game list is what renders next. Unlike
+            // the old direct L+R+Plus-from-gameplay behavior, the game does
+            // NOT stay loaded in the background from here - this is the one
+            // place that actually commits to leaving it (as opposed to just
+            // pausing to show this screen, or resuming via B), so it's the
+            // one place that must save + unload: the game list is never
+            // allowed to be reached with something still loaded, so there's
+            // nothing left to lose if the player quits from hbmenu/HOME
+            // (e.g. via a forwarder) afterward.
+            switch_unload_current_game();
+            g_settings_active = false;
+            g_settings_from_gameplay = false;
+            return;
+        }
+        if (!row_locked) {
+            if (row == SettingsRow::BackgroundCustomEntry) {
+                open_background_custom_keyboard();
+            } else if (row == SettingsRow::SegmentsCustomEntry) {
+                open_segments_custom_keyboard();
+            }
+        }
     }
 
     // Either button closes settings. From the game list, that means back to
@@ -920,7 +1183,11 @@ void switch_menu_render(int viewport_w, int viewport_h) {
         put_icon(SwitchButtonIcon::DpadLeft);
         put_icon(SwitchButtonIcon::DpadRight);
         put_text("Change");
-        if (g_settings_from_gameplay) {
+        // "A" only does something on an action row (Return to Main Menu, or
+        // either Custom-entry row) - shown whenever one of those can
+        // currently be reached, not just in the from-gameplay case that used
+        // to be the only source of one.
+        if (g_settings_from_gameplay || g_bg_custom_selected || g_seg_custom_selected) {
             put_icon(SwitchButtonIcon::A);
             put_text("Confirm");
         }
