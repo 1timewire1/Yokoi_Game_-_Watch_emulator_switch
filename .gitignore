@@ -34,6 +34,14 @@ CONVERT_ROM/rom/*/.gitkeep
 
 games_path.py
 games_path_*.py
+# The pattern above is meant only for generated games_path_<target>.py output
+# (e.g. games_path_3ds.py, games_path_rgds.py), but it also matches the real,
+# checked-in helper module games_path_utils.py by filename prefix - same class
+# of accidental-exclusion bug as gfx2x_open_source/ and the david_and_john_patch
+# assets earlier. That meant games_path_utils.py was NEVER actually pushed to
+# GitHub despite existing locally, breaking convert_original.py for anyone who
+# clones fresh (ModuleNotFoundError: source.games_path_utils). Re-include it.
+!CONVERT_ROM/source/games_path_utils.py
 
 # Per-machine tool configuration (copy from CONVERT_ROM/external_apps_template.py)
 CONVERT_ROM/external_apps.py
