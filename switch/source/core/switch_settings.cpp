@@ -12,9 +12,12 @@
 ScreenRotation g_screen_rotation = ScreenRotation::Deg0;
 bool g_hide_console_art = true;
 LoadStateBehavior g_load_state_behavior = LoadStateBehavior::Ask;
+CloneFilterMode g_clone_filter_mode = CloneFilterMode::ShowAll;
 bool g_log_file_enabled = false;
 std::string g_last_game_played_ref;
 bool g_betagames_enabled = false;
+uint8_t g_panel_gap_percent = 0;
+bool g_experimental_enabled = false;
 bool g_debug_mode = false;
 
 namespace {
@@ -30,9 +33,12 @@ void switch_settings_load() {
     g_screen_rotation = ScreenRotation::Deg0;
     g_hide_console_art = true;
     g_load_state_behavior = LoadStateBehavior::Ask;
+    g_clone_filter_mode = CloneFilterMode::ShowAll;
     g_log_file_enabled = false;
     g_last_game_played_ref.clear();
     g_betagames_enabled = false;
+    g_panel_gap_percent = 0;
+    g_experimental_enabled = false;
     g_debug_mode = false;
 
     // Applied before anything below gets a chance to log, so even the
@@ -73,6 +79,10 @@ void switch_settings_load() {
             if (value == 1) g_load_state_behavior = LoadStateBehavior::AutoLoad;
             else if (value == 2) g_load_state_behavior = LoadStateBehavior::NeverLoad;
             else g_load_state_behavior = LoadStateBehavior::Ask;
+        } else if (strcmp(line, "clonefilter") == 0) {
+            if (value == 1) g_clone_filter_mode = CloneFilterMode::HideDuplicates;
+            else if (value == 2) g_clone_filter_mode = CloneFilterMode::HideAllClones;
+            else g_clone_filter_mode = CloneFilterMode::ShowAll;
         } else if (strcmp(line, "enable_log") == 0) {
             g_log_file_enabled = (value != 0);
         } else if (strcmp(line, "lastgameplayed") == 0) {
@@ -85,6 +95,13 @@ void switch_settings_load() {
             g_last_game_played_ref = ref;
         } else if (strcmp(line, "betagames") == 0) {
             g_betagames_enabled = (value != 0);
+        } else if (strcmp(line, "panelgap") == 0) {
+            long v = value;
+            if (v < 0) v = 0;
+            if (v > 30) v = 30;
+            g_panel_gap_percent = (uint8_t)v;
+        } else if (strcmp(line, "experimental") == 0) {
+            g_experimental_enabled = (value != 0);
         } else if (strcmp(line, "debug") == 0) {
             // Hidden/manual-only - never written back, see switch_settings_save().
             g_debug_mode = (value != 0);
@@ -96,10 +113,12 @@ void switch_settings_load() {
     // value itself - see g_debug_mode's doc comment in switch_settings.h.
     debug_log::set_enabled(g_log_file_enabled || g_debug_mode);
     YOKOI_LOG("switch_settings: loaded from '%s' (background_color=0x%06x, segment_marking_alpha=%u, rotation=%u, "
-              "hide_console_art=%d, loadstate=%u, enable_log=%d, lastgameplayed='%s', betagames=%d, debug=%d)",
+              "hide_console_art=%d, loadstate=%u, enable_log=%d, lastgameplayed='%s', betagames=%d, panelgap=%u, "
+              "clonefilter=%u, experimental=%d, debug=%d)",
               path.c_str(), (unsigned)g_settings.background_color, (unsigned)g_settings.segment_marking_alpha,
               (unsigned)g_screen_rotation, (int)g_hide_console_art, (unsigned)g_load_state_behavior,
-              (int)g_log_file_enabled, g_last_game_played_ref.c_str(), (int)g_betagames_enabled, (int)g_debug_mode);
+              (int)g_log_file_enabled, g_last_game_played_ref.c_str(), (int)g_betagames_enabled,
+              (unsigned)g_panel_gap_percent, (unsigned)g_clone_filter_mode, (int)g_experimental_enabled, (int)g_debug_mode);
 }
 
 void switch_settings_save() {
@@ -120,10 +139,13 @@ void switch_settings_save() {
     fprintf(file, "rotation=%u\n", (unsigned)g_screen_rotation);
     fprintf(file, "hide_console_art=%d\n", g_hide_console_art ? 1 : 0);
     fprintf(file, "loadstate=%u\n", (unsigned)g_load_state_behavior);
+    fprintf(file, "clonefilter=%u\n", (unsigned)g_clone_filter_mode);
     fprintf(file, "enable_log=%d\n", g_log_file_enabled ? 1 : 0);
     if (!g_last_game_played_ref.empty()) {
         fprintf(file, "lastgameplayed=%s\n", g_last_game_played_ref.c_str());
     }
     fprintf(file, "betagames=%d\n", g_betagames_enabled ? 1 : 0);
+    fprintf(file, "panelgap=%u\n", (unsigned)g_panel_gap_percent);
+    fprintf(file, "experimental=%d\n", g_experimental_enabled ? 1 : 0);
     fclose(file);
 }

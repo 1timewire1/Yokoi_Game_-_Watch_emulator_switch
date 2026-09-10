@@ -142,3 +142,54 @@ Special editions are not supported in the emulator, refer to the Notes column fo
 | 15  | tmchammer| tmchammer.zip      | MC Hammer - U Can't Touch This                               | 1991.01.01   | SM511 |  |
 | 16  | tgaunt  | tgaunt.zip          | Gauntlet                                                     | 1988.01.01   | SM510 |  |
 | 17  | tsharr2 | tsharr2.zip         | Space Harrier II                                             | 1990.01.01   | SM510 |  |
+
+## Tiger (Experimental)
+
+<!-- Gated behind the Switch-only "Experimental Features" toggle (see
+     switch_menu.cpp) rather than the Beta toggle above - not yet verified
+     to the same degree as the rest of ## Tiger. Manufacturer id assigned by
+     generate_games_path.py's heading parser: MANUFACTURER_TIGER_EXPERIMENTAL. -->
+
+| No. | Model   | Filename            | Game Title                                                   | Release Date | CPU | Clone Of |
+|-----|---------|---------------------|--------------------------------------------------------------|--------------|-----|-------|
+| 01  | tbatman | tbatman.zip         | Batman                                                       | 1989.01.01   | SM510 |  |
+| 02  | tspidman| tspidman.zip        | Spider-Man                                                   | 1991.01.01   | SM510 |  |
+| 03  | tmkombat| tmkombat.zip        | Mortal Kombat                                                | 1993.01.01   | SM510 |  |
+| 04  | txmen   | txmen.zip           | X-Men                                                        | 1991.01.01   | SM510 |  |
+| 05  | tsuperman| tsuperman.zip      | Superman                                                     | 1996.01.01   | SM510 | tgargnf |
+| 06  | tbtoads | tbtoads.zip         | Battletoads                                                  | 1991.01.01   | SM510 |  |
+| 07  | tkarnov | tkarnov.zip         | Karnov                                                       | 1988.01.01   | SM510 |  |
+| 08  | thook   | thook.zip           | Hook                                                         | 1991.01.01   | SM510 |  |
+| 09  | tbttf   | tbttf.zip           | Back to the Future                                           | 1992.01.01   | SM510 |  |
+| 10  | ttransf2| ttransf2.zip        | Transformers: Generation 2                                   | 1993.01.01   | SM510 |  |
+| 11  | tvindictr| tvindictr.zip      | Vindicators                                                  | 1989.01.01   | SM510 |  |
+| 12  | tjpark  | tjpark.zip          | Jurassic Park                                                | 1993.01.01   | SM510 |  |
+| 13  | tskelwarr| tskelwarr.zip      | Skeleton Warriors: The Dark Crusade                          | 1994.01.01   | SM510 |  |
+| 14  | tgargnf | tgargnf.zip         | Gargoyles: Night Flight                                      | 1995.01.01   | SM511 |  |
+| 15  | taddams | taddams.zip         | The Addams Family                                            | 1992.01.01   | SM510 |  |
+| 16  | tapollo13| tapollo13.zip      | Apollo 13                                                    | 1995.01.01   | SM510 |  |
+| 17  | tbatfor | tbatfor.zip         | Batman Forever: Double Dose of Doom                          | 1995.01.01   | SM510 |  |
+| 18  | tbatmana| tbatmana.zip        | Batman: The Animated Series                                  | 1992.01.01   | SM510 |  |
+| 19  | tdennis | tdennis.zip         | Dennis the Menace                                            | 1993.01.01   | SM510 |  |
+| 20  | tdummies| tdummies.zip        | The Incredible Crash Dummies                                 | 1993.01.01   | SM510 |  |
+| 21  | tflash  | tflash.zip          | The Flash                                                    | 1991.01.01   | SM510 |  |
+| 22  | tgoldeye| tgoldeye.zip        | 007: GoldenEye                                               | 1996.01.01   | SM510 |  |
+| 23  | thalone | thalone.zip         | Home Alone                                                   | 1992.01.01   | SM510 |  |
+| 24  | thalone2| thalone2.zip        | Home Alone 2: Lost in New York                               | 1992.01.01   | SM510 |  |
+| 25  | tinday  | tinday.zip          | Independence Day                                             | 1996.01.01   | SM510 |  |
+| 26  | tjdredd | tjdredd.zip         | Judge Dredd                                                  | 1995.01.01   | SM510 |  |
+| 27  | tkazaam | tkazaam.zip         | Kazaam                                                       | 1996.01.01   | SM510 |  |
+| 28  | tmigmax | tmigmax.zip         | Mighty Max                                                   | 1994.01.01   | SM510 |  |
+| 29  | tnmarebc| tnmarebc.zip        | Nightmare Before Christmas                                   | 1993.01.01   | SM510 |  |
+| 30  | topaliens| topaliens.zip      | Operation: Aliens                                            | 1994.01.01   | SM510 |  |
+| 31  | tpitfight| tpitfight.zip      | Pit-Fighter                                                  | 1991.01.01   | SM510 |  |
+| 32  | trobhood| trobhood.zip        | Robin Hood                                                   | 1991.01.01   | SM510 | tgaunt |
+| 33  | trobocop2| trobocop2.zip      | Robocop 2                                                    | 1990.01.01   | SM510 |  |
+| 34  | trockteer| trockteer.zip      | The Rocketeer                                                | 1991.01.01   | SM510 | trobocop2 |
+| 35  | trobocop3| trobocop3.zip      | Robocop 3                                                    | 1992.01.01   | SM510 |  |
+| 36  | tsf2010 | tsf2010.zip         | Street Fighter 2010: The Final Fight                         | 1991.01.01   | SM510 |  |
+| 37  | tshadow | tshadow.zip         | The Shadow                                                   | 1994.01.01   | SM510 |  |
+| 38  | tsjam   | tsjam.zip           | Space Jam                                                    | 1996.01.01   | SM510 |  |
+| 39  | tswampt | tswampt.zip         | Swamp Thing                                                  | 1991.01.01   | SM510 |  |
+| 40  | twworld | twworld.zip         | Wayne's World                                                | 1992.01.01   | SM510 |  |
+| 41  | txmenpx | txmenpx.zip         | X-Men: Project X                                             | 1993.01.01   | SM510 |  |

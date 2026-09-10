@@ -13,6 +13,9 @@ MANUFACTURER_TRONICA: int = 1
 MANUFACTURER_ELEKTRONIKA: int = 2
 MANUFACTURER_TIGER: int = 3
 MANUFACTURER_DAVID_AND_JOHN: int = 4
+# Tiger games added post-launch, gated behind the Switch-only "Experimental
+# Features" toggle rather than the Beta toggle - see GW_ROM.h.
+MANUFACTURER_TIGER_EXPERIMENTAL: int = 5
 
 
 def normalize_manufacturer_id(value: Any, default: int = MANUFACTURER_NINTENDO) -> int:
@@ -26,7 +29,7 @@ def normalize_manufacturer_id(value: Any, default: int = MANUFACTURER_NINTENDO) 
     except Exception:
         return int(default)
 
-    if numeric not in (MANUFACTURER_NINTENDO, MANUFACTURER_TRONICA, MANUFACTURER_ELEKTRONIKA, MANUFACTURER_DAVID_AND_JOHN, MANUFACTURER_TIGER):
+    if numeric not in (MANUFACTURER_NINTENDO, MANUFACTURER_TRONICA, MANUFACTURER_ELEKTRONIKA, MANUFACTURER_DAVID_AND_JOHN, MANUFACTURER_TIGER, MANUFACTURER_TIGER_EXPERIMENTAL):
         return int(default)
-    
+
     return numeric

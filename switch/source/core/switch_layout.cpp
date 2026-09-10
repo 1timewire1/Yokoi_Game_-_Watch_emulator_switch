@@ -116,12 +116,24 @@ void rebuild_layout_from_game() {
     if (g_combined_canvas_w < 1.0f) {
         g_combined_canvas_w = 1.0f;
     }
-    g_combined_canvas_h = g_top_canvas_h + g_bottom_canvas_h;
+
+    // Real Game & Watch consoles almost always had a visible physical gap
+    // between their two screens (or between a single screen and its
+    // console-art strip below) - see g_panel_gap_percent's doc comment in
+    // switch_settings.h. Only applied when there's actually something below
+    // to space away from: g_bottom_canvas_h is already 0 whenever there
+    // isn't (a single-screen game with Console Art hidden), so no separate
+    // check is needed here.
+    const float panel_gap = (g_bottom_canvas_h > 0.0f)
+        ? g_top_canvas_h * ((float)g_panel_gap_percent / 100.0f)
+        : 0.0f;
+
+    g_combined_canvas_h = g_top_canvas_h + panel_gap + g_bottom_canvas_h;
     if (g_combined_canvas_h < 1.0f) {
         g_combined_canvas_h = 1.0f;
     }
 
     g_top_off_x = (g_combined_canvas_w - g_top_canvas_w) * 0.5f;
     g_bottom_off_x = (g_combined_canvas_w - g_bottom_canvas_w) * 0.5f;
-    g_bottom_off_y = g_top_canvas_h;
+    g_bottom_off_y = g_top_canvas_h + panel_gap;
 }

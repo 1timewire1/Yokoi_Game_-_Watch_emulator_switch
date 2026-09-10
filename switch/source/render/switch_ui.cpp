@@ -340,6 +340,19 @@ void switch_ui_draw_texture(uint32_t gl_tex, float x, float y, float w, float h,
     draw_quad((GLuint)gl_tex, verts);
 }
 
+void switch_ui_draw_texture_plain(uint32_t gl_tex, float x, float y, float w, float h) {
+    if (g_gl.program == 0 || gl_tex == 0) return;
+    glUniform4f(g_gl.uMul, 1.0f, 1.0f, 1.0f, 1.0f);
+    std::vector<RenderVertex> verts;
+    float u0, v0, u1, v1;
+    // Full-texture UVs (0,0)-(1,1); only the V-flip every stb_image-decoded
+    // texture needs applies here (see calc_uv_rect/kUvFlipV above) - no
+    // cropping, no X-flip.
+    calc_uv_rect(1.0f, 1.0f, 0.0f, 0.0f, 1.0f, 1.0f, /*flipX=*/false, u0, v0, u1, v1);
+    append_quad_px(verts, x, y, w, h, u0, v0, u1, v1);
+    draw_quad((GLuint)gl_tex, verts);
+}
+
 void switch_ui_draw_text(float x, float y, float pixel_size, float r, float g, float b, float a, const std::string& text, bool bold) {
     if (g_gl.program == 0 || !g_ft_face || pixel_size <= 0.0f) return;
 

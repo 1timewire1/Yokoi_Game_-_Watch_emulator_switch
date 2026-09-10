@@ -79,6 +79,11 @@ LDFLAGS	=	-specs=$(DEVKITPRO)/libnx/switch.specs -g $(ARCH) -Wl,-Map,$(notdir $*
 # freetype/harfbuzz have a circular dependency (freetype's autohinter can use
 # harfbuzz; harfbuzz uses freetype) - wrapped in --start-group/--end-group so
 # the static linker can resolve both directions regardless of link order.
+#
+# Back to the plain official-switch-mesa form (bundles Zink/NVK inside
+# -lEGL itself, no separate -lnvk/-lvulkan/... libs) - see "If the link step
+# suddenly fails" in switch/README.md's Building section for what changes
+# here (and why) if a newer split-library switch-mesa ever comes back.
 LIBS	:= -lglad -lEGL -lglapi -ldrm_nouveau \
 			-Wl,--start-group -lfreetype -lharfbuzz -lpng16 -lz -lbz2 -Wl,--end-group \
 			-lnx

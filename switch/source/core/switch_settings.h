@@ -40,6 +40,27 @@ extern bool g_hide_console_art;
 enum class LoadStateBehavior : uint8_t { Ask = 0, AutoLoad = 1, NeverLoad = 2 };
 extern LoadStateBehavior g_load_state_behavior;
 
+// Filters near-duplicate / clone entries out of the game list. Three tiers:
+//  - ShowAll: no filtering (default - matches existing behavior).
+//  - HideDuplicates: hides only the small, explicitly-curated set of entries
+//    that are genuinely the *same* release re-cataloged twice (see
+//    kKnownDuplicateRefs in switch_menu.cpp) - e.g. CN-07 vs CN-17 Helmet,
+//    where GNW_LIST.md's own comments explain both are kept only because of
+//    a minor behavioral difference between the two hardware revisions.
+//  - HideAllClones: hides every entry GNW_LIST.md's "Clone Of" column marks
+//    as a clone of another entry (see kKnownCloneRefs in switch_menu.cpp) -
+//    a much larger set that also includes plenty of legitimately distinct,
+//    differently-titled games (e.g. the Elektronika bootlegs) that just
+//    happen to reuse another game's hardware/ports in this build pipeline -
+//    not just the handful of true duplicates HideDuplicates targets.
+// Both ref lists are hand-derived from GNW_LIST.md's "Clone Of" column as of
+// when this was written and are NOT regenerated automatically - if that
+// column changes meaningfully, the lists in switch_menu.cpp need a manual
+// pass to stay accurate. Only ever shown/changeable from the game list's
+// settings screen (this filters that same list - meaningless mid-gameplay).
+enum class CloneFilterMode : uint8_t { ShowAll = 0, HideDuplicates = 1, HideAllClones = 2 };
+extern CloneFilterMode g_clone_filter_mode;
+
 // Whether debug_log (debug_log.h) writes to yokoi_log.txt at all. Defaults
 // off. Applied via debug_log::set_enabled() both at load and live whenever
 // this row changes in the settings menu. Only ever shown/changeable from the
@@ -68,6 +89,36 @@ extern std::string g_last_game_played_ref;
 // screen.
 extern bool g_betagames_enabled;
 
+// Percentage (of the top panel's own height) of empty space inserted below
+// it - between a true dual-screen game's two real panels, or between a
+// single-screen game and its console-art strip (only when Console Art is
+// Shown - see g_hide_console_art above). Real Game & Watch hardware almost
+// always had a visible physical gap here; the renderer used to always butt
+// the two flush together with zero gap. Applied in
+// rebuild_layout_from_game() (switch_layout.cpp), which skips the gap
+// entirely whenever there's nothing below to space away from (e.g. a
+// single-screen game with Console Art hidden) - no separate check needed
+// elsewhere for that case. Unlike Console Art (which only takes effect on a
+// game's next (re)load, since nothing re-derives its layout otherwise), this
+// row's Left/Right handler and its custom-entry keyboard both explicitly
+// call rebuild_layout_from_game() again right after changing the value, so
+// it applies immediately - shown and adjustable from both the game list's
+// settings screen and the in-game one, same as Rotation/Background/Segments.
+// Defaults to 0 (matches the old always-touching behavior) so existing
+// installs see no visual change until this is explicitly set. The settings
+// menu only ever writes 0-30 here (3 presets + a custom-entry keyboard
+// clamped to that range).
+extern uint8_t g_panel_gap_percent;
+
+// Same idea as g_betagames_enabled, for a separate bucket of games (starting
+// with a handful of Tiger titles added after launch - see
+// MANUFACTURER_TIGER_EXPERIMENTAL in GW_ROM.h) that haven't seen the same
+// testing as the Beta-gated set. Kept as its own flag/confirm-gate rather
+// than folded into g_betagames_enabled so the two can be toggled
+// independently. See is_experimental_manufacturer()/experimental_visible()
+// and g_experimental_confirm_active in switch_menu.cpp.
+extern bool g_experimental_enabled;
+
 // Hidden, advanced-use-only flag: never shown in the settings menu, never
 // added to yokoi_settings.txt automatically, and never written back once
 // read - the only way to set it is by hand-editing the file with `debug=1`.
@@ -89,21 +140,25 @@ extern bool g_betagames_enabled;
 //    changing that stored value - see switch_settings_load()'s debug_log::
 //    set_enabled() call. Meant for inspecting a run without also having to
 //    edit enable_log (which would itself be blocked from saving anyway).
-//  - Beta games (Tiger, David & John) are force-visible the same way, and
-//    for the same reason - see rebuild_sorted_order()'s betagames-visible
-//    check in switch_menu.cpp, which ORs this in right alongside
-//    g_betagames_enabled without touching that stored value either.
+//  - Beta games (Tiger, David & John) and experimental games are force-
+//    visible the same way, and for the same reason - see
+//    rebuild_sorted_order()'s betagames-visible/experimental-visible checks
+//    in switch_menu.cpp, which OR this in right alongside
+//    g_betagames_enabled/g_experimental_enabled without touching either
+//    stored value.
 extern bool g_debug_mode;
 
 // Loads yokoi_settings.txt if present (applying background_color/
 // segment_marking_alpha into g_settings, rotation into g_screen_rotation,
 // hide_console_art into g_hide_console_art, loadstate into
 // g_load_state_behavior, enable_log into g_log_file_enabled, lastgameplayed
-// into g_last_game_played_ref, betagames into g_betagames_enabled, and the
+// into g_last_game_played_ref, betagames into g_betagames_enabled, panelgap
+// into g_panel_gap_percent, clonefilter into g_clone_filter_mode, and the
 // hidden debug flag into g_debug_mode - which also then force-enables
 // debug_log regardless of enable_log); otherwise resets to AppSettings'
 // compiled-in defaults, ScreenRotation::Deg0, hidden console art, Ask,
-// logging off, no last-played game, beta games off, and debug mode off.
+// logging off, no last-played game, beta games off, no panel gap, clone
+// filter off (show all), and debug mode off.
 void switch_settings_load();
 
 // Writes the current g_settings fields + g_screen_rotation +

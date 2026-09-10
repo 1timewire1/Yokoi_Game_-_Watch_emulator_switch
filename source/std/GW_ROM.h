@@ -12,7 +12,11 @@ struct GW_rom {
     static constexpr uint8_t MANUFACTURER_ELEKTRONIKA = 2;
     static constexpr uint8_t MANUFACTURER_TIGER = 3;
     static constexpr uint8_t MANUFACTURER_DAVID_AND_JOHN = 4;
-    static constexpr uint8_t MANUFACTURER_COUNT = 5;
+    // Tiger games added post-launch, gated behind the Switch-only
+    // "Experimental Features" toggle (switch_menu.cpp) rather than the
+    // Beta toggle - not yet verified to the same degree as MANUFACTURER_TIGER.
+    static constexpr uint8_t MANUFACTURER_TIGER_EXPERIMENTAL = 5;
+    static constexpr uint8_t MANUFACTURER_COUNT = 6;
 
     const std::string name;
     const std::string ref;

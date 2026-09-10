@@ -20,9 +20,11 @@
 #include "../third_party/stb_image.h"
 
 #include "switch_game_loader.h"
+#include "switch_layout.h"
 #include "switch_runtime_state.h"
 #include "switch_settings.h"
 #include "render/switch_gl.h"
+#include "render/switch_header_icon.h"
 #include "render/switch_ui.h"
 
 namespace {
@@ -56,6 +58,9 @@ bool g_load_prompt_active = false;
 // to flip Off -> On - see the row handler in update_settings_menu(). Turning
 // it back Off never goes through this, only enabling does.
 bool g_betagames_confirm_active = false;
+
+// Same idea as g_betagames_confirm_active, for the Experimental row.
+bool g_experimental_confirm_active = false;
 
 // Settings sub-screen, opened with Plus from the game list (Plus is free
 // there - during gameplay it's mapped to the G&W "A" button instead, and
@@ -91,12 +96,17 @@ bool g_bg_custom_selected = false;
 std::string g_bg_custom_text;  // raw entered hex (no '#'), uppercase; empty = not yet entered
 bool g_seg_custom_selected = false;
 std::string g_seg_custom_text; // raw entered decimal 0-255; empty = not yet entered
+bool g_panelgap_custom_selected = false;
+std::string g_panelgap_custom_text; // raw entered decimal 0-30; empty = not yet entered
 
 // Every row the settings screen can show, in display order. Which of these
-// actually appear varies: BackgroundCustomEntry/SegmentsCustomEntry only show
-// up while their parent row is in Custom mode (see build_settings_rows()),
-// and ConsoleArt/LoadStateBehavior/LogFile/BetaGames vs. ReturnToMenu depend
-// on g_settings_from_gameplay, same as before.
+// actually appear varies: BackgroundCustomEntry/SegmentsCustomEntry/
+// PanelGapCustomEntry only show up while their parent row is in Custom mode
+// (see build_settings_rows()), and ConsoleArt/LoadStateBehavior/LogFile/
+// BetaGames/Experimental vs. ReturnToMenu depend on g_settings_from_gameplay,
+// same as before. Panel Gap is unconditional like Rotation/Background/
+// Segments above it - see g_panel_gap_percent's doc comment in
+// switch_settings.h for why it applies live instead of needing a reload.
 enum class SettingsRow : uint8_t {
     Rotation,
     Background,
@@ -104,9 +114,13 @@ enum class SettingsRow : uint8_t {
     Segments,
     SegmentsCustomEntry,
     ConsoleArt,
+    PanelGap,
+    PanelGapCustomEntry,
     LoadStateBehavior,
+    CloneFilter,
     LogFile,
     BetaGames,
+    Experimental,
     ReturnToMenu,
 };
 
@@ -121,13 +135,17 @@ std::vector<SettingsRow> build_settings_rows() {
     if (g_bg_custom_selected) rows.push_back(SettingsRow::BackgroundCustomEntry);
     rows.push_back(SettingsRow::Segments);
     if (g_seg_custom_selected) rows.push_back(SettingsRow::SegmentsCustomEntry);
+    rows.push_back(SettingsRow::PanelGap);
+    if (g_panelgap_custom_selected) rows.push_back(SettingsRow::PanelGapCustomEntry);
     if (g_settings_from_gameplay) {
         rows.push_back(SettingsRow::ReturnToMenu);
     } else {
         rows.push_back(SettingsRow::ConsoleArt);
         rows.push_back(SettingsRow::LoadStateBehavior);
+        rows.push_back(SettingsRow::CloneFilter);
         rows.push_back(SettingsRow::LogFile);
         rows.push_back(SettingsRow::BetaGames);
+        rows.push_back(SettingsRow::Experimental);
     }
     return rows;
 }
@@ -138,7 +156,8 @@ std::vector<SettingsRow> build_settings_rows() {
 bool settings_row_is_action(SettingsRow row) {
     return row == SettingsRow::ReturnToMenu
         || row == SettingsRow::BackgroundCustomEntry
-        || row == SettingsRow::SegmentsCustomEntry;
+        || row == SettingsRow::SegmentsCustomEntry
+        || row == SettingsRow::PanelGapCustomEntry;
 }
 
 // Mirrors Android's SettingsMenu.java 3-preset "Segments" spinner (None/
@@ -147,6 +166,12 @@ bool settings_row_is_action(SettingsRow row) {
 // this was designed from.
 constexpr uint8_t kSegPresetAlpha[3] = {0, 5, 10};
 constexpr const char* kSegPresetNames[3] = {"None", "Light", "Dark"};
+
+// Same 3-preset-plus-Custom shape as Segments above, for the gap inserted
+// below the top panel (see g_panel_gap_percent's doc comment in
+// switch_settings.h) - a percentage of the top panel's own height.
+constexpr uint8_t kPanelGapPresetPercent[3] = {0, 4, 10};
+constexpr const char* kPanelGapPresetNames[3] = {"None", "Small", "Large"};
 
 // Nearest-index fallbacks (never exact for an off-preset value) - only ever
 // used as a *starting point* to cycle Left/Right from, never to rewrite the
@@ -169,6 +194,15 @@ int find_seg_preset_index(uint8_t alpha) {
     return 1; // closest-match fallback, same as Android's findClosestSegPresetIndex()
 }
 
+int find_panelgap_preset_index(uint8_t percent) {
+    for (int i = 0; i < 3; i++) {
+        if (kPanelGapPresetPercent[i] == percent) return i;
+    }
+    return 0; // closest-match fallback - unlike Segments, 0 (matches the old
+              // always-touching behavior) is the more sensible default guess
+              // for an off-preset value than the middle preset.
+}
+
 // Exact-match checks (unlike the fallback finders above) - used to seed
 // g_bg_custom_selected/g_seg_custom_selected from the loaded settings at
 // boot (see switch_menu_init()): a value that doesn't match any preset can
@@ -183,6 +217,13 @@ bool bg_matches_any_preset(uint32_t color) {
 bool seg_matches_any_preset(uint8_t alpha) {
     for (int i = 0; i < 3; i++) {
         if (kSegPresetAlpha[i] == alpha) return true;
+    }
+    return false;
+}
+
+bool panelgap_matches_any_preset(uint8_t percent) {
+    for (int i = 0; i < 3; i++) {
+        if (kPanelGapPresetPercent[i] == percent) return true;
     }
     return false;
 }
@@ -202,6 +243,15 @@ std::string seg_display(uint8_t alpha) {
     }
     char buf[16];
     snprintf(buf, sizeof(buf), "%u", (unsigned)alpha);
+    return std::string(buf);
+}
+
+std::string panelgap_display(uint8_t percent) {
+    for (int i = 0; i < 3; i++) {
+        if (kPanelGapPresetPercent[i] == percent) return kPanelGapPresetNames[i];
+    }
+    char buf[16];
+    snprintf(buf, sizeof(buf), "%u%%", (unsigned)percent);
     return std::string(buf);
 }
 
@@ -293,6 +343,34 @@ void open_segments_custom_keyboard() {
     switch_settings_save();
 }
 
+// Same idea again, for the 0-30 Panel Gap percentage - falls back to the
+// Small preset (4%) on invalid input.
+void open_panelgap_custom_keyboard() {
+    std::string text;
+    if (!show_keyboard(SwkbdType_NumPad, "Custom Panel Gap", "0-30", g_panelgap_custom_text, 2, text)) {
+        return; // cancelled
+    }
+
+    bool valid = !text.empty() && text.size() <= 2;
+    if (valid) {
+        for (unsigned char c : text) {
+            if (!std::isdigit(c)) { valid = false; break; }
+        }
+    }
+    const long value = valid ? strtol(text.c_str(), nullptr, 10) : -1;
+    valid = valid && value >= 0 && value <= 30;
+
+    if (valid) {
+        g_panelgap_custom_text = text;
+        g_panel_gap_percent = (uint8_t)value;
+    } else {
+        g_panelgap_custom_text.clear();
+        g_panel_gap_percent = kPanelGapPresetPercent[1]; // Small
+    }
+    switch_settings_save();
+    rebuild_layout_from_game(); // apply immediately - see the Left/Right case's comment
+}
+
 const char* rotation_label(ScreenRotation r) {
     switch (r) {
         case ScreenRotation::Deg90:  return "90";
@@ -354,6 +432,39 @@ std::vector<uint8_t> g_sorted_order;
 GLuint g_thumb_tex = 0;
 int g_thumb_w = 0, g_thumb_h = 0;
 uint8_t g_loaded_thumb_index = 0xFF;
+
+// Small header-bar icon shown just left of the "YOKOI"/"PAUSED" title (see
+// switch_menu_render()) - decoded once from the compiled-in PNG bytes in
+// switch_header_icon.h, never reloaded after that (unlike g_thumb_tex,
+// which changes with the game-list selection).
+GLuint g_header_icon_tex = 0;
+int g_header_icon_w = 0, g_header_icon_h = 0;
+
+void load_header_icon_if_needed() {
+    if (g_header_icon_tex != 0) return;
+
+    int w = 0, h = 0, channels = 0;
+    stbi_uc* pixels = stbi_load_from_memory(kHeaderIconPng, (int)kHeaderIconPngLen, &w, &h, &channels, 4);
+    if (!pixels) {
+        YOKOI_LOG("switch_menu: header icon decode failed: %s", stbi_failure_reason());
+        return;
+    }
+
+    glGenTextures(1, &g_header_icon_tex);
+    glBindTexture(GL_TEXTURE_2D, g_header_icon_tex);
+    // NEAREST, not LINEAR (unlike thumbnails) - this is small pixel art
+    // scaled up into the header bar, and should stay crisp rather than
+    // blur at the edges.
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
+    glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, w, h, 0, GL_RGBA, GL_UNSIGNED_BYTE, pixels);
+    stbi_image_free(pixels);
+
+    g_header_icon_w = w;
+    g_header_icon_h = h;
+}
 
 std::string t3x_path_to_png_asset(const std::string& p) {
     if (p.empty()) return std::string();
@@ -430,6 +541,9 @@ const char* mfr_name(uint8_t mfr) {
     if (mfr == GW_rom::MANUFACTURER_ELEKTRONIKA) return "ELEKTRONIKA";
     if (mfr == GW_rom::MANUFACTURER_TIGER) return "TIGER";
     if (mfr == GW_rom::MANUFACTURER_DAVID_AND_JOHN) return "DAVID AND JOHN";
+    // Distinct from plain "TIGER" so these stay visually identifiable while
+    // testing even with the Experimental toggle on - see is_experimental_manufacturer().
+    if (mfr == GW_rom::MANUFACTURER_TIGER_EXPERIMENTAL) return "TIGER (EXPERIMENTAL)";
     return "NINTENDO";
 }
 
@@ -442,6 +556,87 @@ bool is_beta_manufacturer(uint8_t mfr) {
 // g_betagames_enabled value either.
 bool betagames_visible() {
     return g_betagames_enabled || g_debug_mode;
+}
+
+// Separate bucket from is_beta_manufacturer() - see g_experimental_enabled's
+// doc comment in switch_settings.h.
+bool is_experimental_manufacturer(uint8_t mfr) {
+    return mfr == GW_rom::MANUFACTURER_TIGER_EXPERIMENTAL;
+}
+
+// Mirrors betagames_visible() - g_debug_mode force-shows experimental games
+// the same way, without touching the stored g_experimental_enabled value.
+bool experimental_visible() {
+    return g_experimental_enabled || g_debug_mode;
+}
+
+// See g_clone_filter_mode's doc comment in switch_settings.h for what these
+// two tiers mean and why they're separate, hand-maintained lists rather than
+// something derived from the pack at runtime (GNW_LIST.md's "Clone Of"
+// column never reaches the runtime pack at all - it's purely a build-time
+// concept in CONVERT_ROM's Python pipeline, used only to fall back to a
+// parent game's ROM/artwork files when a clone doesn't have its own).
+//
+// kKnownDuplicateRefs - the 3 entries GNW_LIST.md's own comments call out as
+// genuinely the *same* release cataloged twice, kept as separate pack
+// entries only because of a documented minor hardware/behavior difference:
+//   CN-07 vs CN-17 Helmet, IP-05 vs IP-15 Judge, CM-72A vs CM-72 Mario's
+//   Cement Factory.
+constexpr const char* kKnownDuplicateRefs[] = {
+    "CN_07", "IP_05", "CM_72A",
+};
+
+// kKnownCloneRefs - every entry GNW_LIST.md's "Clone Of" column marks as a
+// clone of another entry, as of when this list was written (30 entries) -
+// a strict superset of kKnownDuplicateRefs above. Most of these are
+// legitimately distinct, differently-titled games (Elektronika bootlegs,
+// Tiger titles reusing another game's ports) that just happen to reuse
+// another entry's hardware/ports in the build pipeline, not simple re-
+// releases of the same game - hiding all of them is a much bigger hammer
+// than kKnownDuplicateRefs.
+constexpr const char* kKnownCloneRefs[] = {
+    "BF_107", "DR_106", "MK_96", "EG_26", "CN_07", "IP_05", "CM_72A", "YM_105",
+    "TG_18", "CC_38V", "SG_21", "FR_23",
+    "IM_53", "IM_19", "IM_11", "IM_10", "IM_09", "IM_50", "IM_32", "IM_33",
+    "IM_51", "IM_49", "IM_02", "IM_16", "IM_13", "IM_03", "IM_04", "IM_22", "IM_12",
+    "TSUPERMAN", "TROBHOOD", "TROCKTEER",
+};
+
+bool ref_in_list(const std::string& ref, const char* const* list, size_t count) {
+    for (size_t i = 0; i < count; i++) {
+        if (ref == list[i]) return true;
+    }
+    return false;
+}
+
+// True when `ref` should be hidden under `mode` - ShowAll never hides
+// anything, HideDuplicates checks the small curated list, HideAllClones
+// checks the full list (which already contains HideDuplicates' 3 entries,
+// so no need to check both).
+bool clone_hidden_under(const std::string& ref, CloneFilterMode mode) {
+    switch (mode) {
+        case CloneFilterMode::HideDuplicates:
+            return ref_in_list(ref, kKnownDuplicateRefs, sizeof(kKnownDuplicateRefs) / sizeof(kKnownDuplicateRefs[0]));
+        case CloneFilterMode::HideAllClones:
+            return ref_in_list(ref, kKnownCloneRefs, sizeof(kKnownCloneRefs) / sizeof(kKnownCloneRefs[0]));
+        default:
+            return false;
+    }
+}
+
+const char* clone_filter_label(CloneFilterMode m) {
+    switch (m) {
+        case CloneFilterMode::HideDuplicates: return "Hide Duplicates";
+        case CloneFilterMode::HideAllClones:  return "Hide All Clones";
+        default:                               return "Show All";
+    }
+}
+
+CloneFilterMode cycle_clone_filter(CloneFilterMode cur, int dir) {
+    int i = (int)cur;
+    i = (i + dir) % 3;
+    if (i < 0) i += 3;
+    return (CloneFilterMode)i;
 }
 
 const char* sort_mode_label(SortMode m) {
@@ -469,6 +664,11 @@ std::string name_of(uint8_t idx) {
 std::string date_of(uint8_t idx) {
     const GW_rom* g = load_game(idx);
     return g ? g->date : std::string();
+}
+
+std::string ref_of(uint8_t idx) {
+    const GW_rom* g = load_game(idx);
+    return g ? g->ref : std::string();
 }
 
 bool name_less_ci(const std::string& a, const std::string& b) {
@@ -513,17 +713,26 @@ int group_key(uint8_t idx) {
 // Rebuilds g_sorted_order - the single list every bit of navigation, the
 // bottom counter, and Up/Down group-jumping all walk (see select_next(),
 // select_next_other_group(), position_of_selected() below). Filtering beta
-// games out here, rather than skipping them individually at each call site,
-// is what makes them disappear from navigation *and* the visible count at
-// the same time with no other code needing to know about it.
+// games, experimental games, and duplicate/clone entries out here, rather
+// than skipping them individually at each call site, is what makes them
+// disappear from navigation *and* the visible count at the same time with
+// no other code needing to know about it.
 void rebuild_sorted_order() {
     const size_t n = get_nb_name();
     const bool show_beta = betagames_visible();
+    const bool show_experimental = experimental_visible();
 
     g_sorted_order.clear();
     g_sorted_order.reserve(n);
     for (size_t i = 0; i < n; i++) {
-        if (!show_beta && is_beta_manufacturer(get_mfr((uint8_t)i))) {
+        const uint8_t mfr = get_mfr((uint8_t)i);
+        if (!show_beta && is_beta_manufacturer(mfr)) {
+            continue;
+        }
+        if (!show_experimental && is_experimental_manufacturer(mfr)) {
+            continue;
+        }
+        if (clone_hidden_under(ref_of((uint8_t)i), g_clone_filter_mode)) {
             continue;
         }
         g_sorted_order.push_back((uint8_t)i);
@@ -632,9 +841,13 @@ const char* settings_row_label(SettingsRow row) {
         case SettingsRow::Segments:                return "Segments";
         case SettingsRow::SegmentsCustomEntry:     return "Enter Custom Value";
         case SettingsRow::ConsoleArt:               return "Display Single Screen Console Art";
+        case SettingsRow::PanelGap:                 return "Panel Gap";
+        case SettingsRow::PanelGapCustomEntry:      return "Enter Custom Value";
         case SettingsRow::LoadStateBehavior:        return "Load State Behavior";
+        case SettingsRow::CloneFilter:               return "Duplicate & Clone Games";
         case SettingsRow::LogFile:                   return "Log File";
         case SettingsRow::BetaGames:                  return "Tiger / David and John games (Beta)";
+        case SettingsRow::Experimental:                return "Experimental Features";
         case SettingsRow::ReturnToMenu:                return "Return to Main Menu";
     }
     return "";
@@ -656,12 +869,20 @@ std::string settings_row_value(SettingsRow row) {
                 : seg_display(g_settings.segment_marking_alpha);
         case SettingsRow::ConsoleArt:
             return g_hide_console_art ? "Hidden" : "Shown";
+        case SettingsRow::PanelGap:
+            return g_panelgap_custom_selected
+                ? (g_panelgap_custom_text.empty() ? std::string("Custom") : ("Custom: " + g_panelgap_custom_text + "%"))
+                : panelgap_display(g_panel_gap_percent);
         case SettingsRow::LoadStateBehavior:
             return load_state_behavior_label(g_load_state_behavior);
+        case SettingsRow::CloneFilter:
+            return clone_filter_label(g_clone_filter_mode);
         case SettingsRow::LogFile:
             return g_log_file_enabled ? "On" : "Off";
         case SettingsRow::BetaGames:
             return g_betagames_enabled ? "On" : "Off";
+        case SettingsRow::Experimental:
+            return g_experimental_enabled ? "On" : "Off";
         default:
             return "";
     }
@@ -670,31 +891,84 @@ std::string settings_row_value(SettingsRow row) {
 // logical_w/logical_h are already rotation-swapped by the caller (see
 // switch_menu_render()) - this just lays rows out against them like any
 // other menu content.
-void render_settings_rows(int logical_w) {
+//
+// The row count varies at runtime (Custom-entry rows appear/disappear, and
+// with Panel Gap + Segments + Panel Gap's own Custom slot all open at once
+// the full list can run past what fits between the top and bottom bars) -
+// rather than letting it overflow into/past the bottom bar, this scrolls a
+// window of rows that follows the current selection. Short lists (the
+// common case) render exactly as before, no indicators, no space lost.
+void render_settings_rows(int logical_w, int logical_h) {
     const std::vector<SettingsRow> rows = build_settings_rows();
     const float label_size = 30.0f;
     const float row_h = 56.0f;
-    const float start_y = (float)kTopBarH + 48.0f;
+    // Trimmed from the original +48/-12 margins (which left room to spare)
+    // to reclaim a bit more vertical budget for content rows now that
+    // scrolling needs some of that space for its own indicators below.
+    const float start_y = (float)kTopBarH + 20.0f;
     const float label_x = 56.0f;
     const float value_x = (float)logical_w * 0.6f;
 
-    for (size_t i = 0; i < rows.size(); i++) {
+    // Leaves a little breathing room above the bottom bar rather than
+    // packing the last row flush against it.
+    const float avail_h = (float)(logical_h - kBottomBarH) - start_y - 4.0f;
+    int max_slots = (int)(avail_h / row_h);
+    if (max_slots < 1) max_slots = 1;
+
+    const int row_count = (int)rows.size();
+    // Compact bands (not full row_h slots) reserved above/below the content
+    // for "more above"/"more below" indicators. The top one needs to be
+    // tall enough that its own text clears the *next* row's selection-highlight
+    // rect (which starts 8px above that row's own y) - too little clearance
+    // here is exactly what made it collide with the first content row
+    // before. The bottom one has no such neighbor to clear, so it can stay
+    // noticeably smaller.
+    const float indicator_h_top = 40.0f;
+    const float indicator_h_bottom = 22.0f;
+    const bool scrolling = row_count > max_slots;
+    const int content_slots = scrolling
+        ? std::max(1, (int)((avail_h - indicator_h_top - indicator_h_bottom) / row_h))
+        : max_slots;
+
+    int scroll_top = 0;
+    if (scrolling) {
+        const int max_scroll_top = row_count - content_slots;
+        scroll_top = std::max(0, std::min(g_settings_selected_row - content_slots / 2, max_scroll_top));
+        if (g_settings_selected_row < scroll_top) scroll_top = g_settings_selected_row;
+        if (g_settings_selected_row >= scroll_top + content_slots) scroll_top = g_settings_selected_row - content_slots + 1;
+    }
+    const int visible_count = std::min(content_slots, row_count - scroll_top);
+    const float content_start_y = scrolling ? start_y + indicator_h_top : start_y;
+
+    if (scrolling) {
+        if (scroll_top > 0) {
+            switch_ui_draw_text(label_x, start_y + 4.0f, 18.0f, kTextR, kTextG, kTextB, 0.6f, "^ more above");
+        }
+        if (scroll_top + visible_count < row_count) {
+            switch_ui_draw_text(label_x, content_start_y + (float)content_slots * row_h + 4.0f, 18.0f, kTextR, kTextG, kTextB, 0.6f, "v more below");
+        }
+    }
+
+    for (int vi = 0; vi < visible_count; vi++) {
+        const int i = scroll_top + vi;
         const SettingsRow row = rows[i];
-        const float y = start_y + (float)i * row_h;
-        const bool sel = ((int)i == g_settings_selected_row);
+        const float y = content_start_y + (float)vi * row_h;
+        const bool sel = (i == g_settings_selected_row);
         const bool action_row = settings_row_is_action(row);
         // Hidden debug mode locks every settings *value* row except Rotation -
         // see g_debug_mode's doc comment in switch_settings.h. "Return to
         // Main Menu" is a navigation action, not a setting, so it's excluded
-        // too - it isn't locked by update_settings_menu() either. The two
+        // too - it isn't locked by update_settings_menu() either. The three
         // Custom-entry rows are locked like any other value row, but in
         // practice can never even be reached under debug mode: Background/
-        // Segments (their parent rows) are themselves locked, so Left/Right
-        // can never select the Custom slot that would make these appear.
+        // Segments/Panel Gap (their parent rows) are themselves locked, so
+        // Left/Right can never select the Custom slot that would make these
+        // appear.
         const bool locked = g_debug_mode && row != SettingsRow::Rotation && row != SettingsRow::ReturnToMenu;
-        // The two Custom-entry rows read as nested under their parent -
+        // The three Custom-entry rows read as nested under their parent -
         // indent the label only, keep the selection highlight full-width.
-        const bool nested = (row == SettingsRow::BackgroundCustomEntry) || (row == SettingsRow::SegmentsCustomEntry);
+        const bool nested = (row == SettingsRow::BackgroundCustomEntry) || (row == SettingsRow::SegmentsCustomEntry)
+            || (row == SettingsRow::PanelGapCustomEntry);
         const float indent = nested ? 24.0f : 0.0f;
 
         if (sel) {
@@ -804,10 +1078,50 @@ void render_betagames_confirm(int logical_w, int logical_h) {
     draw_option(opt_y2, SwitchButtonIcon::B, "Cancel");
 }
 
+// Mirrors render_betagames_confirm() above - see its comment for the layout
+// notes (rotation-swapped logical_w/logical_h, pre-split fixed lines).
+void render_experimental_confirm(int logical_w, int logical_h) {
+    static const char* kLines[] = {
+        "WARNING: These games are experimental",
+        "and largely untested. You may experience",
+        "unexpected issues while playing them.",
+        "Do you still wish to enable?",
+    };
+    constexpr int kNumLines = 4;
+
+    const float cx = (float)logical_w * 0.5f;
+    const float line_size = 26.0f;
+    const float line_gap = 10.0f;
+    float y = (float)logical_h * 0.5f - 150.0f;
+
+    for (int i = 0; i < kNumLines; i++) {
+        const float w = switch_ui_text_width(kLines[i], line_size);
+        switch_ui_draw_text(cx - w * 0.5f, y, line_size, kTextR, kTextG, kTextB, 1.0f, kLines[i]);
+        y += line_size + line_gap;
+    }
+
+    const float opt_size = 28.0f;
+    const float icon_pad = 10.0f;
+    const float opt_y1 = y + 30.0f;
+    const float opt_y2 = opt_y1 + 50.0f;
+
+    auto draw_option = [&](float oy, SwitchButtonIcon icon, const std::string& text) {
+        const float w = switch_ui_button_icon_width(opt_size, icon) + icon_pad + switch_ui_text_width(text, opt_size);
+        float x = cx - w * 0.5f;
+        switch_ui_draw_button_icon(x, oy, opt_size, kTextR, kTextG, kTextB, 1.0f, icon);
+        x += switch_ui_button_icon_width(opt_size, icon) + icon_pad;
+        switch_ui_draw_text(x, oy, opt_size, kTextR, kTextG, kTextB, 1.0f, text);
+    };
+
+    draw_option(opt_y1, SwitchButtonIcon::A, "Enable");
+    draw_option(opt_y2, SwitchButtonIcon::B, "Cancel");
+}
+
 } // namespace
 
 void switch_menu_init() {
     switch_ui_init();
+    load_header_icon_if_needed();
     g_selected_index = switch_get_default_game_index();
     rebuild_sorted_order();
 
@@ -827,6 +1141,12 @@ void switch_menu_init() {
         snprintf(buf, sizeof(buf), "%u", (unsigned)g_settings.segment_marking_alpha);
         g_seg_custom_text = buf;
     }
+    g_panelgap_custom_selected = !panelgap_matches_any_preset(g_panel_gap_percent);
+    if (g_panelgap_custom_selected) {
+        char buf[8];
+        snprintf(buf, sizeof(buf), "%u", (unsigned)g_panel_gap_percent);
+        g_panelgap_custom_text = buf;
+    }
 
     g_menu_active = true;
 }
@@ -834,6 +1154,8 @@ void switch_menu_init() {
 void switch_menu_shutdown() {
     if (g_thumb_tex) glDeleteTextures(1, &g_thumb_tex);
     g_thumb_tex = 0;
+    if (g_header_icon_tex) glDeleteTextures(1, &g_header_icon_tex);
+    g_header_icon_tex = 0;
     switch_ui_shutdown();
 }
 
@@ -866,6 +1188,20 @@ static void update_betagames_confirm(uint64_t kDown) {
     } else if (kDown & HidNpadButton_B) {
         YOKOI_LOG("switch_menu: beta games enable cancelled");
         g_betagames_confirm_active = false;
+    }
+}
+
+// Mirrors update_betagames_confirm() above.
+static void update_experimental_confirm(uint64_t kDown) {
+    if (kDown & HidNpadButton_A) {
+        YOKOI_LOG("switch_menu: experimental games enable confirmed");
+        g_experimental_enabled = true;
+        switch_settings_save();
+        g_experimental_confirm_active = false;
+        rebuild_sorted_order(); // newly-visible games need to enter the navigable set
+    } else if (kDown & HidNpadButton_B) {
+        YOKOI_LOG("switch_menu: experimental games enable cancelled");
+        g_experimental_confirm_active = false;
     }
 }
 
@@ -944,9 +1280,51 @@ static void update_settings_menu(uint64_t kDown) {
             case SettingsRow::ConsoleArt:
                 g_hide_console_art = !g_hide_console_art;
                 break;
+            case SettingsRow::PanelGap: {
+                int slot = g_panelgap_custom_selected ? 3 : find_panelgap_preset_index(g_panel_gap_percent);
+                slot = (slot + dir + 4) % 4;
+                if (slot == 3) {
+                    g_panelgap_custom_selected = true;
+                    // Defaults to the Small preset's percentage until a
+                    // value is typed, per the same spec as Background/Segments.
+                    g_panel_gap_percent = g_panelgap_custom_text.empty()
+                        ? kPanelGapPresetPercent[1]
+                        : (uint8_t)std::clamp((int)strtol(g_panelgap_custom_text.c_str(), nullptr, 10), 0, 30);
+                } else {
+                    g_panelgap_custom_selected = false;
+                    g_panel_gap_percent = kPanelGapPresetPercent[slot];
+                }
+                // Unlike Rotation/Background/Segments (read fresh every
+                // frame by the renderer, no cached geometry), the gap is
+                // baked into g_top_off_x/g_bottom_off_y/g_combined_canvas_*
+                // by rebuild_layout_from_game() - re-run it now so this
+                // applies immediately instead of only on the next game
+                // load. Safe to call whether or not a game is currently
+                // loaded (no-ops instantly if g_game is null - see its own
+                // doc comment in switch_layout.cpp).
+                rebuild_layout_from_game();
+                break;
+            }
             case SettingsRow::LoadStateBehavior:
                 g_load_state_behavior = cycle_load_state_behavior(g_load_state_behavior, dir);
                 break;
+            case SettingsRow::CloneFilter: {
+                g_clone_filter_mode = cycle_clone_filter(g_clone_filter_mode, dir);
+                if (!g_last_game_played_ref.empty()) {
+                    bool found = false;
+                    const uint8_t idx = find_game_index_by_ref(g_last_game_played_ref, &found);
+                    if (found && clone_hidden_under(ref_of(idx), g_clone_filter_mode)) {
+                        // Same idea as BetaGames/Experimental below - the
+                        // saved last-played game just became hidden under
+                        // the new filter tier, so point lastgameplayed
+                        // somewhere still visible instead of leaving a
+                        // technically-invalid reference on disk.
+                        g_last_game_played_ref = "AC_01";
+                    }
+                }
+                rebuild_sorted_order();
+                break;
+            }
             case SettingsRow::LogFile:
                 g_log_file_enabled = !g_log_file_enabled;
                 debug_log::set_enabled(g_log_file_enabled);
@@ -973,6 +1351,24 @@ static void update_settings_menu(uint64_t kDown) {
                             // reference on disk. Its save file is untouched;
                             // only this pointer moves, and only in memory
                             // until switch_settings_save() below writes it.
+                            g_last_game_played_ref = "AC_01";
+                        }
+                    }
+                    rebuild_sorted_order();
+                }
+                break;
+            case SettingsRow::Experimental:
+                if (!g_experimental_enabled) {
+                    // Same flow as BetaGames above - confirmation gates
+                    // enabling, see update_experimental_confirm().
+                    g_experimental_confirm_active = true;
+                } else {
+                    // Turning OFF is instant, no confirmation.
+                    g_experimental_enabled = false;
+                    if (!g_last_game_played_ref.empty()) {
+                        bool found = false;
+                        const uint8_t idx = find_game_index_by_ref(g_last_game_played_ref, &found);
+                        if (found && is_experimental_manufacturer(get_mfr(idx))) {
                             g_last_game_played_ref = "AC_01";
                         }
                     }
@@ -1007,6 +1403,8 @@ static void update_settings_menu(uint64_t kDown) {
                 open_background_custom_keyboard();
             } else if (row == SettingsRow::SegmentsCustomEntry) {
                 open_segments_custom_keyboard();
+            } else if (row == SettingsRow::PanelGapCustomEntry) {
+                open_panelgap_custom_keyboard();
             }
         }
     }
@@ -1044,6 +1442,11 @@ void switch_menu_update(uint64_t kDown, uint64_t kHeld) {
     // top-level screen like the load prompt above.
     if (g_betagames_confirm_active) {
         update_betagames_confirm(kDown);
+        return;
+    }
+
+    if (g_experimental_confirm_active) {
+        update_experimental_confirm(kDown);
         return;
     }
 
@@ -1138,7 +1541,17 @@ void switch_menu_render(int viewport_w, int viewport_h) {
     switch_ui_draw_rect(0.0f, (float)(kTopBarH - 1), (float)logical_w, 1.0f, kTextR, kTextG, kTextB, 0.4f);
     switch_ui_draw_rect(0.0f, (float)(logical_h - kBottomBarH), (float)logical_w, 1.0f, kTextR, kTextG, kTextB, 0.4f);
 
-    switch_ui_draw_text(24.0f, 16.0f, 28.0f, kTextR, kTextG, kTextB, 1.0f, g_settings_from_gameplay ? "PAUSED" : "YOKOI", /*bold=*/true);
+    // Small header icon, left of the title - drawn at a fixed square size
+    // matching the title's own line height rather than the source PNG's
+    // native 48x48, so it scales consistently regardless of that asset's
+    // actual dimensions.
+    float title_x = 24.0f;
+    if (g_header_icon_tex != 0) {
+        constexpr float kIconSize = 28.0f;
+        switch_ui_draw_texture_plain(g_header_icon_tex, title_x, 16.0f, kIconSize, kIconSize);
+        title_x += kIconSize + 10.0f;
+    }
+    switch_ui_draw_text(title_x, 16.0f, 28.0f, kTextR, kTextG, kTextB, 1.0f, g_settings_from_gameplay ? "PAUSED" : "YOKOI", /*bold=*/true);
 
     if (g_load_prompt_active) {
         render_load_prompt(logical_w, logical_h);
@@ -1147,6 +1560,11 @@ void switch_menu_render(int viewport_w, int viewport_h) {
 
     if (g_betagames_confirm_active) {
         render_betagames_confirm(logical_w, logical_h);
+        return;
+    }
+
+    if (g_experimental_confirm_active) {
+        render_experimental_confirm(logical_w, logical_h);
         return;
     }
 
@@ -1160,7 +1578,7 @@ void switch_menu_render(int viewport_w, int viewport_h) {
         const float title_w = switch_ui_text_width(title, title_size);
         switch_ui_draw_text((float)logical_w - 24.0f - title_w, 20.0f, title_size, kTextR, kTextG, kTextB, 0.85f, title);
 
-        render_settings_rows(logical_w);
+        render_settings_rows(logical_w, logical_h);
 
         const float hint_size = 20.0f;
         const float hint_y = (float)(logical_h - kBottomBarH + 14);
@@ -1187,7 +1605,7 @@ void switch_menu_render(int viewport_w, int viewport_h) {
         // either Custom-entry row) - shown whenever one of those can
         // currently be reached, not just in the from-gameplay case that used
         // to be the only source of one.
-        if (g_settings_from_gameplay || g_bg_custom_selected || g_seg_custom_selected) {
+        if (g_settings_from_gameplay || g_bg_custom_selected || g_seg_custom_selected || g_panelgap_custom_selected) {
             put_icon(SwitchButtonIcon::A);
             put_text("Confirm");
         }

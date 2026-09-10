@@ -34,6 +34,13 @@ void switch_ui_draw_rect(float x, float y, float w, float h, float r, float g, f
 void switch_ui_draw_texture(uint32_t gl_tex, float x, float y, float w, float h,
                              float tex_w, float tex_h, float src_x, float src_y, float src_w, float src_h);
 
+// Draws the *whole* texture into a pixel-space destination rect, stretching
+// to fit (aspect preservation is the caller's job) - unlike
+// switch_ui_draw_texture() above, this does NOT apply the CONVERT_ROM-
+// pipeline's X-mirror correction, so it's the right one for a generic UI
+// texture (e.g. a header icon) that was never run through that pipeline.
+void switch_ui_draw_texture_plain(uint32_t gl_tex, float x, float y, float w, float h);
+
 // Draws `text` in pixel space, (x,y) = top-left of the line. `pixel_size` is
 // the requested glyph height in pixels (glyphs are individually cached per
 // exact pixel size + bold combination the first time they're drawn).

@@ -10,15 +10,18 @@ from dataclasses import dataclass, field
 from pathlib import Path
 from typing import Dict, List, Optional, Sequence, Tuple, Iterable
 
+import numpy as np
+from PIL import Image
+
 try:
     # When imported as part of the 'source' package
     from source.games_path_utils import GameEntry, write_games_path
-    from source.manufacturer_ids import MANUFACTURER_NINTENDO, MANUFACTURER_TRONICA, MANUFACTURER_ELEKTRONIKA, MANUFACTURER_TIGER, MANUFACTURER_DAVID_AND_JOHN
+    from source.manufacturer_ids import MANUFACTURER_NINTENDO, MANUFACTURER_TRONICA, MANUFACTURER_ELEKTRONIKA, MANUFACTURER_TIGER, MANUFACTURER_DAVID_AND_JOHN, MANUFACTURER_TIGER_EXPERIMENTAL
     from source.target_profiles import get_target
 except ImportError:
     # When run directly from the 'source' directory
     from games_path_utils import GameEntry, write_games_path
-    from manufacturer_ids import MANUFACTURER_NINTENDO, MANUFACTURER_TRONICA, MANUFACTURER_ELEKTRONIKA, MANUFACTURER_TIGER, MANUFACTURER_DAVID_AND_JOHN
+    from manufacturer_ids import MANUFACTURER_NINTENDO, MANUFACTURER_TRONICA, MANUFACTURER_ELEKTRONIKA, MANUFACTURER_TIGER, MANUFACTURER_DAVID_AND_JOHN, MANUFACTURER_TIGER_EXPERIMENTAL
     from target_profiles import get_target
 
 # Preferred background views ordered by desirability. Boolean marks multi-screen views.
@@ -64,6 +67,15 @@ DISPLAY_NAME_PATTERNS = (
 )
 
 ROM_PRIORITY = ("*.program", "*.bin", "*.rom", "*.prg", "*.hex")
+
+# Pixel-value std-dev below which a resolved background candidate is
+# treated as "basically a flat tint, not real art" - see
+# _image_detail_score/_pick_best_background. Calibrated against the
+# "hydef"-style layered artwork's actual flat screen-tint overlay, which
+# consistently scores ~6.1 (not near-0 - it's a soft gradient, not a
+# perfectly solid fill) versus ~17-110+ for the real decorative/photo
+# backgrounds in the same sets.
+_FLAT_BACKGROUND_SCORE_THRESHOLD = 8.0
 
 
 @dataclass(frozen=True)
@@ -149,6 +161,8 @@ def _load_game_metadata(script_dir: Path) -> Dict[str, GameMetadata]:
                 current_manufacturer = MANUFACTURER_ELEKTRONIKA
             elif "game & watch" in heading or "game and watch" in heading:
                 current_manufacturer = MANUFACTURER_NINTENDO
+            elif "tiger" in heading and "experimental" in heading:
+                current_manufacturer = MANUFACTURER_TIGER_EXPERIMENTAL
             elif "tiger" in heading:
                 current_manufacturer = MANUFACTURER_TIGER
             continue
@@ -284,10 +298,37 @@ def _is_background_name(name: str) -> bool:
     )
 
 
-def _find_adjacent_background(
+def _is_background_name_global(name: str) -> bool:
+    """Stricter than _is_background_name, for _pick_best_background's
+    whole-layout fallback scan only.
+
+    The loose bg-/screen-prefix rules in _is_background_name are fine when
+    scoped to elements immediately adjacent to one specific <screen> tag
+    (its original use) - false positives there are rare and low-stakes.
+    Applied across *every* declared element in the layout instead, those
+    same loose rules produce real false positives (e.g. "Screen-TopNS", a
+    screen-glass/overlay asset unrelated to any decorative background, just
+    because its name happens to start with "screen") that can crash later
+    crop math when the wrong, oddly-sized image gets treated as one.
+    """
+    lowered = name.lower()
+    return "background" in lowered or "backdrop" in lowered
+
+
+def _collect_adjacent_background_candidates(
     siblings: Sequence[ET.Element],
     position: int,
-) -> Optional[ET.Element]:
+) -> List[ET.Element]:
+    """Collect every background-name-matching element/overlay adjacent to
+    the screen at ``position``, scanning outward in both directions until
+    hitting another ``screen`` tag (nearest-before elements first, then
+    nearest-after). This is the same scan the old single-candidate version
+    did; it just doesn't stop at the first hit, since some artwork styles
+    place more than one background-ish element around the same screen (see
+    _pick_best_background).
+    """
+    candidates: List[ET.Element] = []
+
     before = position - 1
     while before >= 0:
         candidate = siblings[before]
@@ -296,7 +337,7 @@ def _find_adjacent_background(
         if candidate.tag in {"element", "overlay"}:
             name = candidate.get("ref") or candidate.get("element") or ""
             if _is_background_name(name):
-                return candidate
+                candidates.append(candidate)
         before -= 1
 
     after = position + 1
@@ -307,10 +348,112 @@ def _find_adjacent_background(
         if candidate.tag in {"element", "overlay"}:
             name = candidate.get("ref") or candidate.get("element") or ""
             if _is_background_name(name):
-                return candidate
+                candidates.append(candidate)
         after += 1
 
-    return None
+    return candidates
+
+
+def _image_detail_score(path: Path) -> float:
+    """Rough 'real art vs. flat tint' signal, used to disambiguate multiple
+    background-like candidates near the same screen.
+
+    Some MAME artwork styles (e.g. the "hydef"-credited photo-realistic
+    layouts) place a small, near-solid-color screen-tint overlay (composited
+    with blend="multiply"/alpha) right next to the <screen> tag alongside
+    the real decorative backdrop - both can be named/sized similarly, so
+    proximity or bounds alone can't tell them apart. A flat tint is,
+    definitionally, close to a single solid color, so its pixel standard
+    deviation is near zero versus real photographic/decorative art. Missing
+    or unreadable files score lowest so a working candidate is always
+    preferred over a broken reference.
+    """
+    try:
+        with Image.open(path) as img:
+            arr = np.asarray(img.convert("RGB"), dtype=np.float32)
+    except Exception:
+        return -1.0
+    return float(arr.std())
+
+
+def _pick_best_background(
+    candidates: List[ET.Element],
+    image_map: Dict[str, str],
+    folder: Path,
+) -> Optional[ET.Element]:
+    """Pick the best background candidate.
+
+    Defaults to candidates[0] - the same element the original single-match
+    _find_adjacent_background would have returned (nearest-before the
+    screen, else nearest-after), with zero extra file I/O. That proximity
+    pick is correct for the vast majority of artwork sets and is trusted
+    as-is: this does NOT chase whichever adjacent candidate merely *looks*
+    most detailed, since a nearby but unrelated element (e.g. a screen-glass
+    overlay) can easily out-score the real background on pure pixel
+    variance while still being the wrong asset. Only when the default
+    pick's own score suggests it's a flat tint (see
+    _image_detail_score/_FLAT_BACKGROUND_SCORE_THRESHOLD) do we look for
+    something better - first among the other in-view candidates, then
+    (in the caller) across the whole layout file.
+    """
+    if not candidates:
+        return None
+
+    resolved: List[Tuple[ET.Element, Optional[str]]] = []
+    seen_files: set[str] = set()
+    for cand in candidates:
+        file_name = _resolve_background_file(cand, image_map)
+        if file_name and file_name in seen_files:
+            continue
+        if file_name:
+            seen_files.add(file_name)
+        resolved.append((cand, file_name))
+
+    if not resolved:
+        return candidates[0]
+
+    def score_of(file_name: Optional[str]) -> float:
+        if not file_name:
+            return -1.0
+        return _image_detail_score(folder / file_name)
+
+    best_cand, best_file = resolved[0]
+    best_score = score_of(best_file)
+
+    if best_score < _FLAT_BACKGROUND_SCORE_THRESHOLD and len(resolved) > 1:
+        alt_cand, alt_file = max(resolved[1:], key=lambda item: score_of(item[1]))
+        alt_score = score_of(alt_file)
+        if alt_score > best_score:
+            best_cand, best_file, best_score = alt_cand, alt_file, alt_score
+
+    if best_score < _FLAT_BACKGROUND_SCORE_THRESHOLD:
+        # Some artwork styles only ever place a flat screen-tint overlay
+        # near the <screen> tag in the view VIEW_PRIORITY prefers (the
+        # "clean, no frame/shadow" views), with the real decorative art
+        # declared elsewhere in the layout under a different element that's
+        # simply not used anywhere near this screen in this view. If even
+        # our best in-view candidate looks flat, widen the search to every
+        # background-named element declared anywhere in the layout file -
+        # image_map already covers the whole document, not just this view.
+        global_best_file = best_file
+        global_best_score = best_score
+        for elem_name, file_name in image_map.items():
+            if not _is_background_name_global(elem_name) or file_name == best_file:
+                continue
+            s = score_of(file_name)
+            if s > global_best_score:
+                global_best_score = s
+                global_best_file = file_name
+        if global_best_file != best_file:
+            # Synthetic element carrying just a file reference -
+            # _resolve_background_file() checks node.get("file") once
+            # name-based lookup comes up empty, so this is honored. It has
+            # no bounds, so _extract_bounds() will fall back to "use the
+            # whole image, no crop" for this surface - a safe default for
+            # what's already a best-effort recovery path.
+            return ET.Element("element", {"file": global_best_file})
+
+    return best_cand
 
 
 def _resolve_background_file(node: Optional[ET.Element], image_map: Dict[str, str]) -> Optional[str]:
@@ -352,6 +495,7 @@ def _collect_background_candidates(
 def _extract_view_assets(
     root: ET.Element,
     image_map: Dict[str, str],
+    folder: Path,
 ) -> Tuple[List[str], List[SurfaceData]]:
     for view_name, _ in VIEW_PRIORITY:
         view = root.find(f".//view[@name='{view_name}']")
@@ -374,7 +518,8 @@ def _extract_view_assets(
                 screen_id = screen_node.get("index") or str(len(ordered_ids))
                 if screen_id not in surface_by_id:
                     ordered_ids.append(screen_id)
-                background_node = _find_adjacent_background(siblings, pos)
+                bg_candidates = _collect_adjacent_background_candidates(siblings, pos)
+                background_node = _pick_best_background(bg_candidates, image_map, folder)
                 background_bounds = _extract_bounds(background_node, root)
                 background_file = _resolve_background_file(background_node, image_map)
                 surface_by_id[screen_id] = SurfaceData(
@@ -601,7 +746,7 @@ def _parse_layout(lay_path: Path) -> Tuple[Optional[str], Optional[str], List[st
         return display_name, None, [], []
 
     image_map = _collect_element_images(root)
-    background_files, surfaces = _extract_view_assets(root, image_map)
+    background_files, surfaces = _extract_view_assets(root, image_map, lay_path.parent)
 
     ref_candidate: Optional[str] = None
     for element in root.findall("element"):

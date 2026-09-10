@@ -2281,6 +2281,1383 @@ class TSHARR2 : public Virtual_Input{
 };
 
 
+////////// Experimental Tiger games (MANUFACTURER_TIGER_EXPERIMENTAL) //////////
+// Button assignments derived directly from MAME's hh_sm510.cpp INPUT_PORTS
+// definitions for each romset (IN.N port index -> group, bit position ->
+// line - e.g. bit 0x04 is line 2 - confirmed against TSFIGHT2/TMCHAMMER
+// above, whose existing group/line values match their MAME ports exactly
+// under this same translation). PART_LEFT/PART_RIGHT button choices were
+// then picked to match each console's actual physical button layout, using
+// the MAME-rendered console screenshots as reference (see
+// CONVERT_ROM/GNW_LIST.md's "Tiger (Experimental)" section).
+
+////// Batman (Tiger) : SM510 //////
+// Physical: left = 4-way d-pad (only Up/Right/Down wired - no Left on this
+// particular romset); right = 2 stacked buttons, "Pick" above "Attack".
+class TBATMAN : public Virtual_Input{
+    public :
+        TBATMAN(SM5XX* c) : Virtual_Input(c) {
+            left_configuration = CONF_4_BUTTON_DIRECTION;
+            right_configuration = CONF_2_BUTTON_UPDOWN;
+        }
+
+        void set_input(uint8_t part, uint8_t button, bool state, uint8_t player = 1) override{
+            switch (part) {
+                case PART_SETUP:
+                    switch (button) {
+                        case BUTTON_GAMEA: cpu->input_set(5, 3, state, true); break; // Power On/Start
+                        case BUTTON_GAMEB: cpu->input_set(4, 0, state); break; // Max Score
+                        default: break; } break;
+                case PART_LEFT:
+                    switch (button) {
+                        case BUTTON_UP: cpu->input_set(0, 2, state); break;
+                        case BUTTON_RIGHT: cpu->input_set(1, 1, state); break;
+                        case BUTTON_DOWN: cpu->input_set(2, 1, state); break;
+                        default: break; } break;
+                case PART_RIGHT:
+                    switch (button) {
+                        case BUTTON_UP: cpu->input_set(3, 0, state); break; // Pick
+                        case BUTTON_DOWN: cpu->input_set(3, 1, state); break; // Attack
+                        default: break; } break;
+                default: break;
+            }
+        }
+};
+
+////// Spider-Man (Tiger, 1991) : SM510 //////
+// Physical: left = full 4-way d-pad; right = "PUNCH" button above a
+// "RESCUE"/"KICK" rocker (Left=Rescue, Right=Kick).
+class TSPIDMAN : public Virtual_Input{
+    public :
+        TSPIDMAN(SM5XX* c) : Virtual_Input(c) {
+            left_configuration = CONF_4_BUTTON_DIRECTION;
+            right_configuration = CONF_4_BUTTON_DIRECTION;
+        }
+
+        void set_input(uint8_t part, uint8_t button, bool state, uint8_t player = 1) override{
+            switch (part) {
+                case PART_SETUP:
+                    switch (button) {
+                        case BUTTON_GAMEA: cpu->input_set(6, 3, state, true); break; // Power On/Start
+                        case BUTTON_GAMEB: cpu->input_set(5, 0, state); break; // Status
+                        default: break; } break;
+                case PART_LEFT:
+                    switch (button) {
+                        case BUTTON_UP: cpu->input_set(0, 2, state); break;
+                        case BUTTON_RIGHT: cpu->input_set(1, 1, state); break;
+                        case BUTTON_LEFT: cpu->input_set(1, 2, state); break;
+                        case BUTTON_DOWN: cpu->input_set(2, 1, state); break;
+                        default: break; } break;
+                case PART_RIGHT:
+                    switch (button) {
+                        case BUTTON_UP: cpu->input_set(4, 0, state); break; // Shoot Up/Punch
+                        case BUTTON_RIGHT: cpu->input_set(3, 1, state); break; // Shoot Right/Kick
+                        case BUTTON_LEFT: cpu->input_set(4, 1, state); break; // Shoot Left/Rescue
+                        default: break; } break;
+                default: break;
+            }
+        }
+};
+
+////// X-Men (Tiger) : SM510 //////
+// Physical: left = full 4-way d-pad; right = "ATTACK/PICK" rocker (Left=Pick,
+// Right=Attack) above a "PUNCH/CLAWS" button.
+class TXMEN : public Virtual_Input{
+    public :
+        TXMEN(SM5XX* c) : Virtual_Input(c) {
+            left_configuration = CONF_4_BUTTON_DIRECTION;
+            right_configuration = CONF_4_BUTTON_DIRECTION;
+        }
+
+        void set_input(uint8_t part, uint8_t button, bool state, uint8_t player = 1) override{
+            switch (part) {
+                case PART_SETUP:
+                    switch (button) {
+                        case BUTTON_GAMEA: cpu->input_set(6, 3, state, true); break; // Power On/Start
+                        case BUTTON_GAMEB: cpu->input_set(5, 0, state); break; // Pause
+                        default: break; } break;
+                case PART_LEFT:
+                    switch (button) {
+                        case BUTTON_UP: cpu->input_set(0, 2, state); break;
+                        case BUTTON_RIGHT: cpu->input_set(1, 1, state); break;
+                        case BUTTON_LEFT: cpu->input_set(1, 2, state); break;
+                        case BUTTON_DOWN: cpu->input_set(2, 1, state); break;
+                        default: break; } break;
+                case PART_RIGHT:
+                    switch (button) {
+                        case BUTTON_RIGHT: cpu->input_set(3, 1, state); break; // Attack/Pick Right
+                        case BUTTON_LEFT: cpu->input_set(4, 1, state); break; // Attack/Pick Left
+                        case BUTTON_DOWN: cpu->input_set(4, 0, state); break; // Punch/Claws
+                        default: break; } break;
+                default: break;
+            }
+        }
+};
+
+////// Mortal Kombat (Tiger) : SM510 //////
+// Physical: left = full 4-way d-pad; right = two 2-way rockers stacked,
+// "H PUNCH L" above "H KICK L". Mapped to the 4-way pad as
+// Up=Punch High, Right=Kick High, Down=Punch Low, Left=Kick Low.
+class TMKOMBAT : public Virtual_Input{
+    public :
+        TMKOMBAT(SM5XX* c) : Virtual_Input(c) {
+            left_configuration = CONF_4_BUTTON_DIRECTION;
+            right_configuration = CONF_4_BUTTON_DIRECTION;
+        }
+
+        void set_input(uint8_t part, uint8_t button, bool state, uint8_t player = 1) override{
+            switch (part) {
+                case PART_SETUP:
+                    switch (button) {
+                        case BUTTON_GAMEA: cpu->input_set(6, 3, state, true); break; // Power On/Start
+                        case BUTTON_GAMEB: cpu->input_set(5, 0, state); break; // Select
+                        default: break; } break;
+                case PART_LEFT:
+                    switch (button) {
+                        case BUTTON_UP: cpu->input_set(0, 2, state); break;
+                        case BUTTON_RIGHT: cpu->input_set(1, 1, state); break;
+                        case BUTTON_LEFT: cpu->input_set(1, 2, state); break;
+                        case BUTTON_DOWN: cpu->input_set(2, 1, state); break;
+                        default: break; } break;
+                case PART_RIGHT:
+                    switch (button) {
+                        case BUTTON_UP: cpu->input_set(0, 0, state); break; // Punch High
+                        case BUTTON_RIGHT: cpu->input_set(3, 1, state); break; // Kick High
+                        case BUTTON_DOWN: cpu->input_set(4, 0, state); break; // Punch Low
+                        case BUTTON_LEFT: cpu->input_set(4, 1, state); break; // Kick Low
+                        default: break; } break;
+                default: break;
+            }
+        }
+};
+
+////// Superman (Tiger) : SM511 //////
+// Physical: left = left/right-only rocker (no up/down on this romset);
+// right = 2 stacked buttons, "Punch" above "Call".
+class TSUPERMAN : public Virtual_Input{
+    public :
+        TSUPERMAN(SM5XX* c) : Virtual_Input(c) {
+            left_configuration = CONF_2_BUTTON_LEFTRIGHT;
+            right_configuration = CONF_2_BUTTON_UPDOWN;
+        }
+
+        // NOTE: this chip variant (shared with Gargoyles: Night Flight,
+        // tgargnf in MAME) doesn't use the first scan line - MAME's own
+        // port comments read S2, S3, S4... instead of the usual S1, S2,
+        // S3..., unlike every other class in this file. The `group` used
+        // here is the actual physical S-line minus 1 (S2 -> group 1, S3 ->
+        // group 2, ...), NOT the port's position in the list (which would
+        // be off by one for this game specifically) - confirmed against
+        // TSONIC2 above, whose MAME source has this exact same S2-start
+        // quirk and already encodes the same +1 offset. `group` is ignored
+        // entirely for the not_multiplex=true Start call (see
+        // SM5XX::input_set), so that one was unaffected by this bug.
+        void set_input(uint8_t part, uint8_t button, bool state, uint8_t player = 1) override{
+            switch (part) {
+                case PART_SETUP:
+                    switch (button) {
+                        case BUTTON_GAMEA: cpu->input_set(6, 3, state, true); break; // Power On/Start
+                        case BUTTON_GAMEB: cpu->input_set(6, 0, state); break; // Max Score
+                        default: break; } break;
+                case PART_LEFT:
+                    switch (button) {
+                        case BUTTON_RIGHT: cpu->input_set(2, 1, state); break;
+                        case BUTTON_LEFT: cpu->input_set(2, 2, state); break;
+                        default: break; } break;
+                case PART_RIGHT:
+                    switch (button) {
+                        case BUTTON_UP: cpu->input_set(4, 1, state); break; // Punch
+                        case BUTTON_DOWN: cpu->input_set(5, 0, state); break; // Call
+                        default: break; } break;
+                default: break;
+            }
+        }
+};
+
+////// Battletoads (Tiger) : SM510 //////
+// Physical: left = full 4-way d-pad; right = "ATTACK" rocker (Left/Right)
+// above "SELECT" (single button).
+class TBTOADS : public Virtual_Input{
+    public :
+        TBTOADS(SM5XX* c) : Virtual_Input(c) {
+            left_configuration = CONF_4_BUTTON_DIRECTION;
+            right_configuration = CONF_4_BUTTON_DIRECTION;
+        }
+
+        void set_input(uint8_t part, uint8_t button, bool state, uint8_t player = 1) override{
+            switch (part) {
+                case PART_SETUP:
+                    switch (button) {
+                        case BUTTON_GAMEA: cpu->input_set(6, 3, state, true); break; // Power On/Start
+                        case BUTTON_GAMEB: cpu->input_set(5, 0, state); break; // Score
+                        default: break; } break;
+                case PART_LEFT:
+                    switch (button) {
+                        case BUTTON_UP: cpu->input_set(0, 2, state); break;
+                        case BUTTON_RIGHT: cpu->input_set(1, 1, state); break;
+                        case BUTTON_LEFT: cpu->input_set(1, 2, state); break;
+                        case BUTTON_DOWN: cpu->input_set(2, 1, state); break;
+                        default: break; } break;
+                case PART_RIGHT:
+                    switch (button) {
+                        case BUTTON_RIGHT: cpu->input_set(3, 1, state); break; // Attack Right
+                        case BUTTON_LEFT: cpu->input_set(4, 1, state); break; // Attack Left
+                        case BUTTON_DOWN: cpu->input_set(4, 0, state); break; // Select
+                        default: break; } break;
+                default: break;
+            }
+        }
+};
+
+////// Karnov (Tiger) : SM510 //////
+// NOTE: this romset uses a different bit layout than most others in this
+// file (Up/Right on bit 0 instead of the usual bit 2/bit 1, Left on bit 1,
+// Max Score on bit 2 instead of bit 0) - verified directly against its own
+// MAME INPUT_PORTS rather than assumed from another game.
+// Physical: left = full 4-way d-pad; right = "FIRE-BALL"/"BOOMERANG"
+// rocker above "SHIELD" (single button).
+class TKARNOV : public Virtual_Input{
+    public :
+        TKARNOV(SM5XX* c) : Virtual_Input(c) {
+            left_configuration = CONF_4_BUTTON_DIRECTION;
+            right_configuration = CONF_4_BUTTON_DIRECTION;
+        }
+
+        void set_input(uint8_t part, uint8_t button, bool state, uint8_t player = 1) override{
+            switch (part) {
+                case PART_SETUP:
+                    switch (button) {
+                        case BUTTON_GAMEA: cpu->input_set(6, 3, state, true); break; // Power On/Start
+                        case BUTTON_GAMEB: cpu->input_set(5, 2, state); break; // Max Score
+                        default: break; } break;
+                case PART_LEFT:
+                    switch (button) {
+                        case BUTTON_UP: cpu->input_set(0, 0, state); break;
+                        case BUTTON_RIGHT: cpu->input_set(1, 0, state); break;
+                        case BUTTON_LEFT: cpu->input_set(1, 1, state); break;
+                        case BUTTON_DOWN: cpu->input_set(2, 1, state); break;
+                        default: break; } break;
+                case PART_RIGHT:
+                    switch (button) {
+                        case BUTTON_LEFT: cpu->input_set(3, 1, state); break; // Fire-Ball
+                        case BUTTON_RIGHT: cpu->input_set(4, 1, state); break; // Boomerang
+                        case BUTTON_DOWN: cpu->input_set(4, 2, state); break; // Shield
+                        default: break; } break;
+                default: break;
+            }
+        }
+};
+
+////// Hook (Tiger) : SM510 //////
+// Physical: left = full 4-way d-pad ("Sword Up"/"Sword Down/Dodge"); right
+// = "SWING" rocker (Left/Right) above "ATTACK/PICK" (single button).
+class THOOK : public Virtual_Input{
+    public :
+        THOOK(SM5XX* c) : Virtual_Input(c) {
+            left_configuration = CONF_4_BUTTON_DIRECTION;
+            right_configuration = CONF_4_BUTTON_DIRECTION;
+        }
+
+        void set_input(uint8_t part, uint8_t button, bool state, uint8_t player = 1) override{
+            switch (part) {
+                case PART_SETUP:
+                    switch (button) {
+                        case BUTTON_GAMEA: cpu->input_set(6, 3, state, true); break; // Power On/Start
+                        case BUTTON_GAMEB: cpu->input_set(5, 0, state); break; // Pause
+                        default: break; } break;
+                case PART_LEFT:
+                    switch (button) {
+                        case BUTTON_UP: cpu->input_set(0, 2, state); break; // Sword Up
+                        case BUTTON_RIGHT: cpu->input_set(1, 1, state); break;
+                        case BUTTON_LEFT: cpu->input_set(1, 2, state); break;
+                        case BUTTON_DOWN: cpu->input_set(2, 1, state); break; // Sword Down/Dodge
+                        default: break; } break;
+                case PART_RIGHT:
+                    switch (button) {
+                        case BUTTON_RIGHT: cpu->input_set(3, 1, state); break; // Swing Right
+                        case BUTTON_LEFT: cpu->input_set(4, 1, state); break; // Swing Left
+                        case BUTTON_DOWN: cpu->input_set(4, 0, state); break; // Attack/Pick
+                        default: break; } break;
+                default: break;
+            }
+        }
+};
+
+////// Back to the Future (Tiger) : SM510 //////
+// Physical: left = full 4-way d-pad ("Repair"/"Brake"); right = 2 stacked
+// buttons, "Accelerate" above "Rescue". Only 6 IN.x ports total on this
+// romset (Start is on IN.5, not IN.6 like most others).
+class TBTTF : public Virtual_Input{
+    public :
+        TBTTF(SM5XX* c) : Virtual_Input(c) {
+            left_configuration = CONF_4_BUTTON_DIRECTION;
+            right_configuration = CONF_2_BUTTON_UPDOWN;
+        }
+
+        void set_input(uint8_t part, uint8_t button, bool state, uint8_t player = 1) override{
+            switch (part) {
+                case PART_SETUP:
+                    switch (button) {
+                        case BUTTON_GAMEA: cpu->input_set(5, 3, state, true); break; // Power On/Start
+                        case BUTTON_GAMEB: cpu->input_set(4, 0, state); break; // Pause
+                        default: break; } break;
+                case PART_LEFT:
+                    switch (button) {
+                        case BUTTON_UP: cpu->input_set(0, 2, state); break; // Repair
+                        case BUTTON_RIGHT: cpu->input_set(1, 1, state); break;
+                        case BUTTON_LEFT: cpu->input_set(1, 2, state); break;
+                        case BUTTON_DOWN: cpu->input_set(2, 1, state); break; // Brake
+                        default: break; } break;
+                case PART_RIGHT:
+                    switch (button) {
+                        case BUTTON_UP: cpu->input_set(3, 0, state); break; // Accelerate
+                        case BUTTON_DOWN: cpu->input_set(3, 1, state); break; // Rescue
+                        default: break; } break;
+                default: break;
+            }
+        }
+};
+
+////// Transformers: Generation 2 (Tiger) : SM510 //////
+// Physical: left = full 4-way d-pad; right = "CALL" (single button) above
+// "TRANSFORM"/"ATTACK" rocker (Left/Right).
+class TTRANSF2 : public Virtual_Input{
+    public :
+        TTRANSF2(SM5XX* c) : Virtual_Input(c) {
+            left_configuration = CONF_4_BUTTON_DIRECTION;
+            right_configuration = CONF_4_BUTTON_DIRECTION;
+        }
+
+        void set_input(uint8_t part, uint8_t button, bool state, uint8_t player = 1) override{
+            switch (part) {
+                case PART_SETUP:
+                    switch (button) {
+                        case BUTTON_GAMEA: cpu->input_set(6, 3, state, true); break; // Power On/Start
+                        case BUTTON_GAMEB: cpu->input_set(5, 0, state); break; // Pause
+                        default: break; } break;
+                case PART_LEFT:
+                    switch (button) {
+                        case BUTTON_UP: cpu->input_set(0, 2, state); break;
+                        case BUTTON_RIGHT: cpu->input_set(1, 1, state); break;
+                        case BUTTON_LEFT: cpu->input_set(1, 2, state); break;
+                        case BUTTON_DOWN: cpu->input_set(2, 1, state); break;
+                        default: break; } break;
+                case PART_RIGHT:
+                    switch (button) {
+                        case BUTTON_UP: cpu->input_set(4, 0, state); break; // Call
+                        case BUTTON_LEFT: cpu->input_set(4, 1, state); break; // Transform
+                        case BUTTON_RIGHT: cpu->input_set(3, 0, state); break; // Attack
+                        default: break; } break;
+                default: break;
+            }
+        }
+};
+
+////// Vindicators (Tiger) : SM510 //////
+// Physical: left = 4-way-shaped d-pad (only Up/Right/Left wired - no Down
+// on this romset); right = "FIRE" (single button) above "GUN" rocker
+// (Left/Right).
+class TVINDICTR : public Virtual_Input{
+    public :
+        TVINDICTR(SM5XX* c) : Virtual_Input(c) {
+            left_configuration = CONF_4_BUTTON_DIRECTION;
+            right_configuration = CONF_4_BUTTON_DIRECTION;
+        }
+
+        void set_input(uint8_t part, uint8_t button, bool state, uint8_t player = 1) override{
+            switch (part) {
+                case PART_SETUP:
+                    switch (button) {
+                        case BUTTON_GAMEA: cpu->input_set(6, 3, state, true); break; // Power On/Start
+                        case BUTTON_GAMEB: cpu->input_set(5, 0, state); break; // Max Score
+                        default: break; } break;
+                case PART_LEFT:
+                    switch (button) {
+                        case BUTTON_UP: cpu->input_set(0, 2, state); break;
+                        case BUTTON_RIGHT: cpu->input_set(1, 1, state); break;
+                        case BUTTON_LEFT: cpu->input_set(1, 2, state); break;
+                        default: break; } break;
+                case PART_RIGHT:
+                    switch (button) {
+                        case BUTTON_UP: cpu->input_set(4, 0, state); break; // Fire
+                        case BUTTON_LEFT: cpu->input_set(4, 1, state); break; // Gun Left
+                        case BUTTON_RIGHT: cpu->input_set(3, 1, state); break; // Gun Right
+                        default: break; } break;
+                default: break;
+            }
+        }
+};
+
+////// Jurassic Park (Tiger) : SM510 //////
+// Physical: left = full 4-way d-pad ("Jump/Climb"/"Forward"); right = 2
+// stacked buttons, "Swing/Power" above "Call". Note "Swing/Power" shares
+// IN.0 with the d-pad's Up (same group, different line) rather than living
+// on its own port like most other games' right-side buttons.
+class TJPARK : public Virtual_Input{
+    public :
+        TJPARK(SM5XX* c) : Virtual_Input(c) {
+            left_configuration = CONF_4_BUTTON_DIRECTION;
+            right_configuration = CONF_2_BUTTON_UPDOWN;
+        }
+
+        void set_input(uint8_t part, uint8_t button, bool state, uint8_t player = 1) override{
+            switch (part) {
+                case PART_SETUP:
+                    switch (button) {
+                        case BUTTON_GAMEA: cpu->input_set(5, 3, state, true); break; // Power On/Start
+                        case BUTTON_GAMEB: cpu->input_set(4, 0, state); break; // Pause
+                        default: break; } break;
+                case PART_LEFT:
+                    switch (button) {
+                        case BUTTON_UP: cpu->input_set(0, 0, state); break; // Jump/Climb
+                        case BUTTON_RIGHT: cpu->input_set(1, 1, state); break;
+                        case BUTTON_LEFT: cpu->input_set(1, 2, state); break;
+                        case BUTTON_DOWN: cpu->input_set(2, 1, state); break; // Forward
+                        default: break; } break;
+                case PART_RIGHT:
+                    switch (button) {
+                        case BUTTON_UP: cpu->input_set(0, 2, state); break; // Swing/Power
+                        case BUTTON_DOWN: cpu->input_set(3, 1, state); break; // Call
+                        default: break; } break;
+                default: break;
+            }
+        }
+};
+
+////// Skeleton Warriors: The Dark Crusade (Tiger) : SM510 //////
+// Physical: left = full 4-way d-pad; right = "ATTACK" rocker (Left/Right)
+// above "PICK/CALL" (single button).
+class TSKELWARR : public Virtual_Input{
+    public :
+        TSKELWARR(SM5XX* c) : Virtual_Input(c) {
+            left_configuration = CONF_4_BUTTON_DIRECTION;
+            right_configuration = CONF_4_BUTTON_DIRECTION;
+        }
+
+        void set_input(uint8_t part, uint8_t button, bool state, uint8_t player = 1) override{
+            switch (part) {
+                case PART_SETUP:
+                    switch (button) {
+                        case BUTTON_GAMEA: cpu->input_set(6, 3, state, true); break; // Power On/Start
+                        case BUTTON_GAMEB: cpu->input_set(5, 0, state); break; // Pause
+                        default: break; } break;
+                case PART_LEFT:
+                    switch (button) {
+                        case BUTTON_UP: cpu->input_set(0, 2, state); break;
+                        case BUTTON_RIGHT: cpu->input_set(1, 1, state); break;
+                        case BUTTON_LEFT: cpu->input_set(1, 2, state); break;
+                        case BUTTON_DOWN: cpu->input_set(2, 1, state); break;
+                        default: break; } break;
+                case PART_RIGHT:
+                    switch (button) {
+                        case BUTTON_RIGHT: cpu->input_set(3, 1, state); break; // Attack Right
+                        case BUTTON_LEFT: cpu->input_set(4, 1, state); break; // Attack Left
+                        case BUTTON_DOWN: cpu->input_set(4, 0, state); break; // Pick/Call
+                        default: break; } break;
+                default: break;
+            }
+        }
+};
+
+////// The Addams Family (Tiger) : SM510 //////
+// Physical: left = full 4-way d-pad; right = "TAKE" (single button) above
+// "THROW"/"SELECT" rocker (Left=Select, Right=Throw).
+class TADDAMS : public Virtual_Input{
+    public :
+        TADDAMS(SM5XX* c) : Virtual_Input(c) {
+            left_configuration = CONF_4_BUTTON_DIRECTION;
+            right_configuration = CONF_4_BUTTON_DIRECTION;
+        }
+
+        void set_input(uint8_t part, uint8_t button, bool state, uint8_t player = 1) override{
+            switch (part) {
+                case PART_SETUP:
+                    switch (button) {
+                        case BUTTON_GAMEA: cpu->input_set(6, 3, state, true); break; // Power On/Start
+                        case BUTTON_GAMEB: cpu->input_set(5, 0, state); break; // Pause
+                        default: break; } break;
+                case PART_LEFT:
+                    switch (button) {
+                        case BUTTON_UP: cpu->input_set(0, 2, state); break;
+                        case BUTTON_RIGHT: cpu->input_set(1, 1, state); break;
+                        case BUTTON_LEFT: cpu->input_set(1, 2, state); break;
+                        case BUTTON_DOWN: cpu->input_set(2, 1, state); break;
+                        default: break; } break;
+                case PART_RIGHT:
+                    switch (button) {
+                        case BUTTON_RIGHT: cpu->input_set(3, 1, state); break; // Take
+                        case BUTTON_UP: cpu->input_set(4, 0, state); break; // Throw
+                        case BUTTON_LEFT: cpu->input_set(4, 1, state); break; // Select
+                        default: break; } break;
+                default: break;
+            }
+        }
+};
+
+////// Home Alone (Tiger) : SM510 //////
+// Physical: left = full 4-way d-pad; right = "TRAP" rocker (Left/Right)
+// above "CLIMB" (single button).
+class THALONE : public Virtual_Input{
+    public :
+        THALONE(SM5XX* c) : Virtual_Input(c) {
+            left_configuration = CONF_4_BUTTON_DIRECTION;
+            right_configuration = CONF_4_BUTTON_DIRECTION;
+        }
+
+        void set_input(uint8_t part, uint8_t button, bool state, uint8_t player = 1) override{
+            switch (part) {
+                case PART_SETUP:
+                    switch (button) {
+                        case BUTTON_GAMEA: cpu->input_set(6, 3, state, true); break; // Power On/Start
+                        case BUTTON_GAMEB: cpu->input_set(5, 0, state); break; // Pause
+                        default: break; } break;
+                case PART_LEFT:
+                    switch (button) {
+                        case BUTTON_UP: cpu->input_set(0, 2, state); break;
+                        case BUTTON_RIGHT: cpu->input_set(1, 1, state); break;
+                        case BUTTON_LEFT: cpu->input_set(1, 2, state); break;
+                        case BUTTON_DOWN: cpu->input_set(2, 1, state); break;
+                        default: break; } break;
+                case PART_RIGHT:
+                    switch (button) {
+                        case BUTTON_RIGHT: cpu->input_set(3, 1, state); break; // Trap Right
+                        case BUTTON_UP: cpu->input_set(4, 0, state); break; // Climb
+                        case BUTTON_LEFT: cpu->input_set(4, 1, state); break; // Trap Left
+                        default: break; } break;
+                default: break;
+            }
+        }
+};
+
+////// Home Alone 2: Lost in New York (Tiger) : SM510 //////
+// Physical: same shape as Home Alone above - left = full 4-way d-pad;
+// right = "TRAP/FLASH" rocker (Left/Right) above "CLIMB/PICK" (single
+// button).
+class THALONE2 : public Virtual_Input{
+    public :
+        THALONE2(SM5XX* c) : Virtual_Input(c) {
+            left_configuration = CONF_4_BUTTON_DIRECTION;
+            right_configuration = CONF_4_BUTTON_DIRECTION;
+        }
+
+        void set_input(uint8_t part, uint8_t button, bool state, uint8_t player = 1) override{
+            switch (part) {
+                case PART_SETUP:
+                    switch (button) {
+                        case BUTTON_GAMEA: cpu->input_set(6, 3, state, true); break; // Power On/Start
+                        case BUTTON_GAMEB: cpu->input_set(5, 0, state); break; // Pause
+                        default: break; } break;
+                case PART_LEFT:
+                    switch (button) {
+                        case BUTTON_UP: cpu->input_set(0, 2, state); break;
+                        case BUTTON_RIGHT: cpu->input_set(1, 1, state); break;
+                        case BUTTON_LEFT: cpu->input_set(1, 2, state); break;
+                        case BUTTON_DOWN: cpu->input_set(2, 1, state); break;
+                        default: break; } break;
+                case PART_RIGHT:
+                    switch (button) {
+                        case BUTTON_RIGHT: cpu->input_set(3, 1, state); break; // Trap/Flash Right
+                        case BUTTON_UP: cpu->input_set(4, 0, state); break; // Climb/Pick
+                        case BUTTON_LEFT: cpu->input_set(4, 1, state); break; // Trap/Flash Left
+                        default: break; } break;
+                default: break;
+            }
+        }
+};
+
+////// X-Men: Project X (Tiger) : SM510 //////
+// Physical: left = full 4-way d-pad ("Pick" on Down); right = "JUMP"
+// (single button) above "MOVE" (single button) - only 6 IN.x ports total
+// (Start is on IN.5, not IN.6; Pause/GameB on IN.4, not IN.5).
+class TXMENPX : public Virtual_Input{
+    public :
+        TXMENPX(SM5XX* c) : Virtual_Input(c) {
+            left_configuration = CONF_4_BUTTON_DIRECTION;
+            right_configuration = CONF_2_BUTTON_UPDOWN;
+        }
+
+        void set_input(uint8_t part, uint8_t button, bool state, uint8_t player = 1) override{
+            switch (part) {
+                case PART_SETUP:
+                    switch (button) {
+                        case BUTTON_GAMEA: cpu->input_set(5, 3, state, true); break; // Power On/Start
+                        case BUTTON_GAMEB: cpu->input_set(4, 0, state); break; // Pause
+                        default: break; } break;
+                case PART_LEFT:
+                    switch (button) {
+                        case BUTTON_UP: cpu->input_set(0, 2, state); break;
+                        case BUTTON_RIGHT: cpu->input_set(1, 1, state); break;
+                        case BUTTON_LEFT: cpu->input_set(1, 2, state); break;
+                        case BUTTON_DOWN: cpu->input_set(2, 1, state); break; // Pick
+                        default: break; } break;
+                case PART_RIGHT:
+                    switch (button) {
+                        case BUTTON_UP: cpu->input_set(3, 0, state); break; // Jump
+                        case BUTTON_DOWN: cpu->input_set(3, 1, state); break; // Move
+                        default: break; } break;
+                default: break;
+            }
+        }
+};
+
+////// Wayne's World (Tiger) : SM510 //////
+// Physical: left = full 4-way d-pad (Up labeled "High Five" - still just
+// the Up direction); right = "HOCKEY" rocker (Left/Right) above
+// "SHOOT/CASSANDRA" (single button).
+class TWWORLD : public Virtual_Input{
+    public :
+        TWWORLD(SM5XX* c) : Virtual_Input(c) {
+            left_configuration = CONF_4_BUTTON_DIRECTION;
+            right_configuration = CONF_4_BUTTON_DIRECTION;
+        }
+
+        void set_input(uint8_t part, uint8_t button, bool state, uint8_t player = 1) override{
+            switch (part) {
+                case PART_SETUP:
+                    switch (button) {
+                        case BUTTON_GAMEA: cpu->input_set(6, 3, state, true); break; // Power On/Start
+                        case BUTTON_GAMEB: cpu->input_set(5, 0, state); break; // Pause
+                        default: break; } break;
+                case PART_LEFT:
+                    switch (button) {
+                        case BUTTON_UP: cpu->input_set(0, 2, state); break; // High Five
+                        case BUTTON_RIGHT: cpu->input_set(1, 1, state); break;
+                        case BUTTON_LEFT: cpu->input_set(1, 2, state); break;
+                        case BUTTON_DOWN: cpu->input_set(2, 1, state); break;
+                        default: break; } break;
+                case PART_RIGHT:
+                    switch (button) {
+                        case BUTTON_RIGHT: cpu->input_set(3, 1, state); break; // Hockey Right
+                        case BUTTON_UP: cpu->input_set(4, 0, state); break; // Shoot/Cassandra
+                        case BUTTON_LEFT: cpu->input_set(4, 1, state); break; // Hockey Left
+                        default: break; } break;
+                default: break;
+            }
+        }
+};
+
+////// The Nightmare Before Christmas (Tiger) : SM510 //////
+// Physical: left = full 4-way d-pad ("JUMP" on Up); right = single big
+// oval button literally labeled "ACTION" on the console - only 5 IN.x
+// ports total (Pause/GameB on IN.4, Start on IN.5).
+class TNMAREBC : public Virtual_Input{
+    public :
+        TNMAREBC(SM5XX* c) : Virtual_Input(c) {
+            left_configuration = CONF_4_BUTTON_DIRECTION;
+            right_configuration = CONF_1_BUTTON_ACTION;
+        }
+
+        void set_input(uint8_t part, uint8_t button, bool state, uint8_t player = 1) override{
+            switch (part) {
+                case PART_SETUP:
+                    switch (button) {
+                        case BUTTON_GAMEA: cpu->input_set(5, 3, state, true); break; // Power On/Start
+                        case BUTTON_GAMEB: cpu->input_set(4, 0, state); break; // Pause
+                        default: break; } break;
+                case PART_LEFT:
+                    switch (button) {
+                        case BUTTON_UP: cpu->input_set(0, 2, state); break; // Jump
+                        case BUTTON_RIGHT: cpu->input_set(1, 1, state); break;
+                        case BUTTON_LEFT: cpu->input_set(1, 2, state); break;
+                        case BUTTON_DOWN: cpu->input_set(2, 1, state); break;
+                        default: break; } break;
+                case PART_RIGHT:
+                    switch (button) {
+                        case BUTTON_ACTION: cpu->input_set(3, 0, state); break; // Action
+                        default: break; } break;
+                default: break;
+            }
+        }
+};
+
+////// Operation: Aliens (Tiger) : SM510 //////
+// Physical: left = full 4-way d-pad; right = "ATTACK" (single button)
+// above "PICK" (single button) - only 5 IN.x ports total.
+class TOPALIENS : public Virtual_Input{
+    public :
+        TOPALIENS(SM5XX* c) : Virtual_Input(c) {
+            left_configuration = CONF_4_BUTTON_DIRECTION;
+            right_configuration = CONF_2_BUTTON_UPDOWN;
+        }
+
+        void set_input(uint8_t part, uint8_t button, bool state, uint8_t player = 1) override{
+            switch (part) {
+                case PART_SETUP:
+                    switch (button) {
+                        case BUTTON_GAMEA: cpu->input_set(5, 3, state, true); break; // Power On/Start
+                        case BUTTON_GAMEB: cpu->input_set(4, 0, state); break; // Pause
+                        default: break; } break;
+                case PART_LEFT:
+                    switch (button) {
+                        case BUTTON_UP: cpu->input_set(0, 2, state); break;
+                        case BUTTON_RIGHT: cpu->input_set(1, 1, state); break;
+                        case BUTTON_LEFT: cpu->input_set(1, 2, state); break;
+                        case BUTTON_DOWN: cpu->input_set(2, 1, state); break;
+                        default: break; } break;
+                case PART_RIGHT:
+                    switch (button) {
+                        case BUTTON_UP: cpu->input_set(3, 0, state); break; // Attack
+                        case BUTTON_DOWN: cpu->input_set(3, 1, state); break; // Pick
+                        default: break; } break;
+                default: break;
+            }
+        }
+};
+
+////// The Shadow (Tiger) : SM510 //////
+// Physical: left = full 4-way d-pad; right = "SHADOW" (single button)
+// above "KICK"/"PUNCH" rocker (Left=Kick, Right=Punch).
+class TSHADOW : public Virtual_Input{
+    public :
+        TSHADOW(SM5XX* c) : Virtual_Input(c) {
+            left_configuration = CONF_4_BUTTON_DIRECTION;
+            right_configuration = CONF_4_BUTTON_DIRECTION;
+        }
+
+        void set_input(uint8_t part, uint8_t button, bool state, uint8_t player = 1) override{
+            switch (part) {
+                case PART_SETUP:
+                    switch (button) {
+                        case BUTTON_GAMEA: cpu->input_set(6, 3, state, true); break; // Power On/Start
+                        case BUTTON_GAMEB: cpu->input_set(5, 0, state); break; // Pause
+                        default: break; } break;
+                case PART_LEFT:
+                    switch (button) {
+                        case BUTTON_UP: cpu->input_set(0, 2, state); break;
+                        case BUTTON_RIGHT: cpu->input_set(1, 1, state); break;
+                        case BUTTON_LEFT: cpu->input_set(1, 2, state); break;
+                        case BUTTON_DOWN: cpu->input_set(2, 1, state); break;
+                        default: break; } break;
+                case PART_RIGHT:
+                    switch (button) {
+                        case BUTTON_RIGHT: cpu->input_set(3, 1, state); break; // Punch
+                        case BUTTON_UP: cpu->input_set(4, 0, state); break; // Shadow
+                        case BUTTON_LEFT: cpu->input_set(4, 1, state); break; // Kick
+                        default: break; } break;
+                default: break;
+            }
+        }
+};
+
+////// Space Jam (Tiger) : SM510 //////
+// Physical: left = full 4-way d-pad; right = "SHOOT/BLOCK" (single button)
+// above "TUNE/STEAL" (single button) - only 6 IN.x ports total.
+class TSJAM : public Virtual_Input{
+    public :
+        TSJAM(SM5XX* c) : Virtual_Input(c) {
+            left_configuration = CONF_4_BUTTON_DIRECTION;
+            right_configuration = CONF_2_BUTTON_UPDOWN;
+        }
+
+        void set_input(uint8_t part, uint8_t button, bool state, uint8_t player = 1) override{
+            switch (part) {
+                case PART_SETUP:
+                    switch (button) {
+                        case BUTTON_GAMEA: cpu->input_set(5, 3, state, true); break; // Power On/Start
+                        case BUTTON_GAMEB: cpu->input_set(4, 0, state); break; // Pause
+                        default: break; } break;
+                case PART_LEFT:
+                    switch (button) {
+                        case BUTTON_UP: cpu->input_set(0, 2, state); break;
+                        case BUTTON_RIGHT: cpu->input_set(1, 1, state); break;
+                        case BUTTON_LEFT: cpu->input_set(1, 2, state); break;
+                        case BUTTON_DOWN: cpu->input_set(2, 1, state); break;
+                        default: break; } break;
+                case PART_RIGHT:
+                    switch (button) {
+                        case BUTTON_UP: cpu->input_set(3, 0, state); break; // Shoot/Block
+                        case BUTTON_DOWN: cpu->input_set(3, 1, state); break; // Tune/Steal
+                        default: break; } break;
+                default: break;
+            }
+        }
+};
+
+////// Street Fighter 2010: The Final Fight (Tiger) : SM510 //////
+// Physical: left = full 4-way d-pad; right = "PUNCH" rocker (Left/Right)
+// above "KICK" (single button).
+class TSF2010 : public Virtual_Input{
+    public :
+        TSF2010(SM5XX* c) : Virtual_Input(c) {
+            left_configuration = CONF_4_BUTTON_DIRECTION;
+            right_configuration = CONF_4_BUTTON_DIRECTION;
+        }
+
+        void set_input(uint8_t part, uint8_t button, bool state, uint8_t player = 1) override{
+            switch (part) {
+                case PART_SETUP:
+                    switch (button) {
+                        case BUTTON_GAMEA: cpu->input_set(6, 3, state, true); break; // Power On/Start
+                        case BUTTON_GAMEB: cpu->input_set(5, 0, state); break; // Select Planet
+                        default: break; } break;
+                case PART_LEFT:
+                    switch (button) {
+                        case BUTTON_UP: cpu->input_set(0, 2, state); break;
+                        case BUTTON_RIGHT: cpu->input_set(1, 1, state); break;
+                        case BUTTON_LEFT: cpu->input_set(1, 2, state); break;
+                        case BUTTON_DOWN: cpu->input_set(2, 1, state); break;
+                        default: break; } break;
+                case PART_RIGHT:
+                    switch (button) {
+                        case BUTTON_RIGHT: cpu->input_set(3, 1, state); break; // Punch Right
+                        case BUTTON_UP: cpu->input_set(4, 0, state); break; // Kick
+                        case BUTTON_LEFT: cpu->input_set(4, 1, state); break; // Punch Left
+                        default: break; } break;
+                default: break;
+            }
+        }
+};
+
+////// Swamp Thing (Tiger) : SM510 //////
+// Physical: left = full 4-way d-pad; right = "PUNCH/FIRE" (single button)
+// above "THROW" (single button) - only 6 IN.x ports total.
+class TSWAMPT : public Virtual_Input{
+    public :
+        TSWAMPT(SM5XX* c) : Virtual_Input(c) {
+            left_configuration = CONF_4_BUTTON_DIRECTION;
+            right_configuration = CONF_2_BUTTON_UPDOWN;
+        }
+
+        void set_input(uint8_t part, uint8_t button, bool state, uint8_t player = 1) override{
+            switch (part) {
+                case PART_SETUP:
+                    switch (button) {
+                        case BUTTON_GAMEA: cpu->input_set(5, 3, state, true); break; // Power On/Start
+                        case BUTTON_GAMEB: cpu->input_set(4, 0, state); break; // Pause
+                        default: break; } break;
+                case PART_LEFT:
+                    switch (button) {
+                        case BUTTON_UP: cpu->input_set(0, 2, state); break;
+                        case BUTTON_RIGHT: cpu->input_set(1, 1, state); break;
+                        case BUTTON_LEFT: cpu->input_set(1, 2, state); break;
+                        case BUTTON_DOWN: cpu->input_set(2, 1, state); break;
+                        default: break; } break;
+                case PART_RIGHT:
+                    switch (button) {
+                        case BUTTON_UP: cpu->input_set(3, 0, state); break; // Punch/Fire
+                        case BUTTON_DOWN: cpu->input_set(3, 1, state); break; // Throw
+                        default: break; } break;
+                default: break;
+            }
+        }
+};
+
+////// The Incredible Crash Dummies (Tiger) : SM510 //////
+// Physical: left = full 4-way d-pad ("BRAKE"/"CRASH" on Left/Right); right
+// = "ACCELERATE" (single button) above "PICK" (single button) - only 6
+// IN.x ports total.
+class TDUMMIES : public Virtual_Input{
+    public :
+        TDUMMIES(SM5XX* c) : Virtual_Input(c) {
+            left_configuration = CONF_4_BUTTON_DIRECTION;
+            right_configuration = CONF_2_BUTTON_UPDOWN;
+        }
+
+        void set_input(uint8_t part, uint8_t button, bool state, uint8_t player = 1) override{
+            switch (part) {
+                case PART_SETUP:
+                    switch (button) {
+                        case BUTTON_GAMEA: cpu->input_set(5, 3, state, true); break; // Power On/Start
+                        case BUTTON_GAMEB: cpu->input_set(4, 0, state); break; // Pause
+                        default: break; } break;
+                case PART_LEFT:
+                    switch (button) {
+                        case BUTTON_UP: cpu->input_set(0, 2, state); break;
+                        case BUTTON_RIGHT: cpu->input_set(1, 1, state); break; // Crash
+                        case BUTTON_LEFT: cpu->input_set(1, 2, state); break; // Brake
+                        case BUTTON_DOWN: cpu->input_set(2, 1, state); break;
+                        default: break; } break;
+                case PART_RIGHT:
+                    switch (button) {
+                        case BUTTON_UP: cpu->input_set(3, 0, state); break; // Accelerate
+                        case BUTTON_DOWN: cpu->input_set(3, 1, state); break; // Pick
+                        default: break; } break;
+                default: break;
+            }
+        }
+};
+
+////// Robocop 2 (Tiger) : SM510 //////
+// Physical: left = full 4-way d-pad ("RESCUE" on Left, "PICK" on Down);
+// right = "SHOOT" (single button) above "SHOOT" rocker (Left/Right).
+class TROBOCOP2 : public Virtual_Input{
+    public :
+        TROBOCOP2(SM5XX* c) : Virtual_Input(c) {
+            left_configuration = CONF_4_BUTTON_DIRECTION;
+            right_configuration = CONF_4_BUTTON_DIRECTION;
+        }
+
+        void set_input(uint8_t part, uint8_t button, bool state, uint8_t player = 1) override{
+            switch (part) {
+                case PART_SETUP:
+                    switch (button) {
+                        case BUTTON_GAMEA: cpu->input_set(6, 3, state, true); break; // Power On/Start
+                        case BUTTON_GAMEB: cpu->input_set(5, 0, state); break; // Pause
+                        default: break; } break;
+                case PART_LEFT:
+                    switch (button) {
+                        case BUTTON_UP: cpu->input_set(0, 2, state); break;
+                        case BUTTON_RIGHT: cpu->input_set(1, 1, state); break;
+                        case BUTTON_LEFT: cpu->input_set(1, 2, state); break; // Rescue
+                        case BUTTON_DOWN: cpu->input_set(2, 1, state); break; // Pick
+                        default: break; } break;
+                case PART_RIGHT:
+                    switch (button) {
+                        case BUTTON_RIGHT: cpu->input_set(3, 1, state); break; // Shoot Right
+                        case BUTTON_UP: cpu->input_set(4, 0, state); break; // Shoot Up
+                        case BUTTON_LEFT: cpu->input_set(4, 1, state); break; // Shoot Left
+                        default: break; } break;
+                default: break;
+            }
+        }
+};
+
+////// Robocop 3 (Tiger) : SM510 //////
+// Same shape as Robocop 2 above. Physical: left = full 4-way d-pad
+// ("JUMP/FLY" on Up, "RESCUE" on Left, "PICK" on Down); right = "SHOOT"
+// (single button) above "SHOOT" rocker (Left/Right).
+class TROBOCOP3 : public Virtual_Input{
+    public :
+        TROBOCOP3(SM5XX* c) : Virtual_Input(c) {
+            left_configuration = CONF_4_BUTTON_DIRECTION;
+            right_configuration = CONF_4_BUTTON_DIRECTION;
+        }
+
+        void set_input(uint8_t part, uint8_t button, bool state, uint8_t player = 1) override{
+            switch (part) {
+                case PART_SETUP:
+                    switch (button) {
+                        case BUTTON_GAMEA: cpu->input_set(6, 3, state, true); break; // Power On/Start
+                        case BUTTON_GAMEB: cpu->input_set(5, 0, state); break; // Pause
+                        default: break; } break;
+                case PART_LEFT:
+                    switch (button) {
+                        case BUTTON_UP: cpu->input_set(0, 2, state); break; // Jump/Fly
+                        case BUTTON_RIGHT: cpu->input_set(1, 1, state); break;
+                        case BUTTON_LEFT: cpu->input_set(1, 2, state); break; // Rescue
+                        case BUTTON_DOWN: cpu->input_set(2, 1, state); break; // Pick
+                        default: break; } break;
+                case PART_RIGHT:
+                    switch (button) {
+                        case BUTTON_RIGHT: cpu->input_set(3, 1, state); break; // Shoot Right
+                        case BUTTON_UP: cpu->input_set(4, 0, state); break; // Shoot Up
+                        case BUTTON_LEFT: cpu->input_set(4, 1, state); break; // Shoot Left
+                        default: break; } break;
+                default: break;
+            }
+        }
+};
+
+////// Independence Day (Tiger) : SM510 //////
+// NOTE: this romset's bit layout for the left d-pad's Up is on line 0, not
+// the usual line 2 (confirmed directly against its own MAME INPUT_PORTS -
+// every other button here follows the normal convention). Physical: left =
+// full 4-way d-pad ("SHIELD" on Up, "ALERT" on Down); right = "FIRE"
+// (single button) above "VELOCITY" (single button) - only 6 IN.x ports.
+class TINDAY : public Virtual_Input{
+    public :
+        TINDAY(SM5XX* c) : Virtual_Input(c) {
+            left_configuration = CONF_4_BUTTON_DIRECTION;
+            right_configuration = CONF_2_BUTTON_UPDOWN;
+        }
+
+        void set_input(uint8_t part, uint8_t button, bool state, uint8_t player = 1) override{
+            switch (part) {
+                case PART_SETUP:
+                    switch (button) {
+                        case BUTTON_GAMEA: cpu->input_set(5, 3, state, true); break; // Power On/Start
+                        case BUTTON_GAMEB: cpu->input_set(4, 0, state); break; // Pause
+                        default: break; } break;
+                case PART_LEFT:
+                    switch (button) {
+                        case BUTTON_UP: cpu->input_set(0, 0, state); break; // Shield
+                        case BUTTON_RIGHT: cpu->input_set(1, 1, state); break;
+                        case BUTTON_LEFT: cpu->input_set(1, 2, state); break;
+                        case BUTTON_DOWN: cpu->input_set(2, 1, state); break; // Alert
+                        default: break; } break;
+                case PART_RIGHT:
+                    switch (button) {
+                        case BUTTON_UP: cpu->input_set(0, 2, state); break; // Fire
+                        case BUTTON_DOWN: cpu->input_set(3, 1, state); break; // Velocity
+                        default: break; } break;
+                default: break;
+            }
+        }
+};
+
+////// The Flash (Tiger) : SM510 //////
+// NOTE: unlike every other game in this file, Left and Right aren't on the
+// same IN port here - "Punch/Brake" (Left) is on IN.1 while "Run" (Right)
+// is on IN.3, and there's no Up/Down at all. Confirmed directly against
+// MAME's own INPUT_PORTS, not assumed. Physical: left = "PUNCH/BRAKE" /
+// "RUN" rocker; right = "TIE" (single button) above "PICK" (single
+// button) - 8 IN.x ports total (the most of any game in this batch).
+class TFLASH : public Virtual_Input{
+    public :
+        TFLASH(SM5XX* c) : Virtual_Input(c) {
+            left_configuration = CONF_2_BUTTON_LEFTRIGHT;
+            right_configuration = CONF_2_BUTTON_UPDOWN;
+        }
+
+        void set_input(uint8_t part, uint8_t button, bool state, uint8_t player = 1) override{
+            switch (part) {
+                case PART_SETUP:
+                    switch (button) {
+                        case BUTTON_GAMEA: cpu->input_set(7, 3, state, true); break; // Power On/Start
+                        case BUTTON_GAMEB: cpu->input_set(6, 0, state); break; // Pause
+                        default: break; } break;
+                case PART_LEFT:
+                    switch (button) {
+                        case BUTTON_LEFT: cpu->input_set(1, 2, state); break; // Punch/Brake
+                        case BUTTON_RIGHT: cpu->input_set(3, 1, state); break; // Run
+                        default: break; } break;
+                case PART_RIGHT:
+                    switch (button) {
+                        case BUTTON_UP: cpu->input_set(4, 1, state); break; // Tie
+                        case BUTTON_DOWN: cpu->input_set(5, 0, state); break; // Pick
+                        default: break; } break;
+                default: break;
+            }
+        }
+};
+
+////// Pit-Fighter (Tiger) : SM510 //////
+// Genuinely different shape from every other game in this file: MAME
+// defines two independent 4-way joysticks (JOYSTICKLEFT_*/JOYSTICKRIGHT_*)
+// rather than one movement d-pad plus face buttons - this console's two
+// controls really are a left-fist stick and a right-fist stick, so they
+// map directly onto PART_LEFT/PART_RIGHT's existing 4-direction slots with
+// no compromise. Physical: both sides are 4-way sticks labeled "ATTACK"
+// (up) / "PICK" (down).
+class TPITFIGHT : public Virtual_Input{
+    public :
+        TPITFIGHT(SM5XX* c) : Virtual_Input(c) {
+            left_configuration = CONF_4_BUTTON_DIRECTION;
+            right_configuration = CONF_4_BUTTON_DIRECTION;
+        }
+
+        void set_input(uint8_t part, uint8_t button, bool state, uint8_t player = 1) override{
+            switch (part) {
+                case PART_SETUP:
+                    switch (button) {
+                        case BUTTON_GAMEA: cpu->input_set(6, 3, state, true); break; // Power On/Start
+                        case BUTTON_GAMEB: cpu->input_set(5, 2, state); break; // Select
+                        default: break; } break;
+                case PART_LEFT:
+                    switch (button) {
+                        case BUTTON_UP: cpu->input_set(0, 2, state); break; // Left Attack High
+                        case BUTTON_RIGHT: cpu->input_set(2, 2, state); break;
+                        case BUTTON_LEFT: cpu->input_set(3, 2, state); break; // Left Attack Low
+                        case BUTTON_DOWN: cpu->input_set(4, 2, state); break; // Pick On Left
+                        default: break; } break;
+                case PART_RIGHT:
+                    switch (button) {
+                        case BUTTON_LEFT: cpu->input_set(0, 0, state); break;
+                        case BUTTON_RIGHT: cpu->input_set(1, 0, state); break; // Right Attack Low
+                        case BUTTON_UP: cpu->input_set(1, 1, state); break; // Right Attack High
+                        case BUTTON_DOWN: cpu->input_set(2, 1, state); break; // Pick On Right
+                        default: break; } break;
+                default: break;
+            }
+        }
+};
+
+////// Apollo 13 (Tiger) : SM510 //////
+// Physical: left = full 4-way d-pad; right = 2x2 button grid, "THRUSTER
+// LEFT"/"THRUSTER RIGHT" on top, "PARACHUTE"/"CAPTURE" on bottom (same
+// physical grid shape confirmed via screenshot on Batman Forever/GoldenEye
+// below - reading order top-left/top-right/bottom-left/bottom-right maps
+// to Up/Right/Left/Down respectively for all of this batch's grid-style
+// consoles).
+class TAPOLLO13 : public Virtual_Input{
+    public :
+        TAPOLLO13(SM5XX* c) : Virtual_Input(c) {
+            left_configuration = CONF_4_BUTTON_DIRECTION;
+            right_configuration = CONF_4_BUTTON_DIRECTION;
+        }
+
+        void set_input(uint8_t part, uint8_t button, bool state, uint8_t player = 1) override{
+            switch (part) {
+                case PART_SETUP:
+                    switch (button) {
+                        case BUTTON_GAMEA: cpu->input_set(6, 3, state, true); break; // Power On/Start
+                        case BUTTON_GAMEB: cpu->input_set(5, 0, state); break; // Pause
+                        default: break; } break;
+                case PART_LEFT:
+                    switch (button) {
+                        case BUTTON_UP: cpu->input_set(0, 2, state); break;
+                        case BUTTON_RIGHT: cpu->input_set(1, 1, state); break;
+                        case BUTTON_LEFT: cpu->input_set(1, 2, state); break;
+                        case BUTTON_DOWN: cpu->input_set(2, 1, state); break;
+                        default: break; } break;
+                case PART_RIGHT:
+                    switch (button) {
+                        case BUTTON_UP: cpu->input_set(0, 0, state); break; // Thruster Left
+                        case BUTTON_RIGHT: cpu->input_set(4, 0, state); break; // Thruster Right
+                        case BUTTON_LEFT: cpu->input_set(3, 1, state); break; // Parachute
+                        case BUTTON_DOWN: cpu->input_set(4, 1, state); break; // Capture
+                        default: break; } break;
+                default: break;
+            }
+        }
+};
+
+////// Batman Forever: Double Dose of Doom (Tiger) : SM510 //////
+// Physical: left = full 4-way d-pad; right = 2x2 button grid, "GRAPPLING
+// GUN"/"BATARANG" on top, "HELP"/"THRUSTER" on bottom (see screenshot -
+// confirmed via CONVERT_ROM/rom/console/tbatfor.png).
+class TBATFOR : public Virtual_Input{
+    public :
+        TBATFOR(SM5XX* c) : Virtual_Input(c) {
+            left_configuration = CONF_4_BUTTON_DIRECTION;
+            right_configuration = CONF_4_BUTTON_DIRECTION;
+        }
+
+        void set_input(uint8_t part, uint8_t button, bool state, uint8_t player = 1) override{
+            switch (part) {
+                case PART_SETUP:
+                    switch (button) {
+                        case BUTTON_GAMEA: cpu->input_set(6, 3, state, true); break; // Power On/Start
+                        case BUTTON_GAMEB: cpu->input_set(5, 0, state); break; // Pause
+                        default: break; } break;
+                case PART_LEFT:
+                    switch (button) {
+                        case BUTTON_UP: cpu->input_set(0, 2, state); break;
+                        case BUTTON_RIGHT: cpu->input_set(1, 1, state); break;
+                        case BUTTON_LEFT: cpu->input_set(1, 2, state); break;
+                        case BUTTON_DOWN: cpu->input_set(2, 1, state); break;
+                        default: break; } break;
+                case PART_RIGHT:
+                    switch (button) {
+                        case BUTTON_UP: cpu->input_set(0, 0, state); break; // Grappling Gun
+                        case BUTTON_RIGHT: cpu->input_set(4, 0, state); break; // Batarang
+                        case BUTTON_LEFT: cpu->input_set(3, 1, state); break; // Help
+                        case BUTTON_DOWN: cpu->input_set(4, 1, state); break; // Thruster
+                        default: break; } break;
+                default: break;
+            }
+        }
+};
+
+////// Dennis the Menace (Tiger) : SM510 //////
+// Physical: left = full 4-way d-pad ("BRAKE" on Down); right = 2x2 button
+// grid, "SLINGSHOT LEFT"/"SLINGSHOT RIGHT" on top, "PICK LEFT"/"PICK
+// RIGHT" on bottom (same grid shape as Batman Forever/GoldenEye above).
+class TDENNIS : public Virtual_Input{
+    public :
+        TDENNIS(SM5XX* c) : Virtual_Input(c) {
+            left_configuration = CONF_4_BUTTON_DIRECTION;
+            right_configuration = CONF_4_BUTTON_DIRECTION;
+        }
+
+        void set_input(uint8_t part, uint8_t button, bool state, uint8_t player = 1) override{
+            switch (part) {
+                case PART_SETUP:
+                    switch (button) {
+                        case BUTTON_GAMEA: cpu->input_set(6, 3, state, true); break; // Power On/Start
+                        case BUTTON_GAMEB: cpu->input_set(5, 0, state); break; // Pause
+                        default: break; } break;
+                case PART_LEFT:
+                    switch (button) {
+                        case BUTTON_UP: cpu->input_set(0, 2, state); break;
+                        case BUTTON_RIGHT: cpu->input_set(1, 1, state); break;
+                        case BUTTON_LEFT: cpu->input_set(1, 2, state); break;
+                        case BUTTON_DOWN: cpu->input_set(2, 1, state); break; // Brake
+                        default: break; } break;
+                case PART_RIGHT:
+                    switch (button) {
+                        case BUTTON_UP: cpu->input_set(0, 0, state); break; // Slingshot Left
+                        case BUTTON_RIGHT: cpu->input_set(4, 0, state); break; // Slingshot Right
+                        case BUTTON_LEFT: cpu->input_set(3, 1, state); break; // Pick Left
+                        case BUTTON_DOWN: cpu->input_set(4, 1, state); break; // Pick Right
+                        default: break; } break;
+                default: break;
+            }
+        }
+};
+
+////// Judge Dredd (Tiger) : SM510 //////
+// Physical: left = full 4-way d-pad; right = 2x2 button grid,
+// "KICK"/"PUNCH" on top, "PICK/CALL"/"FIRE" on bottom (same grid shape as
+// Batman Forever/GoldenEye above).
+class TJDREDD : public Virtual_Input{
+    public :
+        TJDREDD(SM5XX* c) : Virtual_Input(c) {
+            left_configuration = CONF_4_BUTTON_DIRECTION;
+            right_configuration = CONF_4_BUTTON_DIRECTION;
+        }
+
+        void set_input(uint8_t part, uint8_t button, bool state, uint8_t player = 1) override{
+            switch (part) {
+                case PART_SETUP:
+                    switch (button) {
+                        case BUTTON_GAMEA: cpu->input_set(6, 3, state, true); break; // Power On/Start
+                        case BUTTON_GAMEB: cpu->input_set(5, 0, state); break; // Pause
+                        default: break; } break;
+                case PART_LEFT:
+                    switch (button) {
+                        case BUTTON_UP: cpu->input_set(0, 2, state); break;
+                        case BUTTON_RIGHT: cpu->input_set(1, 1, state); break;
+                        case BUTTON_LEFT: cpu->input_set(1, 2, state); break;
+                        case BUTTON_DOWN: cpu->input_set(2, 1, state); break;
+                        default: break; } break;
+                case PART_RIGHT:
+                    switch (button) {
+                        case BUTTON_UP: cpu->input_set(0, 0, state); break; // Kick
+                        case BUTTON_RIGHT: cpu->input_set(4, 0, state); break; // Punch
+                        case BUTTON_LEFT: cpu->input_set(3, 1, state); break; // Pick/Call
+                        case BUTTON_DOWN: cpu->input_set(4, 1, state); break; // Fire
+                        default: break; } break;
+                default: break;
+            }
+        }
+};
+
+////// 007: GoldenEye (Tiger) : SM510 //////
+// Physical: left = full 4-way d-pad; right = 2x2 button grid,
+// "KICK"/"PUNCH" on top, "Q"/"FIRE" on bottom (confirmed via screenshot -
+// CONVERT_ROM/rom/console/tgoldeye.png).
+class TGOLDEYE : public Virtual_Input{
+    public :
+        TGOLDEYE(SM5XX* c) : Virtual_Input(c) {
+            left_configuration = CONF_4_BUTTON_DIRECTION;
+            right_configuration = CONF_4_BUTTON_DIRECTION;
+        }
+
+        void set_input(uint8_t part, uint8_t button, bool state, uint8_t player = 1) override{
+            switch (part) {
+                case PART_SETUP:
+                    switch (button) {
+                        case BUTTON_GAMEA: cpu->input_set(6, 3, state, true); break; // Power On/Start
+                        case BUTTON_GAMEB: cpu->input_set(5, 0, state); break; // Pause
+                        default: break; } break;
+                case PART_LEFT:
+                    switch (button) {
+                        case BUTTON_UP: cpu->input_set(0, 2, state); break;
+                        case BUTTON_RIGHT: cpu->input_set(1, 1, state); break;
+                        case BUTTON_LEFT: cpu->input_set(1, 2, state); break;
+                        case BUTTON_DOWN: cpu->input_set(2, 1, state); break;
+                        default: break; } break;
+                case PART_RIGHT:
+                    switch (button) {
+                        case BUTTON_UP: cpu->input_set(0, 0, state); break; // Kick
+                        case BUTTON_RIGHT: cpu->input_set(4, 0, state); break; // Punch
+                        case BUTTON_LEFT: cpu->input_set(3, 1, state); break; // Q
+                        case BUTTON_DOWN: cpu->input_set(4, 1, state); break; // Fire
+                        default: break; } break;
+                default: break;
+            }
+        }
+};
+
+////// Kazaam (Tiger) : SM510 //////
+// Physical: left = full 4-way d-pad; right = 2x2 button grid,
+// "KICK"/"PUNCH FORWARD" on top, "PICK/RESCUE"/"PUNCH BACK" on bottom
+// (same grid shape as Batman Forever/GoldenEye above).
+class TKAZAAM : public Virtual_Input{
+    public :
+        TKAZAAM(SM5XX* c) : Virtual_Input(c) {
+            left_configuration = CONF_4_BUTTON_DIRECTION;
+            right_configuration = CONF_4_BUTTON_DIRECTION;
+        }
+
+        void set_input(uint8_t part, uint8_t button, bool state, uint8_t player = 1) override{
+            switch (part) {
+                case PART_SETUP:
+                    switch (button) {
+                        case BUTTON_GAMEA: cpu->input_set(6, 3, state, true); break; // Power On/Start
+                        case BUTTON_GAMEB: cpu->input_set(5, 0, state); break; // Pause
+                        default: break; } break;
+                case PART_LEFT:
+                    switch (button) {
+                        case BUTTON_UP: cpu->input_set(0, 2, state); break;
+                        case BUTTON_RIGHT: cpu->input_set(1, 1, state); break;
+                        case BUTTON_LEFT: cpu->input_set(1, 2, state); break;
+                        case BUTTON_DOWN: cpu->input_set(2, 1, state); break;
+                        default: break; } break;
+                case PART_RIGHT:
+                    switch (button) {
+                        case BUTTON_UP: cpu->input_set(0, 0, state); break; // Kick
+                        case BUTTON_RIGHT: cpu->input_set(4, 0, state); break; // Punch Forward
+                        case BUTTON_LEFT: cpu->input_set(3, 1, state); break; // Pick/Rescue
+                        case BUTTON_DOWN: cpu->input_set(4, 1, state); break; // Punch Back
+                        default: break; } break;
+                default: break;
+            }
+        }
+};
+
+////// Batman: The Animated Series (Tiger) : SM510 //////
+// NOTE: this chip variant doesn't use the first scan line, same quirk as
+// Superman/Gargoyles above (MAME's own port comments read S2, S3, S4...
+// instead of S1, S2, S3...) - every group value here is the actual S-line
+// minus 1. Physical: left = "JUMP"/"FAST" rocker (no left/right at all on
+// this romset - confirmed against its own MAME INPUT_PORTS); right =
+// single big oval button labeled "THROW/ATTACK".
+class TBATMANA : public Virtual_Input{
+    public :
+        TBATMANA(SM5XX* c) : Virtual_Input(c) {
+            left_configuration = CONF_2_BUTTON_UPDOWN;
+            right_configuration = CONF_1_BUTTON_ACTION;
+        }
+
+        void set_input(uint8_t part, uint8_t button, bool state, uint8_t player = 1) override{
+            switch (part) {
+                case PART_SETUP:
+                    switch (button) {
+                        case BUTTON_GAMEA: cpu->input_set(6, 3, state, true); break; // Power On/Start
+                        case BUTTON_GAMEB: cpu->input_set(6, 0, state); break; // Max Score
+                        default: break; } break;
+                case PART_LEFT:
+                    switch (button) {
+                        case BUTTON_UP: cpu->input_set(1, 2, state); break; // Jump
+                        case BUTTON_DOWN: cpu->input_set(3, 1, state); break; // Fast
+                        default: break; } break;
+                case PART_RIGHT:
+                    switch (button) {
+                        case BUTTON_ACTION: cpu->input_set(4, 1, state); break; // Throw/Attack
+                        default: break; } break;
+                default: break;
+            }
+        }
+};
+
+////// Mighty Max (Tiger) : SM510 //////
+// Same S2-start chip quirk as Batman: The Animated Series/Superman/
+// Gargoyles above - every group value here is the actual S-line minus 1.
+// Physical: left/right-only rocker (no up/down on this romset); right = 2
+// stacked buttons, "PICK" above "CALL" (confirmed via screenshot -
+// CONVERT_ROM/rom/console/tmigmax.png).
+class TMIGMAX : public Virtual_Input{
+    public :
+        TMIGMAX(SM5XX* c) : Virtual_Input(c) {
+            left_configuration = CONF_2_BUTTON_LEFTRIGHT;
+            right_configuration = CONF_2_BUTTON_UPDOWN;
+        }
+
+        void set_input(uint8_t part, uint8_t button, bool state, uint8_t player = 1) override{
+            switch (part) {
+                case PART_SETUP:
+                    switch (button) {
+                        case BUTTON_GAMEA: cpu->input_set(6, 3, state, true); break; // Power On/Start
+                        case BUTTON_GAMEB: cpu->input_set(6, 0, state); break; // Max Score
+                        default: break; } break;
+                case PART_LEFT:
+                    switch (button) {
+                        case BUTTON_RIGHT: cpu->input_set(2, 1, state); break;
+                        case BUTTON_LEFT: cpu->input_set(2, 2, state); break;
+                        default: break; } break;
+                case PART_RIGHT:
+                    switch (button) {
+                        case BUTTON_UP: cpu->input_set(4, 1, state); break; // Pick
+                        case BUTTON_DOWN: cpu->input_set(5, 0, state); break; // Call
+                        default: break; } break;
+                default: break;
+            }
+        }
+};
+
+
 
 //////////////////// Get good Game & Watch input Configuration ////////////////////
 
@@ -2373,6 +3750,47 @@ inline Virtual_Input* get_input_config(SM5XX* cpu, std::string ref_game){
     else if (ref_game == "TGAUNT"){ return new TGAUNT(cpu); } // Gautlet
     else if (ref_game == "TSHARR2"){ return new TSHARR2(cpu); } // Space Harrier II
     else if (ref_game == "TMCHAMMER"){ return new TMCHAMMER(cpu); } // MC Hammer
+
+    /* Tiger (Experimental) */
+    else if (ref_game == "TBATMAN"){ return new TBATMAN(cpu); } // Batman
+    else if (ref_game == "TSPIDMAN"){ return new TSPIDMAN(cpu); } // Spider-Man
+    else if (ref_game == "TXMEN"){ return new TXMEN(cpu); } // X-Men
+    else if (ref_game == "TMKOMBAT"){ return new TMKOMBAT(cpu); } // Mortal Kombat
+    else if (ref_game == "TSUPERMAN" || ref_game == "TGARGNF"){ return new TSUPERMAN(cpu); } // Superman / Gargoyles: Night Flight (identical ports)
+    else if (ref_game == "TBTOADS"){ return new TBTOADS(cpu); } // Battletoads
+    else if (ref_game == "TKARNOV"){ return new TKARNOV(cpu); } // Karnov
+    else if (ref_game == "THOOK"){ return new THOOK(cpu); } // Hook
+    else if (ref_game == "TBTTF"){ return new TBTTF(cpu); } // Back to the Future
+    else if (ref_game == "TTRANSF2"){ return new TTRANSF2(cpu); } // Transformers: Generation 2
+    else if (ref_game == "TVINDICTR"){ return new TVINDICTR(cpu); } // Vindicators
+    else if (ref_game == "TJPARK"){ return new TJPARK(cpu); } // Jurassic Park
+    else if (ref_game == "TSKELWARR"){ return new TSKELWARR(cpu); } // Skeleton Warriors: The Dark Crusade
+    else if (ref_game == "TADDAMS"){ return new TADDAMS(cpu); } // The Addams Family
+    else if (ref_game == "THALONE"){ return new THALONE(cpu); } // Home Alone
+    else if (ref_game == "THALONE2"){ return new THALONE2(cpu); } // Home Alone 2: Lost in New York
+    else if (ref_game == "TXMENPX"){ return new TXMENPX(cpu); } // X-Men: Project X
+    else if (ref_game == "TWWORLD"){ return new TWWORLD(cpu); } // Wayne's World
+    else if (ref_game == "TNMAREBC"){ return new TNMAREBC(cpu); } // The Nightmare Before Christmas
+    else if (ref_game == "TOPALIENS"){ return new TOPALIENS(cpu); } // Operation: Aliens
+    else if (ref_game == "TSHADOW"){ return new TSHADOW(cpu); } // The Shadow
+    else if (ref_game == "TSJAM"){ return new TSJAM(cpu); } // Space Jam
+    else if (ref_game == "TSF2010"){ return new TSF2010(cpu); } // Street Fighter 2010: The Final Fight
+    else if (ref_game == "TSWAMPT"){ return new TSWAMPT(cpu); } // Swamp Thing
+    else if (ref_game == "TDUMMIES"){ return new TDUMMIES(cpu); } // The Incredible Crash Dummies
+    else if (ref_game == "TROBOCOP2" || ref_game == "TROCKTEER"){ return new TROBOCOP2(cpu); } // Robocop 2 / The Rocketeer (identical ports, renamed)
+    else if (ref_game == "TROBOCOP3"){ return new TROBOCOP3(cpu); } // Robocop 3
+    else if (ref_game == "TINDAY"){ return new TINDAY(cpu); } // Independence Day
+    else if (ref_game == "TFLASH"){ return new TFLASH(cpu); } // The Flash
+    else if (ref_game == "TPITFIGHT"){ return new TPITFIGHT(cpu); } // Pit-Fighter
+    else if (ref_game == "TAPOLLO13"){ return new TAPOLLO13(cpu); } // Apollo 13
+    else if (ref_game == "TBATFOR"){ return new TBATFOR(cpu); } // Batman Forever: Double Dose of Doom
+    else if (ref_game == "TDENNIS"){ return new TDENNIS(cpu); } // Dennis the Menace
+    else if (ref_game == "TJDREDD"){ return new TJDREDD(cpu); } // Judge Dredd
+    else if (ref_game == "TGOLDEYE"){ return new TGOLDEYE(cpu); } // 007: GoldenEye
+    else if (ref_game == "TKAZAAM"){ return new TKAZAAM(cpu); } // Kazaam
+    else if (ref_game == "TBATMANA"){ return new TBATMANA(cpu); } // Batman: The Animated Series
+    else if (ref_game == "TMIGMAX"){ return new TMIGMAX(cpu); } // Mighty Max
+    else if (ref_game == "TROBHOOD"){ return new TGAUNT(cpu); } // Robin Hood (identical ports to Gauntlet, renamed)
 
     return nullptr;
 }
