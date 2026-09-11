@@ -435,14 +435,26 @@ void switch_screen_render() {
         draw_vertices(seg_tex, seg_verts);
 
         if (!is_mask && has_colored_segments) {
-            if (g_gl.uAlphaOnly >= 0) glUniform1f(g_gl.uAlphaOnly, 1.0f);
+            // Deliberately NOT alpha-only mode here (unlike text/glyphs in
+            // switch_ui.cpp, which genuinely need it). Every segment texture
+            // this pipeline produces (CONVERT_ROM/source/img_manipulation.py's
+            // convert_to_only_Alpha()) is RGB-white with only alpha carrying
+            // real shape data - a deliberate trick so plain `t * uMul`
+            // multiplication already tints correctly (white is the
+            // multiplicative identity) while alpha still gates transparency.
+            // The shader's alpha-only path instead computes
+            // max(t.a, max(t.r,t.g,t.b)) - since t.rgb is *always* 1.0 for
+            // these textures regardless of actual alpha, that max is always
+            // 1.0, making the whole quad register as "in shape" - a solid
+            // block. Only ever surfaced by Spitball Sparky/Crab Grab, the
+            // only two games with color_segment=true (every other game's
+            // segments never take this branch at all).
             for (uint32_t ci = 1; ci < 5; ci++) {
                 if (seg_color_verts[ci].empty()) continue;
                 const uint32_t rgb = kSegmentColorRgb[ci];
                 glUniform4f(g_gl.uMul, ((rgb >> 16) & 0xFF) / 255.0f, ((rgb >> 8) & 0xFF) / 255.0f, (rgb & 0xFF) / 255.0f, 1.0f);
                 draw_vertices(seg_tex, seg_color_verts[ci]);
             }
-            if (g_gl.uAlphaOnly >= 0) glUniform1f(g_gl.uAlphaOnly, 0.0f);
         }
     }
 

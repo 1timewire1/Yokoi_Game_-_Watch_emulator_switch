@@ -998,7 +998,17 @@ void render_settings_rows(int logical_w, int logical_h) {
         // can actually be changed with Left/Right while debug mode holds.
         if (sel && !locked) value = "< " + value + " >";
 
-        switch_ui_draw_text(value_x, y, label_size, kHighlightR, kHighlightG, kHighlightB, locked ? 0.4f : 1.0f, value);
+        // Same shrink-to-fit as the label above - long values (a full
+        // "< Custom: #RRGGBB >" hex string, especially at 90/270 where
+        // logical_w is portrait-narrow) would otherwise run off the right
+        // edge instead of wrapping or scrolling.
+        float this_value_size = label_size;
+        const float max_value_w = (float)logical_w - value_x - 20.0f;
+        const float value_w = switch_ui_text_width(value, this_value_size);
+        if (value_w > max_value_w && max_value_w > 10.0f) {
+            this_value_size = std::max(14.0f, label_size * (max_value_w / value_w));
+        }
+        switch_ui_draw_text(value_x, y, this_value_size, kHighlightR, kHighlightG, kHighlightB, locked ? 0.4f : 1.0f, value);
     }
 }
 

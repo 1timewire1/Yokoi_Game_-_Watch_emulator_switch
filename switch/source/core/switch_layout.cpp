@@ -6,6 +6,35 @@
 #include "switch_runtime_state.h"
 #include "switch_settings.h"
 
+namespace {
+
+// Games whose data models two "screens" purely for resolution/layout
+// reasons - a single tall portrait display, split top/bottom to fit
+// this codebase's shared dual-screen pipeline - rather than because the
+// real device has two physically separate screens side by side or
+// hinged. g_split_two_screens_to_panels (below) can't tell these apart
+// from a genuine two-screen "clamshell" console on its own, so Panel Gap
+// would otherwise visibly break their intended continuous look by
+// inserting a gap where none should ever appear. Exempted by ref (see
+// GW_rom::ref) rather than a data-level flag since nothing else about
+// their layout needs to differ from a real two-screen game.
+constexpr const char* kPanelGapExemptRefs[] = {
+    "BU_201",           // Spitball Sparky
+    "UD_202",           // Crab Grab
+    "D_AND_J_CLIMBER",  // David the Climber
+    "D_AND_J_RYTHME",   // Please Stop Sleeping David!
+    "D_AND_J_FABRIC",   // New Job for John
+};
+
+bool panel_gap_exempt(const std::string& ref) {
+    for (const char* r : kPanelGapExemptRefs) {
+        if (ref == r) return true;
+    }
+    return false;
+}
+
+} // namespace
+
 // Verbatim port of yokoi_layout.cpp::rebuild_layout_from_game (Android). The
 // Switch renderer always draws in "combined" mode (see switch_screen.cpp), so
 // this is the only layout function needed - rebuild_layout_for_menu (Android's
@@ -123,8 +152,9 @@ void rebuild_layout_from_game() {
     // switch_settings.h. Only applied when there's actually something below
     // to space away from: g_bottom_canvas_h is already 0 whenever there
     // isn't (a single-screen game with Console Art hidden), so no separate
-    // check is needed here.
-    const float panel_gap = (g_bottom_canvas_h > 0.0f)
+    // check is needed here - except for kPanelGapExemptRefs above, which
+    // *do* have a nonzero g_bottom_canvas_h but shouldn't get a gap anyway.
+    const float panel_gap = (g_bottom_canvas_h > 0.0f && !panel_gap_exempt(g_game->ref))
         ? g_top_canvas_h * ((float)g_panel_gap_percent / 100.0f)
         : 0.0f;
 
