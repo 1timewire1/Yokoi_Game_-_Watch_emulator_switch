@@ -17,7 +17,9 @@ from typing import Dict, List, Tuple
 ROMS_ONLY_FILES = {
     "gnw_helmeto",
     "gnw_judgeo",
-    "gnw_mariocmta"
+    "gnw_mariocmta",
+    "nummunch",
+    "uchitari",
 }
 
 

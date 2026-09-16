@@ -61,6 +61,26 @@ extern LoadStateBehavior g_load_state_behavior;
 enum class CloneFilterMode : uint8_t { ShowAll = 0, HideDuplicates = 1, HideAllClones = 2 };
 extern CloneFilterMode g_clone_filter_mode;
 
+// Governs whether games with a real-time clock that blocks Game A/B (or, for
+// UCHITARI/VESARIF, the whole UI) until a time is set and confirmed get that
+// confirmation automated on load - see auto_confirm_press.h and
+// uchitari_clock_setup.h/vesarif_clock_setup.h. Automatic (the default)
+// auto-presses the needed confirm button (or, for UCHITARI/VESARIF, plays
+// out their full scripted set-time sequence) so the game is immediately
+// playable; Manual leaves every affected game exactly as un-automated
+// hardware behaves - clock still set correctly via time_addresses.h where
+// that applies, but nothing pressed on the player's behalf, so UCHITARI/
+// VESARIF show their default 00:00 boot clock and every game normally
+// blocked on a confirm press stays on that screen until the player presses
+// it themselves. Read once per game load (switch_game_loader.cpp) - like
+// Console Art, changing this mid-game has no effect until that game is next
+// (re)loaded. Ungated (no Experimental Features gate) since it's proven
+// behavior, not experimental - but only ever shown on the game list's
+// settings screen, never the in-game one (g_settings_from_gameplay), since
+// it's meaningless once a game has already finished loading.
+enum class TimeSetMode : uint8_t { Automatic = 0, Manual = 1 };
+extern TimeSetMode g_time_set_mode;
+
 // Whether debug_log (debug_log.h) writes to yokoi_log.txt at all. Defaults
 // off. Applied via debug_log::set_enabled() both at load and live whenever
 // this row changes in the settings menu. Only ever shown/changeable from the
@@ -111,13 +131,42 @@ extern bool g_betagames_enabled;
 extern uint8_t g_panel_gap_percent;
 
 // Same idea as g_betagames_enabled, for a separate bucket of games (starting
-// with a handful of Tiger titles added after launch - see
-// MANUFACTURER_TIGER_EXPERIMENTAL in GW_ROM.h) that haven't seen the same
-// testing as the Beta-gated set. Kept as its own flag/confirm-gate rather
-// than folded into g_betagames_enabled so the two can be toggled
-// independently. See is_experimental_manufacturer()/experimental_visible()
-// and g_experimental_confirm_active in switch_menu.cpp.
+// with a batch of Tiger titles added after launch, later joined by Konami/
+// Tronica/Elektronika/Telko-Nintendo titles that don't have their own
+// manufacturer bucket - see MANUFACTURER_EXPERIMENTAL in GW_ROM.h) that
+// haven't seen the same testing as the Beta-gated set. Kept as its own
+// flag/confirm-gate rather than folded into g_betagames_enabled so the two
+// can be toggled independently. See is_experimental_manufacturer()/
+// experimental_visible() and g_experimental_confirm_active in
+// switch_menu.cpp.
 extern bool g_experimental_enabled;
+
+// Simulated reading (0-15) fed continuously into Altair's (GW_rom::ref
+// "naltair") 4-bit "Dosimeter Reading" dial input every frame that game is
+// loaded - see the NALTAIR Virtual_Input class in virtual_input.h and its
+// feeding logic in switch/source/main.cpp. Real hardware read this from an
+// attached Geiger tube (SBM-20-1, per Nauchpribor's mod of the Elektronika
+// IM-22 board); MAME itself doesn't simulate one either, exposing the same
+// raw 4-bit value as a manual dial (IPT_DIAL) instead - this is that same
+// idea, adjustable from the in-game settings screen while Altair is loaded.
+// Only ever shown/changeable there (g_settings_from_gameplay), and only
+// while Altair itself is the loaded game and Experimental Features is on -
+// see build_settings_rows() in switch_menu.cpp. Defaults to 0.
+//
+// Known gap (2026-09-16): no confirmed way to see this value do anything
+// in-game yet. Per MAME's driver comment, "Dosimeter Mode" is entered by
+// pressing the same physical line as P1 Right Stick Up while the unit is
+// showing Time - tried exactly that (dial=15, Time, then that button) in
+// real MAME itself (not just this port) and got no dosimeter display at
+// all; holding the button just resumed normal gameplay instead. This
+// driver is flagged MACHINE_IMPERFECT_CONTROLS in MAME, so the real
+// trigger condition may not even be fully known upstream. The engine-level
+// wiring here is still correct (verified byte-for-byte against MAME's own
+// raw dial input) - what's missing is the ROM-side trigger condition and
+// reading-format logic, which would need an actual disassembly of
+// dbgb-06i.bin to pin down. Not being chased for now; the setting stays
+// since it's harmless and gated behind Experimental Features regardless.
+extern uint8_t g_dosimeter_reading;
 
 // Hidden, advanced-use-only flag: never shown in the settings menu, never
 // added to yokoi_settings.txt automatically, and never written back once
@@ -153,16 +202,18 @@ extern bool g_debug_mode;
 // hide_console_art into g_hide_console_art, loadstate into
 // g_load_state_behavior, enable_log into g_log_file_enabled, lastgameplayed
 // into g_last_game_played_ref, betagames into g_betagames_enabled, panelgap
-// into g_panel_gap_percent, clonefilter into g_clone_filter_mode, and the
-// hidden debug flag into g_debug_mode - which also then force-enables
-// debug_log regardless of enable_log); otherwise resets to AppSettings'
-// compiled-in defaults, ScreenRotation::Deg0, hidden console art, Ask,
-// logging off, no last-played game, beta games off, no panel gap, clone
-// filter off (show all), and debug mode off.
+// into g_panel_gap_percent, clonefilter into g_clone_filter_mode, timesetmode
+// into g_time_set_mode, and the hidden debug flag into g_debug_mode - which
+// also then force-enables debug_log regardless of enable_log); otherwise
+// resets to AppSettings' compiled-in defaults, ScreenRotation::Deg0, hidden
+// console art, Ask, logging off, no last-played game, beta games off, no
+// panel gap, clone filter off (show all), time set mode Automatic, and
+// debug mode off.
 void switch_settings_load();
 
 // Writes the current g_settings fields + g_screen_rotation +
 // g_hide_console_art + g_load_state_behavior + g_log_file_enabled +
-// g_last_game_played_ref + g_betagames_enabled back out. No-op when
-// g_debug_mode is set - see its doc comment above.
+// g_last_game_played_ref + g_betagames_enabled + g_dosimeter_reading +
+// g_time_set_mode back out. No-op when g_debug_mode is set - see its doc
+// comment above.
 void switch_settings_save();

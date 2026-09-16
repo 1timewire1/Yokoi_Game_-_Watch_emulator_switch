@@ -104,7 +104,7 @@ All generic shapes again except where noted.
 | TF_104 | Tropical Fish | 1-button | 1-button | |
 | BU_201 | Spitball Sparky | 2-way (Left/Right) | 1-button | True dual-screen game - **Panel Gap is always off for this one**, regardless of the setting (see below) |
 | UD_202 | Crab Grab | 2-way (Left/Right) | 2-way (Up/Down) | True dual-screen game - **Panel Gap is always off for this one** (see below) |
-| MG_8, TG_18 | Shuttle Voyage / Thief in Garden (Tronica) | 2-way (Up/Down) | 1-button | + is labeled "Mode" in code rather than "Start"; this game doesn't wire up − (Game B) or L (Time) at all, only + and the two sides |
+| MG_8, TG_18 | Shuttle Voyage / Thief in Garden (Tronica) | 2-way (Up/Down) | 1-button | + is labeled "Mode" in code rather than "Start"; this game doesn't wire up − (Game B) or L (Time) at all, only + and the two sides. Also has a hidden calculator keypad, gated behind Experimental Features - see [below](#hidden-calculator-keypad-experimental-features-only) |
 | DA_37 | Diver's Adventure (Tronica) | 1-button | 2-way (Up/Down) | |
 | MG_9, FR_23 | Space Rescue / Thunder Ball (Tronica) | 1-button | 1-button | |
 
@@ -148,8 +148,75 @@ hardware's wiring, confirmed against MAME's `hh_sm510.cpp`, not a bug).
 | DR_802, DR_106 | Climber (Ice Climber) | 4-way | 1-button | |
 | BF_803, BF_107 | Balloon Fight | 4-way | 1-button | |
 | MB_108 | Mario The Juggler | 1-button | 1-button | |
-| BX_301, AK_302, HK_303 | Vs. games sharing one class (e.g. Boxing) | 4-way | 1-button | This class also defines a full Player 2 control set internally, but the Switch build only exposes one controller's worth of input - Player 2's side isn't reachable in this port |
-| SA_12 | Space Adventure (Tronica) | 2-way (Up/Down) | 1-button | Right button is "Fire"; + is labeled "Mode" in code rather than "Start"; − (Game B) and L (Time) aren't wired up at all for this game |
+| BX_301, AK_302, HK_303 | Vs. games sharing one class (e.g. Boxing) | 4-way | 1-button | This class also defines a full Player 2 control set internally - a second connected controller now drives it, see [below](#player-2-vs-games-only) |
+| SA_12 | Space Adventure (Tronica) | 2-way (Up/Down) | 1-button | Right button is "Fire"; + is labeled "Mode" in code rather than "Start"; − (Game B) and L (Time) aren't wired up at all for this game. Also has a hidden calculator keypad, gated behind Experimental Features - see [below](#hidden-calculator-keypad-experimental-features-only) |
+
+---
+
+### Player 2 (Vs. games only)
+
+`BX_301`/`AK_302`/`HK_303` are the only games in this build with a genuine
+second player's worth of input in the emulated hardware itself - real "Vs."
+units had two complete control sets, one per side. Fully automatic, no
+setting: connect a second controller (most simply via the system's own
+HOME-menu overlay) while one of these three is loaded and it's in as
+Player 2; disconnect it and Player 2's side just goes back to reading
+nothing, same as real hardware with nothing plugged into that port.
+
+| Switch input (2nd controller) | Role |
+|---|---|
+| D-Pad / Left Stick | Player 2's left-side control (4-way) |
+| A / B / X / Y | Player 2's right-side control (1-button - any of the four presses it) |
+
+Player 2's controller has no Time/Game A/Game B of its own - those are
+shared, system-level buttons only Player 1's controller reads, same as the
+one physical Time/Game A/Game B pair real "Vs." hardware has.
+
+**Confirmed working on hardware**: tested with all three games in Game Mode
+B and two controllers connected - the second controller drives only Player
+2's character, Player 1's stays independent, and every other (non-Vs.)
+game correctly ignores the second controller entirely. See
+[`README.md`](README.md#two-player-controller-support) for more on this
+feature's origin (ported from D.Smile NX, another MAME-based homebrew
+emulator on this same libnx Npad API).
+
+---
+
+### Hidden calculator keypad (Experimental Features only)
+
+Real hardware for all three Tronica games above (`MG_8`/`TG_18`/`SA_12`) has
+a full calculator keypad - digits, `+ - × ÷`, `=`, a decimal point, `%`,
+`ALM`, and `C` - that was never wired into this codebase's normal
+`Virtual_Input` scheme, since none of it fits the usual D-pad/action-button
+shape these tables describe. Rather than leave it inaccessible, it's now
+layered on top of the normal controls above via the same **hold ZL/hold
+ZR** modifier trick built for `nummunch`/`uchitari` (see
+[`experimental_controls.md`](experimental_controls.md#sixth-batch--modifier-key-calculator-keypads-2-games)),
+just additive here instead of replacing anything - the table above still
+works exactly as documented at all times.
+
+This is gated behind the **Experimental Features** setting and does
+nothing at all when it's off, unlike everything else in this file: unlike
+Tiger/Konami/etc., these three already shipped as ordinary, fully-working
+library games, and exposing a keypad that was never part of the original
+port changes their input behavior in a way players didn't opt into by
+picking an Experimental title - Experimental Features is what that opt-in
+looks like here instead. See `apply_calculator_modifier_input()` in
+[`source/input/modifier_layer_input.h`](source/input/modifier_layer_input.h)
+for the implementation.
+
+| Switch input | Hold ZL | Hold ZR |
+|---|---|---|
+| D-Pad Up | 1 | . |
+| D-Pad Down | 2 | = |
+| D-Pad Left | 3 | + |
+| D-Pad Right | 4 | − |
+| A | 5 | × |
+| B | 6 | ÷ |
+| X | 7 | ALM |
+| Y | 8 | % |
+| L | 9 | C |
+| R | 0 | — |
 
 ---
 

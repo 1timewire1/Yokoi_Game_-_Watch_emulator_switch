@@ -118,9 +118,11 @@ enum class SettingsRow : uint8_t {
     PanelGapCustomEntry,
     LoadStateBehavior,
     CloneFilter,
+    TimeSetMode,
     LogFile,
     BetaGames,
     Experimental,
+    DosimeterReading,
     ReturnToMenu,
 };
 
@@ -138,11 +140,17 @@ std::vector<SettingsRow> build_settings_rows() {
     rows.push_back(SettingsRow::PanelGap);
     if (g_panelgap_custom_selected) rows.push_back(SettingsRow::PanelGapCustomEntry);
     if (g_settings_from_gameplay) {
+        // Only while Altair itself is loaded and Experimental Features is
+        // on - see g_dosimeter_reading's doc comment in switch_settings.h.
+        if (g_game && g_game->ref == "NALTAIR" && g_experimental_enabled) {
+            rows.push_back(SettingsRow::DosimeterReading);
+        }
         rows.push_back(SettingsRow::ReturnToMenu);
     } else {
         rows.push_back(SettingsRow::ConsoleArt);
         rows.push_back(SettingsRow::LoadStateBehavior);
         rows.push_back(SettingsRow::CloneFilter);
+        rows.push_back(SettingsRow::TimeSetMode);
         rows.push_back(SettingsRow::LogFile);
         rows.push_back(SettingsRow::BetaGames);
         rows.push_back(SettingsRow::Experimental);
@@ -541,9 +549,11 @@ const char* mfr_name(uint8_t mfr) {
     if (mfr == GW_rom::MANUFACTURER_ELEKTRONIKA) return "ELEKTRONIKA";
     if (mfr == GW_rom::MANUFACTURER_TIGER) return "TIGER";
     if (mfr == GW_rom::MANUFACTURER_DAVID_AND_JOHN) return "DAVID AND JOHN";
-    // Distinct from plain "TIGER" so these stay visually identifiable while
-    // testing even with the Experimental toggle on - see is_experimental_manufacturer().
-    if (mfr == GW_rom::MANUFACTURER_TIGER_EXPERIMENTAL) return "TIGER (EXPERIMENTAL)";
+    // No longer Tiger-only (see MANUFACTURER_EXPERIMENTAL's doc comment in
+    // GW_ROM.h) - each game's actual original manufacturer is recorded in
+    // its display name instead ("Title (Manufacturer)"), so this group
+    // heading just says what it is: an experimental bucket.
+    if (mfr == GW_rom::MANUFACTURER_EXPERIMENTAL) return "EXPERIMENTAL";
     return "NINTENDO";
 }
 
@@ -561,7 +571,7 @@ bool betagames_visible() {
 // Separate bucket from is_beta_manufacturer() - see g_experimental_enabled's
 // doc comment in switch_settings.h.
 bool is_experimental_manufacturer(uint8_t mfr) {
-    return mfr == GW_rom::MANUFACTURER_TIGER_EXPERIMENTAL;
+    return mfr == GW_rom::MANUFACTURER_EXPERIMENTAL;
 }
 
 // Mirrors betagames_visible() - g_debug_mode force-shows experimental games
@@ -637,6 +647,18 @@ CloneFilterMode cycle_clone_filter(CloneFilterMode cur, int dir) {
     i = (i + dir) % 3;
     if (i < 0) i += 3;
     return (CloneFilterMode)i;
+}
+
+// See g_time_set_mode's doc comment in switch_settings.h.
+const char* time_set_mode_label(TimeSetMode m) {
+    return (m == TimeSetMode::Manual) ? "Manual" : "Automatic";
+}
+
+TimeSetMode cycle_time_set_mode(TimeSetMode cur, int dir) {
+    int i = (int)cur;
+    i = (i + dir) % 2;
+    if (i < 0) i += 2;
+    return (TimeSetMode)i;
 }
 
 const char* sort_mode_label(SortMode m) {
@@ -845,9 +867,11 @@ const char* settings_row_label(SettingsRow row) {
         case SettingsRow::PanelGapCustomEntry:      return "Enter Custom Value";
         case SettingsRow::LoadStateBehavior:        return "Load State Behavior";
         case SettingsRow::CloneFilter:               return "Duplicate & Clone Games";
+        case SettingsRow::TimeSetMode:                return "Time Set Mode";
         case SettingsRow::LogFile:                   return "Log File";
         case SettingsRow::BetaGames:                  return "Tiger / David and John games (Beta)";
         case SettingsRow::Experimental:                return "Experimental Features";
+        case SettingsRow::DosimeterReading:            return "Dosimeter Reading";
         case SettingsRow::ReturnToMenu:                return "Return to Main Menu";
     }
     return "";
@@ -877,12 +901,16 @@ std::string settings_row_value(SettingsRow row) {
             return load_state_behavior_label(g_load_state_behavior);
         case SettingsRow::CloneFilter:
             return clone_filter_label(g_clone_filter_mode);
+        case SettingsRow::TimeSetMode:
+            return time_set_mode_label(g_time_set_mode);
         case SettingsRow::LogFile:
             return g_log_file_enabled ? "On" : "Off";
         case SettingsRow::BetaGames:
             return g_betagames_enabled ? "On" : "Off";
         case SettingsRow::Experimental:
             return g_experimental_enabled ? "On" : "Off";
+        case SettingsRow::DosimeterReading:
+            return std::to_string((unsigned)g_dosimeter_reading);
         default:
             return "";
     }
@@ -1034,6 +1062,7 @@ void render_load_prompt(int logical_w, int logical_h) {
     const float icon_pad = 10.0f;
     const float opt_y1 = title_y + 130.0f;
     const float opt_y2 = opt_y1 + 50.0f;
+    const float opt_y3 = opt_y2 + 50.0f;
 
     auto draw_option = [&](float y, SwitchButtonIcon icon, const std::string& text) {
         const float w = switch_ui_button_icon_width(opt_size, icon) + icon_pad + switch_ui_text_width(text, opt_size);
@@ -1045,6 +1074,7 @@ void render_load_prompt(int logical_w, int logical_h) {
 
     draw_option(opt_y1, SwitchButtonIcon::A, "Load Save");
     draw_option(opt_y2, SwitchButtonIcon::B, "Start Fresh");
+    draw_option(opt_y3, SwitchButtonIcon::Minus, "Back to Game Select");
 }
 
 // logical_w/logical_h are already rotation-swapped by the caller, same as
@@ -1185,6 +1215,12 @@ static void update_load_prompt(uint64_t kDown) {
         switch_load_game_by_index_and_init(g_selected_index);
         g_load_prompt_active = false;
         g_menu_active = false;
+    } else if (kDown & HidNpadButton_Minus) {
+        // Backs out of the prompt entirely - neither loads the save nor
+        // starts fresh, just returns to the game list (g_menu_active was
+        // never cleared getting here, so there's nothing else to restore).
+        YOKOI_LOG("switch_menu: load-save-state prompt cancelled for index %u, returning to game select", (unsigned)g_selected_index);
+        g_load_prompt_active = false;
     }
 }
 
@@ -1335,6 +1371,9 @@ static void update_settings_menu(uint64_t kDown) {
                 rebuild_sorted_order();
                 break;
             }
+            case SettingsRow::TimeSetMode:
+                g_time_set_mode = cycle_time_set_mode(g_time_set_mode, dir);
+                break;
             case SettingsRow::LogFile:
                 g_log_file_enabled = !g_log_file_enabled;
                 debug_log::set_enabled(g_log_file_enabled);
@@ -1384,6 +1423,9 @@ static void update_settings_menu(uint64_t kDown) {
                     }
                     rebuild_sorted_order();
                 }
+                break;
+            case SettingsRow::DosimeterReading:
+                g_dosimeter_reading = (uint8_t)((g_dosimeter_reading + dir + 16) % 16);
                 break;
             default:
                 break;

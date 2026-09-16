@@ -6,6 +6,23 @@ import re
 
 
 ################ Convert SVG to PNG ############################################
+def _iter_titled_segments(parent, ns):
+    """Yield every (element, title_elem) segment under `parent`.
+
+    Most romset SVGs put every segment as a direct child of the "segs"
+    layer, but some (e.g. tbatmana) wrap a handful of segments in an
+    extra untitled <g> for grouping. Recursing through any child that
+    itself carries no title treats that child as a transparent wrapper
+    instead of silently dropping the segments inside it.
+    """
+    for element in parent:
+        title_elem = element.find('svg:title', ns)
+        if title_elem is not None and title_elem.text:
+            yield element, title_elem
+        else:
+            yield from _iter_titled_segments(element, ns)
+
+
 def extract_translation(transform):
     m = re.search(r'translate\(\s*(-?\d+(?:\.\d+)?)[ ,]+(-?\d+(?:\.\d+)?)\s*\)', transform)
     if m:
@@ -88,32 +105,30 @@ def extract_group_segs(svg_path_list, output_dir, INKSCAPE_PATH, export_dpi: int
             tx, ty = extract_translation(segs_transform)
 
         compteur = 1
-        for element in segs_group:
-            title_elem = element.find('svg:title', ns)
-            if title_elem is not None and title_elem.text:
-                nom_base = title_elem.text.strip() + '.' + str(i_path) 
-                png_path = os.path.join(output_dir, f'{nom_base}.png')
-                if not os.path.exists(png_path):
-                    new_svg = etree.Element(root.tag, nsmap=root.nsmap)
-                    for attr in ['width', 'height', 'viewBox']:
-                        if attr == 'viewBox' and attr in root.attrib:
-                            vb = root.attrib[attr].split()
-                            min_x, min_y, w, h = map(float, vb)
-                            min_x -= tx
-                            min_y -= ty
-                            new_svg.attrib[attr] = f"{min_x} {min_y} {w} {h}"
-                        elif attr in root.attrib:
-                            new_svg.attrib[attr] = root.attrib[attr]
-                    clone = etree.Element(element.tag, nsmap=element.nsmap)
-                    clone.attrib.update(element.attrib)
-                    for child in element: 
-                        clone.append(child)
-                    new_svg.append(clone)
-                    svg_temp_path = os.path.join(output_dir, f'{nom_base}.svg')
-                    with open(svg_temp_path, 'wb') as f: 
-                        f.write(etree.tostring(new_svg, pretty_print=True))
-                    export_commands.append((svg_temp_path, png_path))
-                    compteur += 1
+        for element, title_elem in _iter_titled_segments(segs_group, ns):
+            nom_base = title_elem.text.strip() + '.' + str(i_path)
+            png_path = os.path.join(output_dir, f'{nom_base}.png')
+            if not os.path.exists(png_path):
+                new_svg = etree.Element(root.tag, nsmap=root.nsmap)
+                for attr in ['width', 'height', 'viewBox']:
+                    if attr == 'viewBox' and attr in root.attrib:
+                        vb = root.attrib[attr].split()
+                        min_x, min_y, w, h = map(float, vb)
+                        min_x -= tx
+                        min_y -= ty
+                        new_svg.attrib[attr] = f"{min_x} {min_y} {w} {h}"
+                    elif attr in root.attrib:
+                        new_svg.attrib[attr] = root.attrib[attr]
+                clone = etree.Element(element.tag, nsmap=element.nsmap)
+                clone.attrib.update(element.attrib)
+                for child in element:
+                    clone.append(child)
+                new_svg.append(clone)
+                svg_temp_path = os.path.join(output_dir, f'{nom_base}.svg')
+                with open(svg_temp_path, 'wb') as f:
+                    f.write(etree.tostring(new_svg, pretty_print=True))
+                export_commands.append((svg_temp_path, png_path))
+                compteur += 1
 
     # Batch export using Inkscape shell mode
     if export_commands:

@@ -42,8 +42,8 @@ bool panel_gap_exempt(const std::string& ref) {
 void rebuild_layout_from_game() {
     g_canvas_w = 1.0f;
     g_canvas_h = 1.0f;
-    g_screen_off_x[0] = g_screen_off_x[1] = 0.0f;
-    g_screen_off_y[0] = g_screen_off_y[1] = 0.0f;
+    g_screen_off_x[0] = g_screen_off_x[1] = g_screen_off_x[2] = 0.0f;
+    g_screen_off_y[0] = g_screen_off_y[1] = g_screen_off_y[2] = 0.0f;
 
     if (!g_game || !g_game->segment_info) {
         return;
@@ -60,17 +60,25 @@ void rebuild_layout_from_game() {
 
     g_nb_screen = 1;
     for (const auto& s : g_segments) {
-        if (s.screen == 1) {
-            g_nb_screen = 2;
-            break;
+        if ((uint8_t)(s.screen + 1) > g_nb_screen) {
+            g_nb_screen = (uint8_t)(s.screen + 1);
         }
+    }
+    if (g_nb_screen > 3) {
+        g_nb_screen = 3; // g_segment_info/g_screen_off_x/y are only sized for 3
     }
 
     uint16_t scr1w = scr0w;
     uint16_t scr1h = scr0h;
-    if (g_nb_screen == 2) {
+    uint16_t scr2w = scr0w;
+    uint16_t scr2h = scr0h;
+    if (g_nb_screen >= 2) {
         scr1w = g_game->segment_info[6];
         scr1h = g_game->segment_info[7];
+    }
+    if (g_nb_screen >= 3) {
+        scr2w = g_game->segment_info[8];
+        scr2h = g_game->segment_info[9];
     }
 
     g_segment_info[0] = tex_w;
@@ -81,15 +89,33 @@ void rebuild_layout_from_game() {
     g_segment_info[5] = scr0h;
     g_segment_info[6] = scr1w;
     g_segment_info[7] = scr1h;
+    g_segment_info[8] = scr2w;
+    g_segment_info[9] = scr2h;
 
     float w0 = (float)scr0w / (float)scale;
     float h0 = (float)scr0h / (float)scale;
     float w1 = (float)scr1w / (float)scale;
     float h1 = (float)scr1h / (float)scale;
+    float w2 = (float)scr2w / (float)scale;
+    float h2 = (float)scr2h / (float)scale;
 
     if (g_nb_screen == 1) {
         g_canvas_w = w0 > 1.0f ? w0 : 1.0f;
         g_canvas_h = h0 > 1.0f ? h0 : 1.0f;
+    } else if (g_nb_screen == 3) {
+        // Only known 3-screen device so far: Tronica's Treasure Island
+        // ("Super Tri-Screen", ref trtreisl) - always laid out horizontally,
+        // one row of 3 panels side by side, same idea as the
+        // g_double_in_one_screen 2-screen case below extended to a 3rd.
+        g_canvas_w = (w0 + w1 + w2) > 1.0f ? (w0 + w1 + w2) : 1.0f;
+        g_canvas_h = std::max(h0, std::max(h1, h2));
+        g_canvas_h = g_canvas_h > 1.0f ? g_canvas_h : 1.0f;
+        g_screen_off_x[0] = 0.0f;
+        g_screen_off_x[1] = w0;
+        g_screen_off_x[2] = w0 + w1;
+        g_screen_off_y[0] = (g_canvas_h - h0) * 0.5f;
+        g_screen_off_y[1] = (g_canvas_h - h1) * 0.5f;
+        g_screen_off_y[2] = (g_canvas_h - h2) * 0.5f;
     } else if (g_double_in_one_screen) {
         g_canvas_w = (w0 + w1) > 1.0f ? (w0 + w1) : 1.0f;
         g_canvas_h = (std::max(h0, h1)) > 1.0f ? (std::max(h0, h1)) : 1.0f;

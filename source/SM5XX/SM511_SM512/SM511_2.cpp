@@ -216,8 +216,14 @@ void SM511_2::load_new_note(uint8_t* update_melody_adress){
 
 
 void SM511_2::update_sound(){ // NOT FINISH
-    if(!me_melody_activate){ return; }
-    
+    // Note: unlike a naive reading of ME/RME, real SM511 hardware (confirmed against
+    // MAME's clock_melody()) keeps stepping the melody ROM address and detecting the
+    // stop byte (note==1, which sets mes_melody_finish for TMEL) even while ME is off -
+    // RME only mutes the R-pin buzzer output (already gated separately in
+    // get_active_sound() via me_melody_activate). Early-returning here used to freeze
+    // rom_melody_address/mes_melody_finish forever as soon as a ROM called RME before
+    // its melody reached a stop byte, hanging any TMEL wait-loop (e.g. ktmntbb boot).
+
     // execute of each cyle
     static const uint8_t note_frequency_control[4*12]{ // Doc Sharp SM511 + MAME
             7,  8,  8,  8 // do

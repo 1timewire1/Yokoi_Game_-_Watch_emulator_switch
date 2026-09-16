@@ -169,4 +169,10 @@ public : // debug
 
     uint8_t debug_multiplexage() { return w_shift_register; }
 
+    uint8_t debug_melody_address() { return rom_melody_address; }
+    uint8_t debug_melody_note() { return curr_note_melody.note; }
+    bool debug_melody_finish() { return mes_melody_finish; }
+    bool debug_melody_activate() { return me_melody_activate; }
+    uint16_t debug_melody_cycle_count() { return melody_cycle_count; }
+
 };

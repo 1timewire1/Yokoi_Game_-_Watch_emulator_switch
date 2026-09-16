@@ -186,24 +186,43 @@ void switch_screen_load_textures() {
     if (g_gl.tex_segments) glDeleteTextures(1, &g_gl.tex_segments);
     if (g_gl.tex_background) glDeleteTextures(1, &g_gl.tex_background);
     if (g_gl.tex_console) glDeleteTextures(1, &g_gl.tex_console);
+    if (g_gl.tex_overlay) glDeleteTextures(1, &g_gl.tex_overlay);
 
     const std::string seg_asset = t3x_path_to_png_asset(g_game->path_segment);
     const std::string bg_asset = t3x_path_to_png_asset(g_game->path_background);
     const std::string cs_asset = t3x_path_to_png_asset(g_game->path_console);
-    YOKOI_LOG("switch_screen: loading textures for '%s' (gen=%u): seg='%s' (raw '%s'), bg='%s' (raw '%s'), console='%s' (raw '%s')",
+    // Overlay has no path_overlay field of its own (see GW_rom::background_info_count's
+    // comment) - derived from the background asset name by the same "background_"/
+    // "overlay_" naming convention overlay_data_file() writes its file under. Games
+    // without an overlay layer just don't have this file in the pack; upload_png_from_pack
+    // already degrades gracefully (logs, returns 0) when an asset name isn't found.
+    std::string ov_asset = bg_asset;
+    {
+        const std::string from = "background_";
+        const size_t pos = ov_asset.find(from);
+        if (pos != std::string::npos) {
+            ov_asset.replace(pos, from.size(), "overlay_");
+        } else {
+            ov_asset.clear();
+        }
+    }
+    YOKOI_LOG("switch_screen: loading textures for '%s' (gen=%u): seg='%s' (raw '%s'), bg='%s' (raw '%s'), console='%s' (raw '%s'), overlay='%s'",
               g_game->name.c_str(), (unsigned)g_texture_generation,
               seg_asset.c_str(), g_game->path_segment.c_str(),
               bg_asset.c_str(), g_game->path_background.c_str(),
-              cs_asset.c_str(), g_game->path_console.c_str());
+              cs_asset.c_str(), g_game->path_console.c_str(),
+              ov_asset.c_str());
 
     g_gl.tex_segments = upload_png_from_pack(seg_asset, g_gl.tex_segments_w, g_gl.tex_segments_h);
     g_gl.tex_background = upload_png_from_pack(bg_asset, g_gl.tex_background_w, g_gl.tex_background_h);
     g_gl.tex_console = upload_png_from_pack(cs_asset, g_gl.tex_console_w, g_gl.tex_console_h);
+    g_gl.tex_overlay = ov_asset.empty() ? 0 : upload_png_from_pack(ov_asset, g_gl.tex_overlay_w, g_gl.tex_overlay_h);
 
-    YOKOI_LOG("switch_screen: tex ids seg=%u (%dx%d) bg=%u (%dx%d) console=%u (%dx%d)",
+    YOKOI_LOG("switch_screen: tex ids seg=%u (%dx%d) bg=%u (%dx%d) console=%u (%dx%d) overlay=%u (%dx%d)",
               (unsigned)g_gl.tex_segments, g_gl.tex_segments_w, g_gl.tex_segments_h,
               (unsigned)g_gl.tex_background, g_gl.tex_background_w, g_gl.tex_background_h,
-              (unsigned)g_gl.tex_console, g_gl.tex_console_w, g_gl.tex_console_h);
+              (unsigned)g_gl.tex_console, g_gl.tex_console_w, g_gl.tex_console_h,
+              (unsigned)g_gl.tex_overlay, g_gl.tex_overlay_w, g_gl.tex_overlay_h);
 
     // Prefer actual decoded texture sizes for UV normalization, same as Android.
     if (g_gl.tex_segments_w > 0 && g_gl.tex_segments_h > 0) {
@@ -425,14 +444,44 @@ void switch_screen_render() {
             }
         }
 
+        // Games whose "on" segments are large filled rectangles sitting
+        // directly over printed colour/label art (e.g. Bassmate's option
+        // grid) need those segments to darken the art in place rather than
+        // replace it outright - standard alpha blending on a ~fully-opaque
+        // fill just erases whatever's underneath, which is fine for a thin
+        // digit stroke but wrong for a cell-sized block. multiply_darken
+        // switches to a multiply blend for exactly that "on" draw: outside
+        // the shape it multiplies the destination by 1.0 (no-op), inside it
+        // by the tint colour (darken-in-place), matching how MAME's own
+        // artwork compositing (and real LCD ink over a printed backdrop)
+        // looks. See GW_rom::segment_info's flags byte / MULTIPLY_DARKEN_BIT.
+        const bool multiply_darken = (g_segment_info[3] & 0x04) != 0;
+
         if (is_mask) {
             if (g_gl.uAlphaOnly >= 0) glUniform1f(g_gl.uAlphaOnly, 0.0f);
             glUniform4f(g_gl.uMul, 1.0f, 1.0f, 1.0f, 1.0f);
+            draw_vertices(seg_tex, seg_verts);
+        } else if (multiply_darken) {
+            // Darkens whatever's already drawn (the blank NS backdrop) in
+            // place instead of replacing it - same seg_r/g/b tint every
+            // other game's segments use, since label legibility is no
+            // longer this pass's job: the overlay layer below (MAME's own
+            // TEXT-Top/Bottom, drawn after segments at a fixed alpha) is
+            // what keeps labels visible regardless of how dark the "on"
+            // tint is, exactly matching the real device's LCD-ink-over-
+            // printed-backdrop construction.
+            if (g_gl.uAlphaOnly >= 0) glUniform1f(g_gl.uAlphaOnly, 0.0f);
+            if (g_gl.uMultiplyDarken >= 0) glUniform1f(g_gl.uMultiplyDarken, 1.0f);
+            glUniform4f(g_gl.uMul, seg_r, seg_g, seg_b, 1.0f);
+            glBlendFunc(GL_DST_COLOR, GL_ZERO);
+            draw_vertices(seg_tex, seg_verts);
+            glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+            if (g_gl.uMultiplyDarken >= 0) glUniform1f(g_gl.uMultiplyDarken, 0.0f);
         } else {
             if (g_gl.uAlphaOnly >= 0) glUniform1f(g_gl.uAlphaOnly, 0.0f);
             glUniform4f(g_gl.uMul, seg_r, seg_g, seg_b, 1.0f);
+            draw_vertices(seg_tex, seg_verts);
         }
-        draw_vertices(seg_tex, seg_verts);
 
         if (!is_mask && has_colored_segments) {
             // Deliberately NOT alpha-only mode here (unlike text/glyphs in
@@ -455,6 +504,57 @@ void switch_screen_render() {
                 glUniform4f(g_gl.uMul, ((rgb >> 16) & 0xFF) / 255.0f, ((rgb >> 8) & 0xFF) / 255.0f, (rgb & 0xFF) / 255.0f, 1.0f);
                 draw_vertices(seg_tex, seg_color_verts[ci]);
             }
+        }
+    }
+
+    // Label/text overlay, drawn AFTER the segments at a fixed alpha - see
+    // GW_rom::background_info_count's comment and overlay_data_file() in
+    // CONVERT_ROM/convert_switch.py. Mirrors MAME's own compositing order
+    // for games built this way (background -> <screen blend="multiply"> ->
+    // a translucent label layer on top of everything), so labels stay
+    // legible over a darkened "on" cell instead of only existing in the
+    // static backdrop where a lit segment would otherwise erase them.
+    // Presence is entirely data-driven: background_info simply has more
+    // than the normal number of elements for a game with an overlay
+    // (nothing else validates its length), so every other game's
+    // rendering is untouched.
+    if (g_gl.tex_overlay != 0 && g_game && g_game->background_info &&
+        g_gl.tex_overlay_w > 0 && g_gl.tex_overlay_h > 0) {
+        const uint16_t* bi = g_game->background_info;
+        const size_t base_len = (size_t)2 + (size_t)4 * g_nb_screen + 3;
+        if (g_game->background_info_count >= base_len + (size_t)2 + (size_t)4 * g_nb_screen) {
+            const uint16_t* ov = bi + base_len;
+            const float ovTexW = (float)ov[0];
+            const float ovTexH = (float)ov[1];
+            const uint16_t scale = g_segment_info[2] ? g_segment_info[2] : 1;
+
+            std::vector<RenderVertex> ov_verts;
+            ov_verts.reserve(g_nb_screen * 6);
+
+            for (uint8_t screen = 0; screen < g_nb_screen; screen++) {
+                uint16_t id = (uint16_t)(2 + screen * 4);
+                float u = (float)ov[id + 0];
+                float v = (float)ov[id + 1];
+                float w = (float)ov[id + 2];
+                float h = (float)ov[id + 3];
+
+                float u0, v0, u1, v1;
+                calc_uv_rect(ovTexW, ovTexH, u, v, w, h, u0, v0, u1, v1);
+
+                float dw = (float)g_segment_info[4 + screen * 2] / (float)scale;
+                float dh = (float)g_segment_info[5 + screen * 2] / (float)scale;
+
+                float gx = 0.0f, gy = 0.0f;
+                get_screen_base_global(screen, gx, gy);
+                append_quad_ndc_uv_canvas(ov_verts, contentW, contentH, to_local_x(gx), to_local_y(gy), dw, dh, u0, v0, u1, v1);
+            }
+
+            if (g_gl.uAlphaOnly >= 0) glUniform1f(g_gl.uAlphaOnly, 0.0f);
+            if (g_gl.uMultiplyDarken >= 0) glUniform1f(g_gl.uMultiplyDarken, 0.0f);
+            // MAME's own default.lay: <element ref="TEXT-Top"><color alpha="0.7" />.
+            constexpr float kOverlayAlpha = 0.7f;
+            glUniform4f(g_gl.uMul, 1.0f, 1.0f, 1.0f, kOverlayAlpha);
+            draw_vertices(g_gl.tex_overlay, ov_verts);
         }
     }
 
@@ -491,6 +591,7 @@ void switch_screen_shutdown() {
     if (g_gl.tex_segments) glDeleteTextures(1, &g_gl.tex_segments);
     if (g_gl.tex_background) glDeleteTextures(1, &g_gl.tex_background);
     if (g_gl.tex_console) glDeleteTextures(1, &g_gl.tex_console);
+    if (g_gl.tex_overlay) glDeleteTextures(1, &g_gl.tex_overlay);
     if (g_gl.tex_white) glDeleteTextures(1, &g_gl.tex_white);
     if (g_gl.vbo) glDeleteBuffers(1, &g_gl.vbo);
     if (g_gl.vao) glDeleteVertexArrays(1, &g_gl.vao);

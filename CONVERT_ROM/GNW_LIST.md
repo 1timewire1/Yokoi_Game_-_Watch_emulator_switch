@@ -143,12 +143,18 @@ Special editions are not supported in the emulator, refer to the Notes column fo
 | 16  | tgaunt  | tgaunt.zip          | Gauntlet                                                     | 1988.01.01   | SM510 |  |
 | 17  | tsharr2 | tsharr2.zip         | Space Harrier II                                             | 1990.01.01   | SM510 |  |
 
-## Tiger (Experimental)
+## Experimental
 
 <!-- Gated behind the Switch-only "Experimental Features" toggle (see
      switch_menu.cpp) rather than the Beta toggle above - not yet verified
-     to the same degree as the rest of ## Tiger. Manufacturer id assigned by
-     generate_games_path.py's heading parser: MANUFACTURER_TIGER_EXPERIMENTAL. -->
+     to the same degree as the rest of this list. Manufacturer id assigned
+     by generate_games_path.py's heading parser: MANUFACTURER_EXPERIMENTAL.
+     Originally "Tiger (Experimental)" (Tiger titles only) - now also holds
+     Konami/Tronica/Elektronika/Telko-Nintendo titles that don't have their
+     own manufacturer bucket and aren't numerous enough yet to justify one.
+     Each such game's real manufacturer is recorded in its own Game Title
+     column value instead, as "Title (Manufacturer)" - the Model/CPU/Clone
+     Of columns follow the same convention as every other section. -->
 
 | No. | Model   | Filename            | Game Title                                                   | Release Date | CPU | Clone Of |
 |-----|---------|---------------------|--------------------------------------------------------------|--------------|-----|-------|
@@ -193,3 +199,32 @@ Special editions are not supported in the emulator, refer to the Notes column fo
 | 39  | tswampt | tswampt.zip         | Swamp Thing                                                  | 1991.01.01   | SM510 |  |
 | 40  | twworld | twworld.zip         | Wayne's World                                                | 1992.01.01   | SM510 |  |
 | 41  | txmenpx | txmenpx.zip         | X-Men: Project X                                             | 1993.01.01   | SM510 |  |
+| 42  | kcontra | kcontra.zip         | Contra (Konami)                                              | 1989.01.01   | SM511 |  |
+| 43  | kdribble| kdribble.zip        | Double Dribble (Konami)                                      | 1989.01.01   | SM510 |  |
+| 44  | ktopgun | ktopgun.zip         | Top Gun (Konami)                                             | 1989.01.01   | SM510 |  |
+| 45  | kgradius| kgradius.zip        | Gradius (Konami)                                             | 1989.01.01   | SM511 |  |
+| 46  | kskatedie| kskatedie.zip      | Skate or Die (Konami)                                        | 1989.01.01   | SM511 |  |
+| 47  | ktmnt   | ktmnt.zip           | Teenage Mutant Ninja Turtles (Konami)                        | 1989.01.01   | SM511 |  |
+| 48  | kbilly  | kbilly.zip          | The Adventures of Bayou Billy (Konami)                       | 1990.01.01   | SM511 |  |
+| 49  | kbottom9| kbottom9.zip        | Bottom of the Ninth (Konami)                                 | 1990.01.01   | SM511 |  |
+| 50  | kchqflag| kchqflag.zip        | Chequered Flag (Konami)                                      | 1990.01.01   | SM511 | knascar |
+| 51  | kloneran| kloneran.zip        | The Lone Ranger (Konami)                                     | 1990.01.01   | SM511 |  |
+| 52  | knascar | knascar.zip         | Bill Elliott's NASCAR Racing (Konami)                        | 1990.01.01   | SM511 |  |
+| 53  | ktmnt2  | ktmnt2.zip          | Teenage Mutant Ninja Turtles II: Splinter Speaks (Konami)    | 1990.01.01   | SM511 |  |
+| 54  | kbucky  | kbucky.zip          | Bucky O'Hare (Konami)                                        | 1991.01.01   | SM511 |  |
+| 55  | kgarfld | kgarfld.zip         | Garfield (Konami)                                            | 1991.01.01   | SM511 |  |
+| 56  | knfl    | knfl.zip            | NFL Football (Konami)                                        | 1991.01.01   | SM511 |  |
+| 57  | kst25   | kst25.zip           | Star Trek: 25th Anniversary (Konami)                         | 1991.01.01   | SM511 |  |
+| 58  | ktmnt3  | ktmnt3.zip          | Teenage Mutant Ninja Turtles 3: Shredder's Last Stand (Konami)| 1991.01.01  | SM511 |  |
+| 59  | ktmntbb | ktmntbb.zip         | Teenage Mutant Ninja Turtles: Basketball (Konami)            | 1991.01.01   | SM511 |  |
+| 60  | ktopgun2| ktopgun2.zip        | Top Gun: Second Mission (Konami)                             | 1991.01.01   | SM511 |  |
+| 61  | kblades | kblades.zip         | Blades of Steel (Konami)                                     | 1990.01.01   | SM511 |  |
+| 62  | trtreisl| trtreisl.zip        | Treasure Island (Tronica)                                    | 1983.01.01   | SM511 |  |
+| 63  | vesarif | vesarif.zip         | Vesolaya arifmetika (Elektronika)                            | 1992.01.01   | SM511 |  |
+| 64  | bassmate| bassmate.zip        | Bassmate Computer (Telko / Nintendo)                         | 1984.01.01   | SM511 |  |
+| 65  | naltair | naltair.zip         | Altair (Nauchpribor)                                         | 1991.01.01   | SM5A | gnw_mmouse |
+| 66  | nstarfox| nstarfox.zip        | Star Fox (Nelsonic)                                          | 1993.01.01   | SM530 |  |
+| 67  | nsmb3   | nsmb3.zip           | Super Mario Bros. 3 (Nelsonic)                                | 1990.01.01   | SM530 |  |
+| 68  | nsmw    | nsmw.zip            | Super Mario World (Nelsonic)                                 | 1991.01.01   | SM530 |  |
+| 69  | nummunch| nummunch.zip        | Electronic Number Muncher (VTech)                            | 1989.01.01   | SM511 |  |
+| 70  | uchitari| uchitari.zip        | Uchitel' arifmetiki (Elektronika)                             | 1991.01.01   | SM511 |  |

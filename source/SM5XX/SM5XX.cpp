@@ -117,6 +117,7 @@ void SM5XX::input_set(int group, int line, bool state, bool not_multiplex){
 bool SM5XX::check_button_pressed(){ // used for detect wake up
     uint8_t result = 0x00;
     for(int i = 0; i < 8; i++){ result |= k_input[i]; }
+    result |= k_input_sp_not_multiplex; // SM530's K register is a single non-multiplexed 8-bit input (see input_set's not_multiplex param) - without this, pressing a button while asleep would never wake the CPU until the next 1s gamma tick
     if(!alpha_input || !beta_input){ result |= 0x01; }
     return (result != 0x00);
 }
@@ -157,12 +158,55 @@ void SM5XX::set_time(uint8_t hour, uint8_t minute, uint8_t second) {
         }
 
         // Set the time digits in RAM using per-digit (col, line)
-        set_ram_value(time_addresses->col_hour_tens, time_addresses->line_hour_tens, (hour_12h_value / 10) | pm_bit);
-        set_ram_value(time_addresses->col_hour_units, time_addresses->line_hour_units, hour_12h_value % 10);
+        if (time_addresses->col_hour_tens == time_addresses->col_hour_units
+            && time_addresses->line_hour_tens == time_addresses->line_hour_units) {
+            // Combined-hour sentinel: both hour fields point at the same cell.
+            // Some watches (the SM530 Nelsonic games) store the 1-12 hour value
+            // directly in a single RAM cell instead of splitting it into BCD
+            // tens/units digits - confirmed by watching that cell roll 12->1
+            // after exactly one real hour of emulated runtime. No room left in
+            // the nibble for pm_bit here (1-12 already uses every bit), so it
+            // goes to its own dedicated cell instead - found on a longer probe
+            // toggling bit3 at noon/midnight, see col_pm/line_pm's doc comment.
+            set_ram_value(time_addresses->col_hour_units, time_addresses->line_hour_units, hour_12h_value);
+            if (time_addresses->col_pm != 99 || time_addresses->line_pm != 99) {
+                set_ram_value(time_addresses->col_pm, time_addresses->line_pm, pm_bit);
+            }
+            cached_hour_12h_value = hour_12h_value;
+            cached_pm_bit = pm_bit;
+        }
+        else {
+            set_ram_value(time_addresses->col_hour_tens, time_addresses->line_hour_tens, (hour_12h_value / 10) | pm_bit);
+            set_ram_value(time_addresses->col_hour_units, time_addresses->line_hour_units, hour_12h_value % 10);
+        }
         set_ram_value(time_addresses->col_minute_tens, time_addresses->line_minute_tens, minute / 10);
         set_ram_value(time_addresses->col_minute_units, time_addresses->line_minute_units, minute % 10);
         set_ram_value(time_addresses->col_second_tens, time_addresses->line_second_tens, second / 10);
         set_ram_value(time_addresses->col_second_units, time_addresses->line_second_units, second % 10);
+    }
+}
+
+void SM5XX::reassert_combined_hour() {
+    // Some combined-hour watches (the SM530 Nelsonic games so far - see
+    // set_time()'s "col_hour_tens == col_hour_units" sentinel) run a
+    // hardcoded "reset display to 12:00" boot routine tens of thousands of
+    // instructions after power-on (measured 3-5 real seconds on nstarfox/
+    // nsmb3/nsmw), which unconditionally overwrites whatever set_time()
+    // wrote to the hour/PM cells - real hardware does the same thing on a
+    // cold boot, the user would then press the physical Set button to fix
+    // it. minute/second aren't touched by this routine, so they survive
+    // set_time()'s one-shot write untouched; only the hour needs replaying.
+    // No-op for every other core/game (no time_addresses, or a normal split
+    // BCD hour with no cached value to replay). Cheap - just two RAM
+    // writes, safe to call every frame for a few seconds after load (see
+    // g_hour_reassert_grace_frames in switch_runtime_state.h).
+    if (!time_addresses || !is_time_set()) return;
+    if (time_addresses->col_hour_tens != time_addresses->col_hour_units
+        || time_addresses->line_hour_tens != time_addresses->line_hour_units) return;
+
+    set_ram_value(time_addresses->col_hour_units, time_addresses->line_hour_units, cached_hour_12h_value);
+    if (time_addresses->col_pm != 99 || time_addresses->line_pm != 99) {
+        set_ram_value(time_addresses->col_pm, time_addresses->line_pm, cached_pm_bit);
     }
 }
 

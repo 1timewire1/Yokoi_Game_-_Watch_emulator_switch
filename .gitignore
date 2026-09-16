@@ -7,6 +7,9 @@ background_*.t3s
 console_*.png
 console_*.t3s
 
+overlay_*.png
+overlay_*.t3s
+
 # The patterns above match by filename anywhere in the tree (meant for
 # generated per-game rompack-pipeline output), which would otherwise also
 # swallow gfx2x_open_source/ and CONVERT_ROM/david_and_john_patch/assets/ -
@@ -48,6 +51,12 @@ CONVERT_ROM/external_apps.py
 
 # Dev script outputs
 CONVERT_ROM/utils/EXTRACTED_LIST*.md
+
+# Personal scratch/reference material (test photos, MAME romset dumps, old
+# pack-manifest output) - never meant for the public repo. Deliberately
+# excludes reference/excluded_roms_only/, which holds actual copyrighted
+# MAME ROM zips.
+reference/
 
 Yokoi*.3dsx
 Yokoi*.elf

@@ -16,12 +16,12 @@ from PIL import Image
 try:
     # When imported as part of the 'source' package
     from source.games_path_utils import GameEntry, write_games_path
-    from source.manufacturer_ids import MANUFACTURER_NINTENDO, MANUFACTURER_TRONICA, MANUFACTURER_ELEKTRONIKA, MANUFACTURER_TIGER, MANUFACTURER_DAVID_AND_JOHN, MANUFACTURER_TIGER_EXPERIMENTAL
+    from source.manufacturer_ids import MANUFACTURER_NINTENDO, MANUFACTURER_TRONICA, MANUFACTURER_ELEKTRONIKA, MANUFACTURER_TIGER, MANUFACTURER_DAVID_AND_JOHN, MANUFACTURER_EXPERIMENTAL
     from source.target_profiles import get_target
 except ImportError:
     # When run directly from the 'source' directory
     from games_path_utils import GameEntry, write_games_path
-    from manufacturer_ids import MANUFACTURER_NINTENDO, MANUFACTURER_TRONICA, MANUFACTURER_ELEKTRONIKA, MANUFACTURER_TIGER, MANUFACTURER_DAVID_AND_JOHN, MANUFACTURER_TIGER_EXPERIMENTAL
+    from manufacturer_ids import MANUFACTURER_NINTENDO, MANUFACTURER_TRONICA, MANUFACTURER_ELEKTRONIKA, MANUFACTURER_TIGER, MANUFACTURER_DAVID_AND_JOHN, MANUFACTURER_EXPERIMENTAL
     from target_profiles import get_target
 
 # Preferred background views ordered by desirability. Boolean marks multi-screen views.
@@ -153,6 +153,11 @@ def _load_game_metadata(script_dir: Path) -> Dict[str, GameMetadata]:
             # - Nintendo section headings usually include "Game & Watch"
             # - Tronica section headings include "Tronica"
             # - Elektronika section headings include "Elektronika"
+            # - The "Experimental" section (checked before the plain "Tiger"
+            #   one below - it used to be "Tiger (Experimental)", but now
+            #   covers other manufacturers too, recorded in each game's
+            #   display name instead of via a per-manufacturer heading) maps
+            #   to MANUFACTURER_EXPERIMENTAL regardless of manufacturer.
             # Keep the current value for unrelated headings like "Special Editions".
             in_table = False
             if "tronica" in heading:
@@ -161,8 +166,8 @@ def _load_game_metadata(script_dir: Path) -> Dict[str, GameMetadata]:
                 current_manufacturer = MANUFACTURER_ELEKTRONIKA
             elif "game & watch" in heading or "game and watch" in heading:
                 current_manufacturer = MANUFACTURER_NINTENDO
-            elif "tiger" in heading and "experimental" in heading:
-                current_manufacturer = MANUFACTURER_TIGER_EXPERIMENTAL
+            elif "experimental" in heading:
+                current_manufacturer = MANUFACTURER_EXPERIMENTAL
             elif "tiger" in heading:
                 current_manufacturer = MANUFACTURER_TIGER
             continue
@@ -492,6 +497,133 @@ def _collect_background_candidates(
     return collected
 
 
+def _find_label_overlay(
+    siblings: Sequence[ET.Element],
+    screen_pos: int,
+    background_node: Optional[ET.Element],
+    background_bounds: Optional[Bounds],
+    image_map: Dict[str, str],
+    root: ET.Element,
+) -> Optional[Tuple[str, float]]:
+    """Detect a translucent static-label overlay layered directly on top of
+    the chosen background, for the screen at ``screen_pos``.
+
+    Some artwork sets (Bassmate Computer is the only one in this catalog)
+    draw their always-visible printed labels ("SPRG", "WORM", ...) as a
+    separate element named with a "TEXT-" prefix, placed immediately
+    *after the <screen> tag itself* with <color alpha="..."> (the
+    background element for the same screen sits immediately *before* the
+    <screen> tag - see default.lay: "Screen-TopNS, screen, TEXT-Top,
+    Screen-BottomNS, screen, TEXT-Bottom"), at identical bounds to the
+    background, rather than baking the text into the background PNG
+    itself or into the LCD segments. Our renderer only ever draws one
+    background image per screen, so without this the labels are silently
+    dropped entirely and the LCD segments (which are just plain on/off
+    indicator boxes on this kind of device, not glyph-shaped) end up
+    looking like meaningless solid squares instead of highlighted options.
+
+    This same "element, screen, translucent element" shape is also used by
+    plenty of *other* artwork sets for unrelated things - a same-image
+    self-tint left at alpha="0.0" as a no-op (e.g. gnw_dkong), or a
+    genuine decorative overlay like Oil Panic's "Balcony" or Pinball's
+    "Plastics-Top" at alpha 0.5 that's no more a static label than the LCD
+    segments are - baking any of those in was tried and broke 30+ other
+    games' resolved backgrounds when this was first written, so two
+    conditions narrow this to just the real idiom:
+    - the overlay element's own ref/name must start with "text" (the one
+      naming convention actually used for this purpose in this catalog -
+      verified nothing else in the whole decompress/ tree uses it);
+    - the chosen background must be the *literal* immediate predecessor of
+      this exact <screen> tag (siblings[screen_pos - 1]), not merely
+      "some background-ish element somewhere near it" - _pick_best_background
+      can walk past nearby decorative elements (Bubbles/Gradient/a repeated
+      self-tint) to find the real background further away in the layout,
+      and this must not pair that resolved background with an unrelated
+      element that only happens to sit next to the <screen> tag.
+    """
+    if background_bounds is None or background_node is None:
+        return None
+    if screen_pos - 1 < 0 or siblings[screen_pos - 1] is not background_node:
+        return None
+
+    idx = screen_pos + 1
+    if idx >= len(siblings):
+        return None
+
+    candidate = siblings[idx]
+    if candidate.tag not in {"element", "overlay"}:
+        return None
+
+    candidate_name = candidate.get("ref") or candidate.get("element") or candidate.get("name") or ""
+    if not candidate_name.lower().startswith("text"):
+        return None
+
+    color_node = candidate.find("color")
+    if color_node is None:
+        return None
+    alpha = _parse_float(color_node.get("alpha", "1"))
+    if alpha is None or alpha >= 0.999:
+        return None
+
+    candidate_bounds = _extract_bounds(candidate, root)
+    if candidate_bounds is None:
+        return None
+
+    def _close(a: float, b: float, tol: float = 2.0) -> bool:
+        return abs(a - b) <= tol
+
+    if not (
+        _close(candidate_bounds.x, background_bounds.x)
+        and _close(candidate_bounds.y, background_bounds.y)
+        and _close(candidate_bounds.width, background_bounds.width)
+        and _close(candidate_bounds.height, background_bounds.height)
+    ):
+        return None
+
+    overlay_file = _resolve_background_file(candidate, image_map)
+    if not overlay_file:
+        return None
+    return overlay_file, alpha
+
+
+def _composite_label_overlay(folder: Path, background_file: str, overlay_file: str, alpha: float) -> Optional[str]:
+    """Bake a translucent static-label element (see _find_label_overlay)
+    into the background image itself, once, caching the result alongside
+    the source images so later runs don't redo the work.
+    """
+    bg_path = folder / background_file
+    overlay_path = folder / overlay_file
+    if not bg_path.exists() or not overlay_path.exists():
+        return None
+
+    out_name = f"{Path(background_file).stem}_labeled.png"
+    out_path = folder / out_name
+
+    try:
+        if (
+            out_path.exists()
+            and out_path.stat().st_mtime >= bg_path.stat().st_mtime
+            and out_path.stat().st_mtime >= overlay_path.stat().st_mtime
+        ):
+            return out_name
+
+        bg_img = Image.open(bg_path).convert("RGBA")
+        overlay_img = Image.open(overlay_path).convert("RGBA")
+        if overlay_img.size != bg_img.size:
+            overlay_img = overlay_img.resize(bg_img.size, Image.LANCZOS)
+
+        bg_arr = np.asarray(bg_img, dtype=np.float32)
+        overlay_arr = np.asarray(overlay_img, dtype=np.float32)
+        src_a = (overlay_arr[..., 3:4] / 255.0) * alpha
+        out_rgb = overlay_arr[..., :3] * src_a + bg_arr[..., :3] * (1.0 - src_a)
+        out_arr = np.dstack([out_rgb, bg_arr[..., 3:4]]).astype(np.uint8)
+        Image.fromarray(out_arr, mode="RGBA").save(out_path)
+    except Exception:
+        return None
+
+    return out_name
+
+
 def _extract_view_assets(
     root: ET.Element,
     image_map: Dict[str, str],
@@ -522,6 +654,14 @@ def _extract_view_assets(
                 background_node = _pick_best_background(bg_candidates, image_map, folder)
                 background_bounds = _extract_bounds(background_node, root)
                 background_file = _resolve_background_file(background_node, image_map)
+
+                overlay = _find_label_overlay(siblings, pos, background_node, background_bounds, image_map, root)
+                if overlay is not None and background_file:
+                    overlay_file, overlay_alpha = overlay
+                    labeled_file = _composite_label_overlay(folder, background_file, overlay_file, overlay_alpha)
+                    if labeled_file:
+                        background_file = labeled_file
+
                 surface_by_id[screen_id] = SurfaceData(
                     screen_bounds=screen_bounds,
                     background_bounds=background_bounds,
@@ -560,6 +700,20 @@ def _compute_transform(surface: SurfaceData) -> List[List[int]]:
     top_cut = max(0, int(round(bg.y - screen.y)))
     bottom_cut = max(0, int(round((screen.y + screen.height) - (bg.y + bg.height))))
 
+    # Defensive clamp: on a multi-screen device (3+ screens, e.g. Tronica's
+    # tri-screen units) it's possible for a screen to get paired with the
+    # wrong background element from the .lay file, producing a cut that
+    # exceeds the screen's own width/height - im.transform_img() downstream
+    # has no bounds checking and crashes with a negative-size PIL error in
+    # that case, silently dropping the whole game from the pack (caught by
+    # convert_switch.py's per-game try/except). Falling back to "no crop"
+    # here is a graceful degradation (a slightly less precisely-cropped
+    # background) rather than losing the game entirely - confirmed against
+    # trtreisl (Treasure Island, Tronica), whose left screen hit exactly
+    # this mismatch.
+    if left_cut + right_cut >= width or top_cut + bottom_cut >= height:
+        return [[width, 0, 0], [height, 0, 0]]
+
     return [[width, left_cut, right_cut], [height, top_cut, bottom_cut]]
 
 
@@ -579,7 +733,36 @@ def _detect_multiscreen_config(
         - size_visual is [[w1, h1], [w2, h2]] for multi-screen games, [] otherwise
         - two_in_one_screen is True for left/right orientation, False otherwise
     """
+    if len(surfaces) >= 3:
+        # 3+ screen devices (e.g. Tronica's tri-screen units, confirmed
+        # against trtreisl/Treasure Island) don't fit the uniform-size
+        # left/right or top/bottom model below, which assumes exactly two
+        # same-sized panels - their screens are typically different sizes
+        # (a larger center display flanked by two smaller wings), so each
+        # gets its own size, proportioned relative to the others rather
+        # than a forced uniform one.
+        #
+        # The .lay file's own coordinate units are arbitrary and often in
+        # the thousands (trtreisl's widest screen is ~1975 units) - passing
+        # that straight through as a *pixel* target broke segment atlas
+        # packing (every one of this game's 134 segments rendered at a
+        # proportionally huge size, together exceeding every candidate
+        # atlas bin). Rescale so the single largest screen dimension lands
+        # at the same order of magnitude the 2-screen sizes below use,
+        # preserving every screen's own aspect ratio and their relative
+        # size to each other - only the overall scale changes.
+        target_max = max(left_right_size[0], left_right_size[1], top_bottom_size[0], top_bottom_size[1])
+        native_max = max(max(s.screen_bounds.width, s.screen_bounds.height) for s in surfaces)
+        scale = (target_max / native_max) if native_max > 0 else 1.0
+        return [
+            [max(1, int(round(s.screen_bounds.width * scale))), max(1, int(round(s.screen_bounds.height * scale)))]
+            for s in surfaces
+        ], False
+
     if len(surfaces) != 2:
+        # 0 or 1 screens - unchanged from before, convert_switch.py's own
+        # [resolution_up, resolution_down] default covers the single-screen
+        # case fine (only index 0 of it is ever read).
         return [], False
 
     screen1 = surfaces[0].screen_bounds

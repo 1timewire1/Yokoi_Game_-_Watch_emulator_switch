@@ -19,6 +19,8 @@ bool g_betagames_enabled = false;
 uint8_t g_panel_gap_percent = 0;
 bool g_experimental_enabled = false;
 bool g_debug_mode = false;
+uint8_t g_dosimeter_reading = 0;
+TimeSetMode g_time_set_mode = TimeSetMode::Automatic;
 
 namespace {
 
@@ -40,6 +42,8 @@ void switch_settings_load() {
     g_panel_gap_percent = 0;
     g_experimental_enabled = false;
     g_debug_mode = false;
+    g_dosimeter_reading = 0;
+    g_time_set_mode = TimeSetMode::Automatic;
 
     // Applied before anything below gets a chance to log, so even the
     // "no settings file" case respects logging being off by default -
@@ -105,6 +109,13 @@ void switch_settings_load() {
         } else if (strcmp(line, "debug") == 0) {
             // Hidden/manual-only - never written back, see switch_settings_save().
             g_debug_mode = (value != 0);
+        } else if (strcmp(line, "dosimeterreading") == 0) {
+            long v = value;
+            if (v < 0) v = 0;
+            if (v > 15) v = 15;
+            g_dosimeter_reading = (uint8_t)v;
+        } else if (strcmp(line, "timesetmode") == 0) {
+            g_time_set_mode = (value == 1) ? TimeSetMode::Manual : TimeSetMode::Automatic;
         }
     }
     fclose(file);
@@ -114,11 +125,12 @@ void switch_settings_load() {
     debug_log::set_enabled(g_log_file_enabled || g_debug_mode);
     YOKOI_LOG("switch_settings: loaded from '%s' (background_color=0x%06x, segment_marking_alpha=%u, rotation=%u, "
               "hide_console_art=%d, loadstate=%u, enable_log=%d, lastgameplayed='%s', betagames=%d, panelgap=%u, "
-              "clonefilter=%u, experimental=%d, debug=%d)",
+              "clonefilter=%u, experimental=%d, debug=%d, dosimeterreading=%u, timesetmode=%u)",
               path.c_str(), (unsigned)g_settings.background_color, (unsigned)g_settings.segment_marking_alpha,
               (unsigned)g_screen_rotation, (int)g_hide_console_art, (unsigned)g_load_state_behavior,
               (int)g_log_file_enabled, g_last_game_played_ref.c_str(), (int)g_betagames_enabled,
-              (unsigned)g_panel_gap_percent, (unsigned)g_clone_filter_mode, (int)g_experimental_enabled, (int)g_debug_mode);
+              (unsigned)g_panel_gap_percent, (unsigned)g_clone_filter_mode, (int)g_experimental_enabled, (int)g_debug_mode,
+              (unsigned)g_dosimeter_reading, (unsigned)g_time_set_mode);
 }
 
 void switch_settings_save() {
@@ -147,5 +159,7 @@ void switch_settings_save() {
     fprintf(file, "betagames=%d\n", g_betagames_enabled ? 1 : 0);
     fprintf(file, "panelgap=%u\n", (unsigned)g_panel_gap_percent);
     fprintf(file, "experimental=%d\n", g_experimental_enabled ? 1 : 0);
+    fprintf(file, "dosimeterreading=%u\n", (unsigned)g_dosimeter_reading);
+    fprintf(file, "timesetmode=%u\n", (unsigned)g_time_set_mode);
     fclose(file);
 }

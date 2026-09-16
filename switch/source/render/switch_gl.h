@@ -26,6 +26,7 @@ struct GlResources {
     GLint uTex = -1;
     GLint uMul = -1;
     GLint uAlphaOnly = -1;
+    GLint uMultiplyDarken = -1;
     GLint uScale = -1;
     GLint uOffset = -1;
     GLint uRotCosSin = -1;
@@ -34,12 +35,15 @@ struct GlResources {
     GLuint tex_segments = 0;
     GLuint tex_background = 0;
     GLuint tex_console = 0;
+    GLuint tex_overlay = 0;
     int tex_segments_w = 0;
     int tex_segments_h = 0;
     int tex_background_w = 0;
     int tex_background_h = 0;
     int tex_console_w = 0;
     int tex_console_h = 0;
+    int tex_overlay_w = 0;
+    int tex_overlay_h = 0;
 
     int viewport_w = 0;
     int viewport_h = 0;

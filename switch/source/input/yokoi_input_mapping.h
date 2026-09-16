@@ -27,9 +27,18 @@ void yokoi_input_apply_action_mask(
     std::atomic<bool>& right_action_down,
     int touch_action_mask);
 
+// `player` is forwarded as-is to every Virtual_Input::set_input() call this
+// makes - only BX_301 (shared by AK_302/HK_303) does anything with a value
+// other than the default 1 (see its set_input()'s player-2 case in
+// virtual_input.h); every other class's set_input() ignores the parameter
+// entirely, so passing player=2 there would just silently duplicate player
+// 1's own input rather than do anything harmful - callers still only ever
+// do this for the three Vs. games (see switch_input_poll_p2() in
+// switch_input.h).
 void yokoi_input_apply_controller_mask(
     Virtual_Input* input,
     uint32_t ctl_mask,
     int touch_action_mask,
     const std::atomic<int>& gamea_pulse_frames,
-    const std::atomic<int>& gameb_pulse_frames);
+    const std::atomic<int>& gameb_pulse_frames,
+    uint8_t player = 1);

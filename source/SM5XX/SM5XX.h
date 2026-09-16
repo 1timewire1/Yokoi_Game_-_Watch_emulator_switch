@@ -68,6 +68,11 @@ protected:
     // time addresses
     const TimeAddress *time_addresses;
 
+    // Cached result of set_time()'s 12h/PM conversion, for reassert_combined_hour()
+    // to replay without recomputing it - see that method's doc comment.
+    uint8_t cached_hour_12h_value = 0;
+    uint8_t cached_pm_bit = 0;
+
 public:
     bool step();
     void execute_cycle();
@@ -77,6 +82,7 @@ public:
     void time_set(bool state){ time_set_state = state; }
     bool is_time_set(){ return time_set_state; }
     void set_time(uint8_t hour, uint8_t minute, uint8_t second);
+    void reassert_combined_hour();
     //void set_input_multiplexage(bool use_multiplexage = true){ input_no_multiplex = !use_multiplexage; };
 
 private : 

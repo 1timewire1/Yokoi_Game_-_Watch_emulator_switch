@@ -2281,7 +2281,7 @@ class TSHARR2 : public Virtual_Input{
 };
 
 
-////////// Experimental Tiger games (MANUFACTURER_TIGER_EXPERIMENTAL) //////////
+////////// Experimental games (MANUFACTURER_EXPERIMENTAL) //////////
 // Button assignments derived directly from MAME's hh_sm510.cpp INPUT_PORTS
 // definitions for each romset (IN.N port index -> group, bit position ->
 // line - e.g. bit 0x04 is line 2 - confirmed against TSFIGHT2/TMCHAMMER
@@ -3657,6 +3657,881 @@ class TMIGMAX : public Virtual_Input{
         }
 };
 
+////// Double Dribble (Konami) : SM510 //////
+// Physical: left = full 4-way d-pad; right = single unlabeled round button
+// (MAME gives this no PORT_NAME - the console art itself has no text on
+// it either, matching every other classic Konami handheld below).
+class KDRIBBLE : public Virtual_Input{
+    public :
+        KDRIBBLE(SM5XX* c) : Virtual_Input(c) {
+            left_configuration = CONF_4_BUTTON_DIRECTION;
+            right_configuration = CONF_2_BUTTON_UPDOWN;
+        }
+
+        void set_input(uint8_t part, uint8_t button, bool state, uint8_t player = 1) override{
+            switch (part) {
+                case PART_SETUP:
+                    switch (button) {
+                        case BUTTON_GAMEA: cpu->input_set(2, 0, state); break; // Power On/Start
+                        case BUTTON_GAMEB: cpu->input_set(1, 0, state); break; // Level Select
+                        default: break; } break;
+                case PART_LEFT:
+                    switch (button) {
+                        case BUTTON_LEFT: cpu->input_set(0, 0, state); break;
+                        case BUTTON_UP: cpu->input_set(0, 1, state); break;
+                        case BUTTON_DOWN: cpu->input_set(0, 2, state); break;
+                        case BUTTON_RIGHT: cpu->input_set(0, 3, state); break;
+                        default: break; } break;
+                case PART_RIGHT:
+                    switch (button) {
+                        case BUTTON_UP: cpu->input_set(1, 3, state); break; // Action
+                        default: break; } break;
+                default: break;
+            }
+        }
+};
+
+////// Contra (Konami) : SM511 //////
+// Physical: left = "LEFT"/"RIGHT" rocker (no up/down on this romset);
+// right = single unlabeled round button.
+class KCONTRA : public Virtual_Input{
+    public :
+        KCONTRA(SM5XX* c) : Virtual_Input(c) {
+            left_configuration = CONF_2_BUTTON_LEFTRIGHT;
+            right_configuration = CONF_2_BUTTON_UPDOWN;
+        }
+
+        void set_input(uint8_t part, uint8_t button, bool state, uint8_t player = 1) override{
+            switch (part) {
+                case PART_SETUP:
+                    switch (button) {
+                        case BUTTON_GAMEA: cpu->input_set(2, 0, state); break; // Power On/Start
+                        case BUTTON_GAMEB: cpu->input_set(1, 0, state); break; // Select
+                        default: break; } break;
+                case PART_LEFT:
+                    switch (button) {
+                        case BUTTON_LEFT: cpu->input_set(0, 0, state); break;
+                        case BUTTON_RIGHT: cpu->input_set(0, 3, state); break;
+                        default: break; } break;
+                case PART_RIGHT:
+                    switch (button) {
+                        case BUTTON_UP: cpu->input_set(1, 3, state); break; // Action
+                        default: break; } break;
+                default: break;
+            }
+        }
+};
+
+////// Top Gun (Konami) : SM510 //////
+// Same shape as Double Dribble above. Physical: left = full 4-way d-pad;
+// right = single unlabeled round button.
+class KTOPGUN : public Virtual_Input{
+    public :
+        KTOPGUN(SM5XX* c) : Virtual_Input(c) {
+            left_configuration = CONF_4_BUTTON_DIRECTION;
+            right_configuration = CONF_2_BUTTON_UPDOWN;
+        }
+
+        void set_input(uint8_t part, uint8_t button, bool state, uint8_t player = 1) override{
+            switch (part) {
+                case PART_SETUP:
+                    switch (button) {
+                        case BUTTON_GAMEA: cpu->input_set(2, 0, state); break; // Power On/Start
+                        case BUTTON_GAMEB: cpu->input_set(1, 0, state); break; // Select
+                        default: break; } break;
+                case PART_LEFT:
+                    switch (button) {
+                        case BUTTON_LEFT: cpu->input_set(0, 0, state); break;
+                        case BUTTON_UP: cpu->input_set(0, 1, state); break;
+                        case BUTTON_DOWN: cpu->input_set(0, 2, state); break;
+                        case BUTTON_RIGHT: cpu->input_set(0, 3, state); break;
+                        default: break; } break;
+                case PART_RIGHT:
+                    switch (button) {
+                        case BUTTON_UP: cpu->input_set(1, 3, state); break; // Action
+                        default: break; } break;
+                default: break;
+            }
+        }
+};
+
+////// Gradius (Konami) : SM511 //////
+// Physical: left = "UP"/"DOWN" rocker (no left/right on this romset);
+// right = single unlabeled round button.
+class KGRADIUS : public Virtual_Input{
+    public :
+        KGRADIUS(SM5XX* c) : Virtual_Input(c) {
+            left_configuration = CONF_2_BUTTON_UPDOWN;
+            right_configuration = CONF_2_BUTTON_UPDOWN;
+        }
+
+        void set_input(uint8_t part, uint8_t button, bool state, uint8_t player = 1) override{
+            switch (part) {
+                case PART_SETUP:
+                    switch (button) {
+                        case BUTTON_GAMEA: cpu->input_set(0, 0, state); break; // Power On/Start
+                        case BUTTON_GAMEB: cpu->input_set(0, 2, state); break; // Select
+                        default: break; } break;
+                case PART_LEFT:
+                    switch (button) {
+                        case BUTTON_UP: cpu->input_set(1, 0, state); break;
+                        case BUTTON_DOWN: cpu->input_set(1, 1, state); break;
+                        default: break; } break;
+                case PART_RIGHT:
+                    switch (button) {
+                        case BUTTON_UP: cpu->input_set(1, 2, state); break; // Action
+                        default: break; } break;
+                default: break;
+            }
+        }
+};
+
+////// Teenage Mutant Ninja Turtles (Konami) : SM511 //////
+// Genuinely two joysticks, like Pit-Fighter earlier in this file: MAME
+// defines separate JOYSTICKLEFT_*/JOYSTICKRIGHT_* ports. Physical: left =
+// full 4-way d-pad; right = same round 4-way-shaped control, but only
+// Left/Right are actually wired on this romset (confirmed via screenshot -
+// the case has two identical-looking cross buttons even though the right
+// one only responds to two of its four positions here).
+class KTMNT : public Virtual_Input{
+    public :
+        KTMNT(SM5XX* c) : Virtual_Input(c) {
+            left_configuration = CONF_4_BUTTON_DIRECTION;
+            right_configuration = CONF_2_BUTTON_LEFTRIGHT;
+        }
+
+        void set_input(uint8_t part, uint8_t button, bool state, uint8_t player = 1) override{
+            switch (part) {
+                case PART_SETUP:
+                    switch (button) {
+                        case BUTTON_GAMEA: cpu->input_set(1, 3, state); break; // Power On/Start
+                        case BUTTON_GAMEB: cpu->input_set(1, 0, state); break; // Game Select
+                        default: break; } break;
+                case PART_LEFT:
+                    switch (button) {
+                        case BUTTON_LEFT: cpu->input_set(0, 0, state); break;
+                        case BUTTON_UP: cpu->input_set(0, 1, state); break;
+                        case BUTTON_DOWN: cpu->input_set(0, 2, state); break;
+                        case BUTTON_RIGHT: cpu->input_set(0, 3, state); break;
+                        default: break; } break;
+                case PART_RIGHT:
+                    switch (button) {
+                        case BUTTON_LEFT: cpu->input_set(2, 0, state); break;
+                        case BUTTON_RIGHT: cpu->input_set(2, 1, state); break;
+                        default: break; } break;
+                default: break;
+            }
+        }
+};
+
+////// Skate or Die (Konami) : SM511 //////
+// Physical: left = 4-way-shaped d-pad, but only Left/Up/Right are wired on
+// this romset (no Down); right = "UP"/"DOWN" rocker, split across two
+// separate MAME ports (still just one physical rocker).
+class KSKATEDIE : public Virtual_Input{
+    public :
+        KSKATEDIE(SM5XX* c) : Virtual_Input(c) {
+            left_configuration = CONF_4_BUTTON_DIRECTION;
+            right_configuration = CONF_2_BUTTON_UPDOWN;
+        }
+
+        void set_input(uint8_t part, uint8_t button, bool state, uint8_t player = 1) override{
+            switch (part) {
+                case PART_SETUP:
+                    switch (button) {
+                        case BUTTON_GAMEA: cpu->input_set(1, 3, state); break; // Power On/Start
+                        case BUTTON_GAMEB: cpu->input_set(1, 2, state); break; // Continue
+                        default: break; } break;
+                case PART_LEFT:
+                    switch (button) {
+                        case BUTTON_LEFT: cpu->input_set(0, 0, state); break;
+                        case BUTTON_UP: cpu->input_set(0, 1, state); break;
+                        case BUTTON_RIGHT: cpu->input_set(0, 3, state); break;
+                        default: break; } break;
+                case PART_RIGHT:
+                    switch (button) {
+                        case BUTTON_UP: cpu->input_set(2, 2, state); break;
+                        case BUTTON_DOWN: cpu->input_set(0, 2, state); break;
+                        default: break; } break;
+                default: break;
+            }
+        }
+};
+
+////// The Adventures of Bayou Billy (Konami) : SM511 //////
+// Physical: left = full 4-way d-pad; right = "UP"/"DOWN" rocker.
+class KBILLY : public Virtual_Input{
+    public :
+        KBILLY(SM5XX* c) : Virtual_Input(c) {
+            left_configuration = CONF_4_BUTTON_DIRECTION;
+            right_configuration = CONF_2_BUTTON_UPDOWN;
+        }
+
+        void set_input(uint8_t part, uint8_t button, bool state, uint8_t player = 1) override{
+            switch (part) {
+                case PART_SETUP:
+                    switch (button) {
+                        case BUTTON_GAMEA: cpu->input_set(1, 3, state); break; // Power On/Start
+                        case BUTTON_GAMEB: cpu->input_set(1, 2, state); break; // Pause
+                        default: break; } break;
+                case PART_LEFT:
+                    switch (button) {
+                        case BUTTON_LEFT: cpu->input_set(0, 0, state); break;
+                        case BUTTON_UP: cpu->input_set(0, 1, state); break;
+                        case BUTTON_DOWN: cpu->input_set(0, 2, state); break;
+                        case BUTTON_RIGHT: cpu->input_set(0, 3, state); break;
+                        default: break; } break;
+                case PART_RIGHT:
+                    switch (button) {
+                        case BUTTON_UP: cpu->input_set(2, 1, state); break;
+                        case BUTTON_DOWN: cpu->input_set(2, 2, state); break;
+                        default: break; } break;
+                default: break;
+            }
+        }
+};
+
+////// Bottom of the Ninth (Konami) : SM511 //////
+// Physical: left = full 4-way d-pad; right = single unlabeled round button.
+class KBOTTOM9 : public Virtual_Input{
+    public :
+        KBOTTOM9(SM5XX* c) : Virtual_Input(c) {
+            left_configuration = CONF_4_BUTTON_DIRECTION;
+            right_configuration = CONF_2_BUTTON_UPDOWN;
+        }
+
+        void set_input(uint8_t part, uint8_t button, bool state, uint8_t player = 1) override{
+            switch (part) {
+                case PART_SETUP:
+                    switch (button) {
+                        case BUTTON_GAMEA: cpu->input_set(1, 3, state); break; // Power On/Start
+                        case BUTTON_GAMEB: cpu->input_set(1, 2, state); break; // Level/Time
+                        default: break; } break;
+                case PART_LEFT:
+                    switch (button) {
+                        case BUTTON_LEFT: cpu->input_set(0, 0, state); break;
+                        case BUTTON_UP: cpu->input_set(0, 1, state); break;
+                        case BUTTON_DOWN: cpu->input_set(0, 2, state); break;
+                        case BUTTON_RIGHT: cpu->input_set(0, 3, state); break;
+                        default: break; } break;
+                case PART_RIGHT:
+                    switch (button) {
+                        case BUTTON_UP: cpu->input_set(2, 2, state); break; // Action
+                        default: break; } break;
+                default: break;
+            }
+        }
+};
+
+////// The Lone Ranger (Konami) : SM511 //////
+// Physical: left = "LEFT"/"RIGHT" rocker (no up/down on this romset);
+// right = single unlabeled round button (shares a MAME port with Left,
+// which is fine - group/line addressing doesn't care which physical side
+// a line ends up wired to).
+class KLONERAN : public Virtual_Input{
+    public :
+        KLONERAN(SM5XX* c) : Virtual_Input(c) {
+            left_configuration = CONF_2_BUTTON_LEFTRIGHT;
+            right_configuration = CONF_2_BUTTON_UPDOWN;
+        }
+
+        void set_input(uint8_t part, uint8_t button, bool state, uint8_t player = 1) override{
+            switch (part) {
+                case PART_SETUP:
+                    switch (button) {
+                        case BUTTON_GAMEA: cpu->input_set(1, 3, state); break; // Power On/Start
+                        case BUTTON_GAMEB: cpu->input_set(1, 2, state); break; // Pause
+                        default: break; } break;
+                case PART_LEFT:
+                    switch (button) {
+                        case BUTTON_LEFT: cpu->input_set(0, 0, state); break;
+                        case BUTTON_RIGHT: cpu->input_set(0, 3, state); break;
+                        default: break; } break;
+                case PART_RIGHT:
+                    switch (button) {
+                        case BUTTON_UP: cpu->input_set(0, 1, state); break; // Action
+                        default: break; } break;
+                default: break;
+            }
+        }
+};
+
+////// Bill Elliott's NASCAR Racing (Konami) : SM511 //////
+// Also serves Chequered Flag (kchqflag, reuses this romset's hardware
+// entirely - MAME's own SYST() entry names knascar_state directly as its
+// device class) and Top Gun: Second Mission (ktopgun2, verified
+// bit-for-bit identical port layout to this one, just a different game).
+// Physical: left = "LEFT"/"RIGHT" rocker; right = "UP"/"DOWN" rocker -
+// both two-stick, no diagonals on either side.
+class KNASCAR : public Virtual_Input{
+    public :
+        KNASCAR(SM5XX* c) : Virtual_Input(c) {
+            left_configuration = CONF_2_BUTTON_LEFTRIGHT;
+            right_configuration = CONF_2_BUTTON_UPDOWN;
+        }
+
+        void set_input(uint8_t part, uint8_t button, bool state, uint8_t player = 1) override{
+            switch (part) {
+                case PART_SETUP:
+                    switch (button) {
+                        case BUTTON_GAMEA: cpu->input_set(0, 3, state); break; // Power On/Start
+                        case BUTTON_GAMEB: cpu->input_set(0, 2, state); break; // Pause
+                        default: break; } break;
+                case PART_LEFT:
+                    switch (button) {
+                        case BUTTON_LEFT: cpu->input_set(0, 0, state); break;
+                        case BUTTON_RIGHT: cpu->input_set(1, 0, state); break;
+                        default: break; } break;
+                case PART_RIGHT:
+                    switch (button) {
+                        case BUTTON_UP: cpu->input_set(0, 1, state); break;
+                        case BUTTON_DOWN: cpu->input_set(1, 1, state); break;
+                        default: break; } break;
+                default: break;
+            }
+        }
+};
+
+////// Blades of Steel (Konami) : SM511 //////
+// Physical: left = full 4-way d-pad; right = single unlabeled round button.
+class KBLADES : public Virtual_Input{
+    public :
+        KBLADES(SM5XX* c) : Virtual_Input(c) {
+            left_configuration = CONF_4_BUTTON_DIRECTION;
+            right_configuration = CONF_2_BUTTON_UPDOWN;
+        }
+
+        void set_input(uint8_t part, uint8_t button, bool state, uint8_t player = 1) override{
+            switch (part) {
+                case PART_SETUP:
+                    switch (button) {
+                        case BUTTON_GAMEA: cpu->input_set(1, 3, state); break; // Power On/Start
+                        case BUTTON_GAMEB: cpu->input_set(1, 2, state); break; // Pause
+                        default: break; } break;
+                case PART_LEFT:
+                    switch (button) {
+                        case BUTTON_LEFT: cpu->input_set(0, 0, state); break;
+                        case BUTTON_UP: cpu->input_set(0, 1, state); break;
+                        case BUTTON_DOWN: cpu->input_set(0, 2, state); break;
+                        case BUTTON_RIGHT: cpu->input_set(0, 3, state); break;
+                        default: break; } break;
+                case PART_RIGHT:
+                    switch (button) {
+                        case BUTTON_UP: cpu->input_set(2, 0, state); break; // Action
+                        default: break; } break;
+                default: break;
+            }
+        }
+};
+
+////// Teenage Mutant Ninja Turtles II: Splinter Speaks (Konami) : SM511 //////
+// Physical: left = full 4-way d-pad; right = single unlabeled round button.
+class KTMNT2 : public Virtual_Input{
+    public :
+        KTMNT2(SM5XX* c) : Virtual_Input(c) {
+            left_configuration = CONF_4_BUTTON_DIRECTION;
+            right_configuration = CONF_2_BUTTON_UPDOWN;
+        }
+
+        void set_input(uint8_t part, uint8_t button, bool state, uint8_t player = 1) override{
+            switch (part) {
+                case PART_SETUP:
+                    switch (button) {
+                        case BUTTON_GAMEA: cpu->input_set(0, 3, state); break; // Power On/Start
+                        case BUTTON_GAMEB: cpu->input_set(0, 1, state); break; // Pause
+                        default: break; } break;
+                case PART_LEFT:
+                    switch (button) {
+                        case BUTTON_RIGHT: cpu->input_set(1, 0, state); break;
+                        case BUTTON_LEFT: cpu->input_set(1, 1, state); break;
+                        case BUTTON_UP: cpu->input_set(1, 2, state); break;
+                        case BUTTON_DOWN: cpu->input_set(1, 3, state); break;
+                        default: break; } break;
+                case PART_RIGHT:
+                    switch (button) {
+                        case BUTTON_UP: cpu->input_set(2, 0, state); break; // Action
+                        default: break; } break;
+                default: break;
+            }
+        }
+};
+
+////// NFL Football (Konami) : SM511 //////
+// Same shape as Blades of Steel above. Physical: left = full 4-way d-pad;
+// right = single unlabeled round button.
+class KNFL : public Virtual_Input{
+    public :
+        KNFL(SM5XX* c) : Virtual_Input(c) {
+            left_configuration = CONF_4_BUTTON_DIRECTION;
+            right_configuration = CONF_2_BUTTON_UPDOWN;
+        }
+
+        void set_input(uint8_t part, uint8_t button, bool state, uint8_t player = 1) override{
+            switch (part) {
+                case PART_SETUP:
+                    switch (button) {
+                        case BUTTON_GAMEA: cpu->input_set(1, 3, state); break; // Power On/Start
+                        case BUTTON_GAMEB: cpu->input_set(1, 2, state); break; // Pause
+                        default: break; } break;
+                case PART_LEFT:
+                    switch (button) {
+                        case BUTTON_LEFT: cpu->input_set(0, 0, state); break;
+                        case BUTTON_UP: cpu->input_set(0, 1, state); break;
+                        case BUTTON_DOWN: cpu->input_set(0, 2, state); break;
+                        case BUTTON_RIGHT: cpu->input_set(0, 3, state); break;
+                        default: break; } break;
+                case PART_RIGHT:
+                    switch (button) {
+                        case BUTTON_UP: cpu->input_set(2, 0, state); break; // Action
+                        default: break; } break;
+                default: break;
+            }
+        }
+};
+
+////// Star Trek: 25th Anniversary (Konami) : SM511 //////
+// NOTE: MAME's own port definition ties Up and Down to the exact same
+// physical line via a "FAKE" port condition, commented directly in MAME's
+// source as "Up/Down are electronically the same button" - both mapped to
+// the same (group,line) here to match. Physical: left = "LEFT"/"RIGHT"
+// rocker with a combined "UP/DOWN" position; right = single unlabeled
+// round button.
+class KST25 : public Virtual_Input{
+    public :
+        KST25(SM5XX* c) : Virtual_Input(c) {
+            left_configuration = CONF_4_BUTTON_DIRECTION;
+            right_configuration = CONF_2_BUTTON_UPDOWN;
+        }
+
+        void set_input(uint8_t part, uint8_t button, bool state, uint8_t player = 1) override{
+            switch (part) {
+                case PART_SETUP:
+                    switch (button) {
+                        case BUTTON_GAMEA: cpu->input_set(1, 3, state); break; // Power On/Start
+                        case BUTTON_GAMEB: cpu->input_set(1, 2, state); break; // Pause
+                        default: break; } break;
+                case PART_LEFT:
+                    switch (button) {
+                        case BUTTON_LEFT: cpu->input_set(0, 0, state); break;
+                        case BUTTON_UP: cpu->input_set(0, 1, state); break; // Up/Down (same line)
+                        case BUTTON_DOWN: cpu->input_set(0, 1, state); break; // Up/Down (same line)
+                        case BUTTON_RIGHT: cpu->input_set(0, 3, state); break;
+                        default: break; } break;
+                case PART_RIGHT:
+                    switch (button) {
+                        case BUTTON_UP: cpu->input_set(2, 2, state); break; // Action
+                        default: break; } break;
+                default: break;
+            }
+        }
+};
+
+////// Top Gun: Second Mission (Konami) : SM511 //////
+// See KNASCAR above - bit-for-bit identical port layout, dispatched
+// straight to that class.
+
+////// Teenage Mutant Ninja Turtles 3: Shredder's Last Stand (Konami) : SM511 //////
+// NOTE: despite sharing a model line with Teenage Mutant Ninja Turtles:
+// Basketball (ktmntbb) below, this romset's INPUT_PORTS are NOT
+// bit-for-bit identical to it - confirmed directly against MAME's own
+// port definitions, correcting an earlier assumption in this file. See
+// KTMNTBB's own comment for the differences. Physical: left = full 4-way
+// d-pad; right = single unlabeled round button.
+class KTMNT3 : public Virtual_Input{
+    public :
+        KTMNT3(SM5XX* c) : Virtual_Input(c) {
+            left_configuration = CONF_4_BUTTON_DIRECTION;
+            right_configuration = CONF_2_BUTTON_UPDOWN;
+        }
+
+        void set_input(uint8_t part, uint8_t button, bool state, uint8_t player = 1) override{
+            switch (part) {
+                case PART_SETUP:
+                    switch (button) {
+                        case BUTTON_GAMEA: cpu->input_set(0, 3, state); break; // Power On/Start
+                        case BUTTON_GAMEB: cpu->input_set(0, 2, state); break; // Pause
+                        default: break; } break;
+                case PART_LEFT:
+                    switch (button) {
+                        case BUTTON_LEFT: cpu->input_set(0, 0, state); break;
+                        case BUTTON_UP: cpu->input_set(0, 1, state); break;
+                        case BUTTON_RIGHT: cpu->input_set(1, 0, state); break;
+                        case BUTTON_DOWN: cpu->input_set(1, 1, state); break;
+                        default: break; } break;
+                case PART_RIGHT:
+                    switch (button) {
+                        case BUTTON_UP: cpu->input_set(2, 3, state); break; // Action
+                        default: break; } break;
+                default: break;
+            }
+        }
+};
+
+////// Teenage Mutant Ninja Turtles: Basketball (Konami) : SM511 //////
+// NOT the same port layout as KTMNT3 above despite the similar name/model
+// line - confirmed directly against MAME's own port definitions. All four
+// directions live on a single port here (KTMNT3 splits them across two),
+// and Start/Pause live on a different port/line entirely. This was the
+// cause of the game being unable to start: the old shared class sent
+// Start to a line that's actually wired to "D-Pad Right" on this romset.
+// Physical: left = full 4-way d-pad; right = single unlabeled round
+// button.
+class KTMNTBB : public Virtual_Input{
+    public :
+        KTMNTBB(SM5XX* c) : Virtual_Input(c) {
+            left_configuration = CONF_4_BUTTON_DIRECTION;
+            right_configuration = CONF_2_BUTTON_UPDOWN;
+        }
+
+        void set_input(uint8_t part, uint8_t button, bool state, uint8_t player = 1) override{
+            switch (part) {
+                case PART_SETUP:
+                    switch (button) {
+                        case BUTTON_GAMEA: cpu->input_set(1, 3, state); break; // Power On/Start
+                        case BUTTON_GAMEB: cpu->input_set(1, 2, state); break; // Pause
+                        default: break; } break;
+                case PART_LEFT:
+                    switch (button) {
+                        case BUTTON_LEFT: cpu->input_set(0, 0, state); break;
+                        case BUTTON_UP: cpu->input_set(0, 1, state); break;
+                        case BUTTON_DOWN: cpu->input_set(0, 2, state); break;
+                        case BUTTON_RIGHT: cpu->input_set(0, 3, state); break;
+                        default: break; } break;
+                case PART_RIGHT:
+                    switch (button) {
+                        case BUTTON_UP: cpu->input_set(2, 3, state); break; // Action
+                        default: break; } break;
+                default: break;
+            }
+        }
+};
+
+////// Bucky O'Hare (Konami) : SM511 //////
+// Physical: left = "UP"/"DOWN" rocker (no left/right on this romset);
+// right = single unlabeled round button (shares a MAME port with Up).
+class KBUCKY : public Virtual_Input{
+    public :
+        KBUCKY(SM5XX* c) : Virtual_Input(c) {
+            left_configuration = CONF_2_BUTTON_UPDOWN;
+            right_configuration = CONF_2_BUTTON_UPDOWN;
+        }
+
+        void set_input(uint8_t part, uint8_t button, bool state, uint8_t player = 1) override{
+            switch (part) {
+                case PART_SETUP:
+                    switch (button) {
+                        case BUTTON_GAMEA: cpu->input_set(0, 3, state); break; // Power On/Start
+                        case BUTTON_GAMEB: cpu->input_set(0, 2, state); break; // Pause
+                        default: break; } break;
+                case PART_LEFT:
+                    switch (button) {
+                        case BUTTON_UP: cpu->input_set(0, 0, state); break;
+                        case BUTTON_DOWN: cpu->input_set(1, 0, state); break;
+                        default: break; } break;
+                case PART_RIGHT:
+                    switch (button) {
+                        case BUTTON_UP: cpu->input_set(0, 1, state); break; // Action
+                        default: break; } break;
+                default: break;
+            }
+        }
+};
+
+////// Garfield (Konami) : SM511 //////
+// Physical: left = full 4-way d-pad; right = single unlabeled round button.
+class KGARFLD : public Virtual_Input{
+    public :
+        KGARFLD(SM5XX* c) : Virtual_Input(c) {
+            left_configuration = CONF_4_BUTTON_DIRECTION;
+            right_configuration = CONF_2_BUTTON_UPDOWN;
+        }
+
+        void set_input(uint8_t part, uint8_t button, bool state, uint8_t player = 1) override{
+            switch (part) {
+                case PART_SETUP:
+                    switch (button) {
+                        case BUTTON_GAMEA: cpu->input_set(1, 3, state); break; // Power On/Start
+                        case BUTTON_GAMEB: cpu->input_set(1, 2, state); break; // Pause
+                        default: break; } break;
+                case PART_LEFT:
+                    switch (button) {
+                        case BUTTON_LEFT: cpu->input_set(0, 0, state); break;
+                        case BUTTON_UP: cpu->input_set(0, 1, state); break;
+                        case BUTTON_RIGHT: cpu->input_set(1, 0, state); break;
+                        case BUTTON_DOWN: cpu->input_set(1, 1, state); break;
+                        default: break; } break;
+                case PART_RIGHT:
+                    switch (button) {
+                        case BUTTON_UP: cpu->input_set(2, 3, state); break; // Action
+                        default: break; } break;
+                default: break;
+            }
+        }
+};
+
+////// Treasure Island (Tronica) : SM511 //////
+// Physical: left = full 4-way d-pad; right = single button labeled
+// "Start/Jump/Pick" on the console (any of A/B/X/Y triggers it - MAME's
+// own port comment notes this button is electronically the same line as a
+// separate clock-setting "Hour" function, not modeled here - see below).
+// "Game A"/"Game B" map directly onto our GameA/GameB slots by name.
+// Clock-only functions (Min, Alarm, and the "Hour" half of the shared
+// Start/Jump/Pick line) have no equivalent slot in this scheme and are
+// intentionally left unmapped, same as every other game's ACL/reset.
+class TRTREISL : public Virtual_Input{
+    public :
+        TRTREISL(SM5XX* c) : Virtual_Input(c) {
+            left_configuration = CONF_4_BUTTON_DIRECTION;
+            right_configuration = CONF_1_BUTTON_ACTION;
+        }
+
+        void set_input(uint8_t part, uint8_t button, bool state, uint8_t player = 1) override{
+            switch (part) {
+                case PART_SETUP:
+                    switch (button) {
+                        case BUTTON_GAMEA: cpu->input_set(3, 1, state); break; // Game A
+                        case BUTTON_GAMEB: cpu->input_set(3, 2, state); break; // Game B
+                        default: break; } break;
+                case PART_LEFT:
+                    switch (button) {
+                        case BUTTON_RIGHT: cpu->input_set(1, 0, state); break;
+                        case BUTTON_UP: cpu->input_set(1, 1, state); break;
+                        case BUTTON_LEFT: cpu->input_set(1, 2, state); break;
+                        case BUTTON_DOWN: cpu->input_set(1, 3, state); break;
+                        default: break; } break;
+                case PART_RIGHT:
+                    switch (button) {
+                        case BUTTON_ACTION: cpu->input_set(0, 0, state); break; // Start/Jump/Pick
+                        default: break; } break;
+                default: break;
+            }
+        }
+};
+
+////// Vesolaya arifmetika (Elektronika) : SM511 //////
+// Physical: left/right-only... actually up/down-only rockers on both
+// sides (no left/right at all on either) - a two-stick, vertical-only
+// layout. "Game" and "Start" map onto our GameA/GameB slots by name;
+// "Time" maps to the Time (L) slot. "Alarm" has no equivalent slot here
+// and is left unmapped, same as every other clock-utility button in this
+// batch.
+class VESARIF : public Virtual_Input{
+    public :
+        VESARIF(SM5XX* c) : Virtual_Input(c) {
+            left_configuration = CONF_2_BUTTON_UPDOWN;
+            right_configuration = CONF_2_BUTTON_UPDOWN;
+        }
+
+        void set_input(uint8_t part, uint8_t button, bool state, uint8_t player = 1) override{
+            switch (part) {
+                case PART_SETUP:
+                    switch (button) {
+                        case BUTTON_GAMEA: cpu->input_set(0, 0, state); break; // Game
+                        case BUTTON_GAMEB: cpu->input_set(0, 1, state); break; // Start
+                        case BUTTON_TIME: cpu->input_set(0, 2, state); break; // Time
+                        default: break; } break;
+                case PART_LEFT:
+                    switch (button) {
+                        case BUTTON_UP: cpu->input_set(1, 0, state); break;
+                        case BUTTON_DOWN: cpu->input_set(1, 1, state); break;
+                        default: break; } break;
+                case PART_RIGHT:
+                    switch (button) {
+                        case BUTTON_UP: cpu->input_set(1, 3, state); break;
+                        case BUTTON_DOWN: cpu->input_set(1, 2, state); break;
+                        default: break; } break;
+                default: break;
+            }
+        }
+};
+
+////// Bassmate Computer (Telko / Nintendo) : SM511 //////
+// Not a game at all - a real fishing-computer novelty device with a
+// keypad of 9 distinct labeled function buttons (Compute, Wind, Cover,
+// Time of Day, Water Temp F, Water Clarity, Structure, Water Depth(ft),
+// Season, Alarm - see the console screenshot), nothing resembling a
+// d-pad. There is no physically-meaningful way to preserve this on our
+// PART_LEFT/PART_RIGHT diamond layout, so the 8 non-Compute/Alarm buttons
+// are assigned to the 8 available direction slots in the same order MAME
+// itself lists their port bits in, purely for a stable, documented
+// mapping - see switch/standard_controls.md for the exact button-by-
+// button listing, since none of this is guessable from the Switch
+// controller alone the way every other game in this file is.
+class BASSMATE : public Virtual_Input{
+    public :
+        BASSMATE(SM5XX* c) : Virtual_Input(c) {
+            left_configuration = CONF_4_BUTTON_DIRECTION;
+            right_configuration = CONF_4_BUTTON_DIRECTION;
+        }
+
+        void set_input(uint8_t part, uint8_t button, bool state, uint8_t player = 1) override{
+            switch (part) {
+                case PART_SETUP:
+                    switch (button) {
+                        case BUTTON_GAMEA: cpu->input_set(0, 0, state); break; // Compute
+                        case BUTTON_GAMEB: cpu->input_set(0, 1, state); break; // Alarm
+                        default: break; } break;
+                case PART_LEFT:
+                    switch (button) {
+                        case BUTTON_UP: cpu->input_set(1, 0, state); break; // Wind
+                        case BUTTON_RIGHT: cpu->input_set(1, 1, state); break; // Cover
+                        case BUTTON_LEFT: cpu->input_set(1, 2, state); break; // Time of Day
+                        case BUTTON_DOWN: cpu->input_set(1, 3, state); break; // Water Temp F
+                        default: break; } break;
+                case PART_RIGHT:
+                    switch (button) {
+                        case BUTTON_UP: cpu->input_set(2, 0, state); break; // Water Clarity
+                        case BUTTON_RIGHT: cpu->input_set(2, 1, state); break; // Structure
+                        case BUTTON_LEFT: cpu->input_set(2, 2, state); break; // Water Depth(ft)
+                        case BUTTON_DOWN: cpu->input_set(2, 3, state); break; // Season
+                        default: break; } break;
+                default: break;
+            }
+        }
+};
+
+
+////// Altair (Nauchpribor bootleg of Elektronika IM-22 / Vesyolye futbolisty) : SM5A //////
+// Same board/ports as MC_25 (IM_22 among others) - MAME's own driver
+// comment says this unit "uses the same screen as IM-22", and naltair.svg
+// confirms it (identical viewBox/docname to vfutbol.svg - the same LCD
+// scan). Left/Right stick Up/Down and Game A/B/Time are wired identically
+// to MC_25 below; the one real difference (IN.0, unused on every other
+// gnw_mmouse-family game) is repurposed here as a 4-bit "Dosimeter
+// Reading" input fed from a settings-menu value, not a normal button - see
+// g_dosimeter_reading (switch_settings.h) and its per-frame feed into
+// k_input group 1 (this engine's group numbering runs one higher than
+// MAME's IN.N port index - group 0 is reserved for the non-multiplexed
+// ACL/alpha/beta lines) in switch/source/main.cpp. Nothing to do here for
+// that input: this class only owns the buttons that behave like every
+// other gnw_mmouse-family game.
+class NALTAIR : public Virtual_Input{
+    public :
+        NALTAIR(SM5XX* c) : Virtual_Input(c) {
+            left_configuration = CONF_2_BUTTON_UPDOWN;
+            right_configuration = CONF_2_BUTTON_UPDOWN;
+        }
+
+        void set_input(uint8_t part, uint8_t button, bool state, uint8_t player = 1) override{
+            switch (part) {
+                case PART_SETUP:
+                    switch (button) {
+                        case BUTTON_GAMEA: cpu->input_set(3, 2, state); break;
+                        case BUTTON_GAMEB: cpu->input_set(3, 1, state); break;
+                        case BUTTON_TIME: cpu->input_set(3, 0, state); break;
+                        default: break; } break;
+                case PART_LEFT:
+                    switch (button) {
+                        case BUTTON_UP: cpu->input_set(2, 3, state); break;
+                        case BUTTON_DOWN: cpu->input_set(2, 2, state); break;
+                        default: break; } break;
+                case PART_RIGHT:
+                    switch (button) {
+                        case BUTTON_UP: cpu->input_set(2, 1, state); break;
+                        case BUTTON_DOWN: cpu->input_set(2, 0, state); break;
+                        default: break; } break;
+                default: break;
+            }
+        }
+};
+
+
+////// Star Fox (Nelsonic) : SM530 //////
+// SM530's K register is a single non-multiplexed 8-bit input (op_kta/op_keta
+// read it as two nibbles), not 8 multiplexed groups like every other core
+// above - so every input_set() call here passes not_multiplex=true and
+// "line" is just the bit position in that one register (0-7), matching
+// MAME's IN.0 port exactly (see hh_sm510.cpp's nstarfox INPUT_PORTS_START,
+// cross-checked against KTA/KETA's own bit split in SM530_instruction.cpp).
+// Two real button-layout revisions exist on physical units but MAME treats
+// them as the same game/same input port, so this covers both.
+class NSTARFOX : public Virtual_Input{
+    public :
+        NSTARFOX(SM5XX* c) : Virtual_Input(c) {
+            left_configuration = CONF_4_BUTTON_DIRECTION;
+            right_configuration = CONF_2_BUTTON_LEFTRIGHT; // laser / bomb - two independent action buttons, not literal left/right (same convention KTMNT uses)
+        }
+
+        void set_input(uint8_t part, uint8_t button, bool state, uint8_t player = 1) override{
+            switch (part) {
+                case PART_LEFT:
+                    switch (button) {
+                        case BUTTON_UP: cpu->input_set(0, 4, state, true); break;
+                        case BUTTON_RIGHT: cpu->input_set(0, 5, state, true); break;
+                        case BUTTON_DOWN: cpu->input_set(0, 6, state, true); break;
+                        case BUTTON_LEFT: cpu->input_set(0, 7, state, true); break;
+                        default: break; } break;
+                case PART_RIGHT:
+                    switch (button) {
+                        case BUTTON_LEFT: cpu->input_set(0, 1, state, true); break; // laser
+                        case BUTTON_RIGHT: cpu->input_set(0, 2, state, true); break; // bomb
+                        default: break; } break;
+                default: break;
+            }
+        }
+};
+
+
+////// Super Mario Bros. 3 / Super Mario World (Nelsonic) : SM530 //////
+// Same IN.0 bit layout as NSTARFOX above (same base gamewatch_state driver -
+// nstarfox's INPUT_PORTS_START( nstarfox ) only PORT_MODIFYs bit1/bit2's
+// label from mode/set to laser/bomb, same bits either way), but here bit1/
+// bit2 are real mode/set buttons (cycle watch mode, adjust time) rather
+// than gameplay actions, so they're mapped as PART_SETUP Game A/B - matching
+// this codebase's convention for mode-select-style buttons elsewhere -
+// instead of NSTARFOX's PART_RIGHT action pair.
+class NSMB3 : public Virtual_Input{
+    public :
+        NSMB3(SM5XX* c) : Virtual_Input(c) {
+            left_configuration = CONF_4_BUTTON_DIRECTION;
+            right_configuration = CONF_NOTHING;
+        }
+
+        void set_input(uint8_t part, uint8_t button, bool state, uint8_t player = 1) override{
+            switch (part) {
+                case PART_SETUP:
+                    switch (button) {
+                        case BUTTON_GAMEA: cpu->input_set(0, 1, state, true); break; // mode
+                        case BUTTON_GAMEB: cpu->input_set(0, 2, state, true); break; // set
+                        default: break; } break;
+                case PART_LEFT:
+                    switch (button) {
+                        case BUTTON_UP: cpu->input_set(0, 4, state, true); break;
+                        case BUTTON_RIGHT: cpu->input_set(0, 5, state, true); break;
+                        case BUTTON_DOWN: cpu->input_set(0, 6, state, true); break;
+                        case BUTTON_LEFT: cpu->input_set(0, 7, state, true); break;
+                        default: break; } break;
+                default: break;
+            }
+        }
+};
+
+class NSMW : public Virtual_Input{
+    public :
+        NSMW(SM5XX* c) : Virtual_Input(c) {
+            left_configuration = CONF_4_BUTTON_DIRECTION;
+            right_configuration = CONF_NOTHING;
+        }
+
+        void set_input(uint8_t part, uint8_t button, bool state, uint8_t player = 1) override{
+            switch (part) {
+                case PART_SETUP:
+                    switch (button) {
+                        case BUTTON_GAMEA: cpu->input_set(0, 1, state, true); break; // mode
+                        case BUTTON_GAMEB: cpu->input_set(0, 2, state, true); break; // set
+                        default: break; } break;
+                case PART_LEFT:
+                    switch (button) {
+                        case BUTTON_UP: cpu->input_set(0, 4, state, true); break;
+                        case BUTTON_RIGHT: cpu->input_set(0, 5, state, true); break;
+                        case BUTTON_DOWN: cpu->input_set(0, 6, state, true); break;
+                        case BUTTON_LEFT: cpu->input_set(0, 7, state, true); break;
+                        default: break; } break;
+                default: break;
+            }
+        }
+};
+
 
 
 //////////////////// Get good Game & Watch input Configuration ////////////////////
@@ -3791,6 +4666,33 @@ inline Virtual_Input* get_input_config(SM5XX* cpu, std::string ref_game){
     else if (ref_game == "TBATMANA"){ return new TBATMANA(cpu); } // Batman: The Animated Series
     else if (ref_game == "TMIGMAX"){ return new TMIGMAX(cpu); } // Mighty Max
     else if (ref_game == "TROBHOOD"){ return new TGAUNT(cpu); } // Robin Hood (identical ports to Gauntlet, renamed)
+    else if (ref_game == "KDRIBBLE"){ return new KDRIBBLE(cpu); } // Double Dribble (Konami)
+    else if (ref_game == "KCONTRA"){ return new KCONTRA(cpu); } // Contra (Konami)
+    else if (ref_game == "KTOPGUN"){ return new KTOPGUN(cpu); } // Top Gun (Konami)
+    else if (ref_game == "KGRADIUS"){ return new KGRADIUS(cpu); } // Gradius (Konami)
+    else if (ref_game == "KTMNT"){ return new KTMNT(cpu); } // Teenage Mutant Ninja Turtles (Konami)
+    else if (ref_game == "KSKATEDIE"){ return new KSKATEDIE(cpu); } // Skate or Die (Konami)
+    else if (ref_game == "KBILLY"){ return new KBILLY(cpu); } // The Adventures of Bayou Billy (Konami)
+    else if (ref_game == "KBOTTOM9"){ return new KBOTTOM9(cpu); } // Bottom of the Ninth (Konami)
+    else if (ref_game == "KLONERAN"){ return new KLONERAN(cpu); } // The Lone Ranger (Konami)
+    else if (ref_game == "KNASCAR" || ref_game == "KCHQFLAG" || ref_game == "KTOPGUN2"){ return new KNASCAR(cpu); } // NASCAR Racing / Chequered Flag / Top Gun: Second Mission (identical ports)
+    else if (ref_game == "KBLADES"){ return new KBLADES(cpu); } // Blades of Steel (Konami)
+    else if (ref_game == "KTMNT2"){ return new KTMNT2(cpu); } // Teenage Mutant Ninja Turtles II: Splinter Speaks (Konami)
+    else if (ref_game == "KNFL"){ return new KNFL(cpu); } // NFL Football (Konami)
+    else if (ref_game == "KST25"){ return new KST25(cpu); } // Star Trek: 25th Anniversary (Konami)
+    else if (ref_game == "KTMNT3"){ return new KTMNT3(cpu); } // TMNT 3: Shredder's Last Stand
+    else if (ref_game == "KTMNTBB"){ return new KTMNTBB(cpu); } // TMNT: Basketball (NOT identical ports to KTMNT3 - see class comment)
+    else if (ref_game == "KBUCKY"){ return new KBUCKY(cpu); } // Bucky O'Hare (Konami)
+    else if (ref_game == "KGARFLD"){ return new KGARFLD(cpu); } // Garfield (Konami)
+    else if (ref_game == "TRTREISL"){ return new TRTREISL(cpu); } // Treasure Island (Tronica)
+    else if (ref_game == "VESARIF"){ return new VESARIF(cpu); } // Vesolaya arifmetika (Elektronika)
+    else if (ref_game == "BASSMATE"){ return new BASSMATE(cpu); } // Bassmate Computer (Telko / Nintendo)
+    else if (ref_game == "NALTAIR"){ return new NALTAIR(cpu); } // Altair (Nauchpribor)
+
+    /* SM530 */
+    else if (ref_game == "NSTARFOX"){ return new NSTARFOX(cpu); } // Star Fox (Nelsonic)
+    else if (ref_game == "NSMB3"){ return new NSMB3(cpu); } // Super Mario Bros. 3 (Nelsonic)
+    else if (ref_game == "NSMW"){ return new NSMW(cpu); } // Super Mario World (Nelsonic)
 
     return nullptr;
 }

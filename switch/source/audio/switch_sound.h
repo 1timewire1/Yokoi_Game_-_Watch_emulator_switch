@@ -24,6 +24,7 @@ class Virtual_Sound {
 
     private:
         void free_buffers();
+        void full_reinit();
 
         AudioDriver drv{};
         bool audren_ok = false;
@@ -48,6 +49,12 @@ class Virtual_Sound {
         float fps_screen = 0.0f;
         uint32_t base_freq = 0;
         uint32_t divide_freq = 1;
+
+        // Self-heal state - see play_sample()'s doc comment for why this
+        // exists (ported from D.Smile NX's switch_audio.cpp, which hit and
+        // fixed the exact same "audio silently dies until relaunch" issue).
+        int stuck_frames = 0;
+        int retry_cooldown = 0;
 };
 
 extern Virtual_Sound g_sound;

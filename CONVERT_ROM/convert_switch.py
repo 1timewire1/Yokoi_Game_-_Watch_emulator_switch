@@ -31,9 +31,29 @@ from source.manufacturer_ids import (
     MANUFACTURER_TRONICA,
     MANUFACTURER_ELEKTRONIKA,
     MANUFACTURER_TIGER,
-    MANUFACTURER_TIGER_EXPERIMENTAL,
+    MANUFACTURER_EXPERIMENTAL,
     normalize_manufacturer_id,
 )
+
+# MANUFACTURER_EXPERIMENTAL started out Tiger-only and later grew to also
+# cover Konami/Tronica/Elektronika/Telko-Nintendo titles that don't have
+# their own bucket (see GW_ROM.h). The Tiger-tuned brightness defaults just
+# below only make sense for the originally-Tiger subset, and since
+# MANUFACTURER_EXPERIMENTAL alone can no longer tell them apart (their real
+# manufacturer lives in the display name string, not a separate field),
+# this hardcodes exactly which experimental refs are Tiger-origin - the 41
+# entries added before the bucket opened up to other manufacturers. New
+# non-Tiger experimental games correctly fall through to the plain
+# defaults below without needing to be listed here.
+TIGER_ORIGIN_EXPERIMENTAL_REFS = frozenset({
+    "TBATMAN", "TSPIDMAN", "TMKOMBAT", "TXMEN", "TSUPERMAN", "TBTOADS",
+    "TKARNOV", "THOOK", "TBTTF", "TTRANSF2", "TVINDICTR", "TJPARK",
+    "TSKELWARR", "TGARGNF", "TADDAMS", "TAPOLLO13", "TBATFOR", "TBATMANA",
+    "TDENNIS", "TDUMMIES", "TFLASH", "TGOLDEYE", "THALONE", "THALONE2",
+    "TINDAY", "TJDREDD", "TKAZAAM", "TMIGMAX", "TNMAREBC", "TOPALIENS",
+    "TPITFIGHT", "TROBHOOD", "TROBOCOP2", "TROCKTEER", "TROBOCOP3",
+    "TSF2010", "TSHADOW", "TSJAM", "TSWAMPT", "TWWORLD", "TXMENPX",
+})
 
 ROMPACK_FORMAT_VERSION = 3
 ROMPACK_CONTENT_VERSION = 3
@@ -78,7 +98,18 @@ gw_rom_include_dir = "GW_ROM"
 default_alpha_bright = 1.7
 default_fond_bright = 1.35
 
-tiger_default_alpha_bright = 1.1
+
+# background_data_file()'s alpha computation treats near-white as fully
+# transparent and near-black as fully opaque, fading between - a good model
+# for classic G&W ink-on-white line art, but not for Tiger's densely painted
+# scene illustrations, whose mid-brightness content (fields, skies, painted
+# characters) was still landing in the fade zone at the old 1.1 and washing
+# out toward the base fill colour. Verified against source art at 0.5 across
+# a deliberately diverse sample (worst-case content, and a game with a
+# genuinely blank cutout, to confirm intentional empty space doesn't turn
+# unwantedly opaque) before lowering this shared default - see
+# clean_games_path()'s is_konami_origin branch for the matching Konami fix.
+tiger_default_alpha_bright = 0.5
 tiger_default_fond_bright = 1.2
 
 default_rotate = False
@@ -292,7 +323,7 @@ def find_best_parquet(rects: list):
     return None, None
 
 
-def visual_data_file(name, size_list, background_path_list, rotate = False, mask = False, color_segment = False, two_in_one_screen = False, transform = []):
+def visual_data_file(name, size_list, background_path_list, rotate = False, mask = False, color_segment = False, two_in_one_screen = False, transform = [], multiply_segments = False):
     """
     """
     img_screen_sort = sort_by_screen(name)
@@ -347,6 +378,7 @@ def visual_data_file(name, size_list, background_path_list, rotate = False, mask
     int_mask = 0
     if(mask): int_mask = 1 # first byte
     if(two_in_one_screen) : int_mask += 2 # second byte
+    if(multiply_segments) : int_mask += 4 # third byte - darken "on" segments in place (multiply blend) instead of replacing the art beneath them; see switch_screen.cpp's multiply_darken
     seg_info_ints: list[int] = [int(atlas_size[0]), int(atlas_size[1]), 1, int(int_mask)]
 
     for src in screen_size:
@@ -422,7 +454,14 @@ def background_data_file(name, path_list = [], size_list = [], rotate = False, a
             info_background_ints.append(int(atlas_size[1]-curr_ind_r_img-data.shape[0])) # pos y
             info_background_ints.append(int(data.shape[1])) # size x
             info_background_ints.append(int(data.shape[0])) # size y
-            curr_ind_r_img = data.shape[0]+2
+            # Accumulate the cursor past every image written so far, not just
+            # this one - atlas_size was already summed this way above, but
+            # this reassigned instead of accumulated, so a 3rd+ background
+            # (e.g. Treasure Island's tri-screen unit) landed on the same
+            # rows as the 2nd, silently overlapping it. Invisible with
+            # exactly 2 backgrounds, since the very first advance (from
+            # image 0 to image 1) happens to match either way.
+            curr_ind_r_img += data.shape[0]+2
             i += 1
 
         if(camera): # create alpha
@@ -447,8 +486,76 @@ def background_data_file(name, path_list = [], size_list = [], rotate = False, a
     info_background_ints.append(1 if background_in_front else 0)
     info_background_ints.append(1 if camera else 0)
     result += f"const uint16_t background_info_{name}[] = {{ " + ', '.join(str(i) for i in info_background_ints) + " }; \n\n"
- 
+
     return result, info_background_ints
+
+
+def overlay_data_file(name, path_list = [], size_list = [], rotate = False):
+    """A translucent layer drawn AFTER the LCD segments, at a fixed alpha,
+    for games whose real hardware composites a semi-transparent label/text
+    layer over the lit segments rather than baking it into the static
+    background (see Bassmate's `TEXT-Top`/`TEXT-Bottom` in its MAME .lay -
+    drawn after <screen blend="multiply">, not before). Optional: most
+    games have no Overlay entry, in which case this writes nothing and
+    background_info's array simply stays at its normal length - the
+    Switch renderer treats "no extra trailing background_info values" as
+    "no overlay", so this needs no pack-format change and is fully
+    backward compatible with anything reading the existing fields.
+
+    Mirrors background_data_file()'s atlas-packing shape but skips the
+    brightness/alpha_bright adjustments entirely: this is a direct RGBA
+    passthrough of the source art (already correctly coloured), just
+    resized/mirrored to match how the background layer is placed.
+    """
+    if not path_list or path_list[0] == '':
+        return '', []
+
+    i = 0
+    atlas_size = [1, 1]
+    for size in size_list:
+        atlas_size[0] = max(1 + atlas_size[0] + 1, size[0])
+        atlas_size[1] += size[1] + 2
+
+    for i_a in range(2):
+        atlas_size[i_a] = _round_up_to_one_of(atlas_size[i_a], background_atlas_sizes or [atlas_size[i_a]])
+
+    result_img = np.zeros((atlas_size[1], atlas_size[0], 4))
+    curr_ind_r_img = 1
+    info_overlay_ints: list[int] = [int(atlas_size[0]), int(atlas_size[1])]
+
+    for path in path_list:
+        if rotate:
+            y_size, x_size = size_list[i]
+        else:
+            x_size, y_size = size_list[i]
+
+        img = Image.open(path)
+        img, x_size, y_size = im.transform_img(img, x_size, y_size, False, rotate, True)
+        data = np.array(img)
+
+        result_img[curr_ind_r_img:(data.shape[0] + curr_ind_r_img), 1:data.shape[1] + 1, :] = data
+
+        info_overlay_ints.append(1)  # pos x
+        info_overlay_ints.append(int(atlas_size[1] - curr_ind_r_img - data.shape[0]))  # pos y
+        info_overlay_ints.append(int(data.shape[1]))  # size x
+        info_overlay_ints.append(int(data.shape[0]))  # size y
+        # See the matching fix in background_data_file(): must accumulate
+        # past every image written so far, not just this one, or a 3rd+
+        # overlay would overlap the 2nd.
+        curr_ind_r_img += data.shape[0] + 2
+        i += 1
+
+    img = Image.fromarray(result_img.astype(np.uint8))
+    img.save(destination_graphique_file + 'overlay_' + name + '.png')
+    with open(destination_graphique_file + 'overlay_' + name + '.t3s', "w", encoding="utf-8") as f:
+        if tex3ds_enabled:
+            f.write("-f RGBA8 -z none\n" + 'overlay_' + name + '.png')
+        else:
+            f.write("")
+    result = f'\nconst std::string path_overlay_{name} = "{texture_path_prefix}overlay_{name}{texture_path_ext}";\n'
+    result += f"const uint16_t overlay_info_{name}[] = {{ " + ', '.join(str(i) for i in info_overlay_ints) + " }; \n\n"
+
+    return result, info_overlay_ints
 
 
 
@@ -550,6 +657,8 @@ def generate_game_file(destination_game_file, name, display_name, ref, date
                 , background_in_front = False, camera = False, manufacturer = MANUFACTURER_NINTENDO
                 , background_keep_white: bool = False
                 , background_white_keep_threshold: int = 245
+                , multiply_segments: bool = False
+                , overlay_path = []
                 ):
     
     c_file = f"""
@@ -567,13 +676,19 @@ def generate_game_file(destination_game_file, name, display_name, ref, date
     
     cs.extract_group_segs(visual_path, "./tmp/img/"+name, INKSCAPE_PATH, export_dpi=export_dpi)
     text, new_size_screen, seg_info_ints, segment_records = visual_data_file(
-        name, size_visual, background_path, rotate, mask, color_segment, two_in_one_screen, transform
+        name, size_visual, background_path, rotate, mask, color_segment, two_in_one_screen, transform, multiply_segments
     )
     c_file += text
     
     size_background = []
     for s in new_size_screen: size_background.append([int(s[0]), int(s[1])])
-    if(two_in_one_screen): size_background[0] = size_background[1]
+    # Only meaningful for genuine 2-screen side-by-side games (e.g. Life
+    # Boat), whose two screens are the same physical size anyway - this is a
+    # no-op for them. Applying it to a 3-screen two_in_one_screen game (e.g.
+    # Treasure Island's tri-screen unit, whose 3 panels are different sizes)
+    # clobbered screen 0's background size with screen 1's, corrupting the
+    # left panel's background crop/placement.
+    if(two_in_one_screen and len(size_background) == 2): size_background[0] = size_background[1]
         
     if(mask): background_path = [] # background used for create segment
     bg_text, background_info_ints = background_data_file(
@@ -593,7 +708,16 @@ def generate_game_file(destination_game_file, name, display_name, ref, date
     
     cs_text, console_info_ints = visual_console_data(name, path_console)
     c_file += cs_text
-    
+
+    ov_text, overlay_info_ints = overlay_data_file(name, overlay_path, size_background, rotate)
+    c_file += ov_text
+    # No pack-format change needed for this: appended straight onto
+    # background_info, whose length nothing else validates (see
+    # overlay_data_file's docstring). Absent for every game except ones
+    # that set an 'Overlay' path (currently just Bassmate).
+    if overlay_info_ints:
+        background_info_ints = list(background_info_ints) + overlay_info_ints
+
     c_file += "\n\n"
     
     manufacturer_id = _manufacturer_to_id(manufacturer)
@@ -603,8 +727,8 @@ def generate_game_file(destination_game_file, name, display_name, ref, date
         manufacturer_cpp = "GW_rom::MANUFACTURER_ELEKTRONIKA"
     elif manufacturer_id == MANUFACTURER_TIGER:
         manufacturer_cpp = "GW_rom::MANUFACTURER_TIGER"
-    elif manufacturer_id == MANUFACTURER_TIGER_EXPERIMENTAL:
-        manufacturer_cpp = "GW_rom::MANUFACTURER_TIGER_EXPERIMENTAL"
+    elif manufacturer_id == MANUFACTURER_EXPERIMENTAL:
+        manufacturer_cpp = "GW_rom::MANUFACTURER_EXPERIMENTAL"
     else:
         manufacturer_cpp = "GW_rom::MANUFACTURER_NINTENDO"
 
@@ -779,6 +903,8 @@ def process_single_game(args):
     mask = game_data.get('mask', False)
     color_segment = game_data.get('color_segment', False)
     two_in_one_screen = game_data.get('2_in_one_screen', False)
+    multiply_segments = game_data.get('multiply_segments', False)
+    overlay_path = game_data.get('Overlay', [])
     melody_path = game_data.get('Melody_Rom', '')
     background_path = game_data.get('Background', [])
     background_in_front = game_data.get('background_in_front', False)
@@ -814,6 +940,8 @@ def process_single_game(args):
         manufacturer,
         background_keep_white,
         background_white_keep_threshold,
+        multiply_segments,
+        overlay_path,
     )
 
     wrote_cache = game_cache.write_game_cache(key, game_data, pack_meta)
@@ -884,7 +1012,7 @@ def write_rom_pack_v1(pack_games: list[dict], gfx_dir: str, out_path: str, platf
     file_name_to_path: dict[str, str] = {}
     for g in pack_games:
         key = g["key"]
-        for base in (f"segment_{key}{texture_file_ext}", f"background_{key}{texture_file_ext}", f"console_{key}{texture_file_ext}"):
+        for base in (f"segment_{key}{texture_file_ext}", f"background_{key}{texture_file_ext}", f"console_{key}{texture_file_ext}", f"overlay_{key}{texture_file_ext}"):
             p = os.path.join(gfx_dir, base)
             if os.path.exists(p):
                 file_name_to_path[base] = p
@@ -1229,9 +1357,51 @@ if __name__ == "__main__":
         game_data = games_path[key].copy()
         
         # Set defaults
-        if (game_data.get("manufacturer", 0) in (MANUFACTURER_TIGER, MANUFACTURER_TIGER_EXPERIMENTAL)):
+        mfr_for_defaults = game_data.get("manufacturer", 0)
+        ref_norm_for_defaults = str(game_data.get("ref", "")).replace('-', '_').upper()
+        is_tiger_origin = (mfr_for_defaults == MANUFACTURER_TIGER) or (
+            mfr_for_defaults == MANUFACTURER_EXPERIMENTAL and ref_norm_for_defaults in TIGER_ORIGIN_EXPERIMENTAL_REFS
+        )
+        # Konami's Experimental-bucket entries (all "K"-prefixed refs; the
+        # only other manufacturers sharing that bucket - Tronica's trtreisl,
+        # Elektronika's vesarif - don't use this prefix, and Bassmate
+        # already sets its own explicit alpha_bright/fond_bright via its
+        # processor so it never reaches this default path). Same painted-
+        # illustration art style as Tiger's, same fix needed - see below.
+        is_konami_origin = (
+            mfr_for_defaults == MANUFACTURER_EXPERIMENTAL and ref_norm_for_defaults.startswith('K')
+        )
+        if is_tiger_origin:
             if 'alpha_bright' not in game_data: game_data['alpha_bright'] = tiger_default_alpha_bright
-            if 'fond_bright' not in game_data: game_data['fond_bright'] = tiger_default_fond_bright            
+            if 'fond_bright' not in game_data: game_data['fond_bright'] = tiger_default_fond_bright
+        elif is_konami_origin:
+            # background_data_file()'s alpha computation (img_manipulation.py's
+            # make_alpha) is tuned for classic G&W ink-on-white line art: it
+            # brightens a copy of the background by alpha_bright, then treats
+            # "all channels above 170" as transparent (paper) and "darkest
+            # channel below 100" as opaque (ink), fading everything between.
+            # Tiger's and Konami's console art is densely painted scene
+            # illustration instead - at the plain default alpha_bright=1.7,
+            # mid-brightness content (a green field, a painted planet) gets
+            # brightened past the transparent threshold or deep into the
+            # fade zone and reads as mostly see-through, washing the whole
+            # background toward the base fill colour (confirmed directly:
+            # Gradius's background lost ~98% of its content-pixel opacity
+            # this way). tiger_default_alpha_bright already existed at a
+            # gentler 1.1 for Tiger but still left real muting on every
+            # Tiger game tested; Konami had no override at all. Verified visually
+            # against source art at alpha_bright=0.5 across a deliberately
+            # diverse sample (Gradius - worst Konami case, Mighty Max - worst
+            # Tiger case, Dennis the Menace - has a deliberately blank
+            # "road" cutout, to confirm this doesn't wrongly turn intentional
+            # empty space opaque) before changing the shared default rather
+            # than hand-tuning per game.
+            if 'alpha_bright' not in game_data: game_data['alpha_bright'] = 0.5
+            # fond_bright (RGB brightness, separate from the alpha/transparency
+            # computation above) was already fine at the plain default -
+            # confirmed visually alongside alpha_bright above - so it's left
+            # as-is here rather than also overridden.
+            if 'fond_bright' not in game_data: game_data['fond_bright'] = default_fond_bright
         else:
             if 'alpha_bright' not in game_data: game_data['alpha_bright'] = default_alpha_bright
             if 'fond_bright' not in game_data: game_data['fond_bright'] = default_fond_bright
@@ -1239,8 +1409,10 @@ if __name__ == "__main__":
         if 'mask' not in game_data: game_data['mask'] = False
         if 'color_segment' not in game_data: game_data['color_segment'] = False
         if '2_in_one_screen' not in game_data: game_data['2_in_one_screen'] = False
+        if 'multiply_segments' not in game_data: game_data['multiply_segments'] = False
         if 'Melody_Rom' not in game_data: game_data['Melody_Rom'] = ''
         if 'Background' not in game_data: game_data['Background'] = []
+        if 'Overlay' not in game_data: game_data['Overlay'] = []
         if 'size_visual' not in game_data: game_data['size_visual'] = [resolution_up, resolution_down]
         if 'console' not in game_data: game_data['console'] = default_console
         if 'display_name' not in game_data: game_data['display_name'] = key

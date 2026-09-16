@@ -41,7 +41,8 @@ void yokoi_input_apply_controller_mask(
     uint32_t ctl_mask,
     int touch_action_mask,
     const std::atomic<int>& gamea_pulse_frames,
-    const std::atomic<int>& gameb_pulse_frames) {
+    const std::atomic<int>& gameb_pulse_frames,
+    uint8_t player) {
     if (!input) {
         return;
     }
@@ -65,9 +66,9 @@ void yokoi_input_apply_controller_mask(
 
     // Match 3DS mapping from source/main.cpp::input_get()
     // Setup buttons.
-    input->set_input(PART_SETUP, BUTTON_TIME, l1);
-    input->set_input(PART_SETUP, BUTTON_GAMEA, start || (gamea_pulse_frames.load() > 0));
-    input->set_input(PART_SETUP, BUTTON_GAMEB, select || (gameb_pulse_frames.load() > 0));
+    input->set_input(PART_SETUP, BUTTON_TIME, l1, player);
+    input->set_input(PART_SETUP, BUTTON_GAMEA, start || (gamea_pulse_frames.load() > 0), player);
+    input->set_input(PART_SETUP, BUTTON_GAMEB, select || (gameb_pulse_frames.load() > 0), player);
 
     // Left controls.
     if (input->left_configuration == CONF_1_BUTTON_ACTION) {
@@ -78,12 +79,12 @@ void yokoi_input_apply_controller_mask(
             check = d_up || d_down || d_left || d_right;
         }
         check = check || touch_left;
-        input->set_input(PART_LEFT, BUTTON_ACTION, check);
+        input->set_input(PART_LEFT, BUTTON_ACTION, check, player);
     } else {
-        input->set_input(PART_LEFT, BUTTON_LEFT, d_left);
-        input->set_input(PART_LEFT, BUTTON_RIGHT, d_right);
-        input->set_input(PART_LEFT, BUTTON_UP, d_up);
-        input->set_input(PART_LEFT, BUTTON_DOWN, d_down);
+        input->set_input(PART_LEFT, BUTTON_LEFT, d_left, player);
+        input->set_input(PART_LEFT, BUTTON_RIGHT, d_right, player);
+        input->set_input(PART_LEFT, BUTTON_UP, d_up, player);
+        input->set_input(PART_LEFT, BUTTON_DOWN, d_down, player);
     }
 
     // Right controls.
@@ -95,12 +96,12 @@ void yokoi_input_apply_controller_mask(
             check = a || b || x || y;
         }
         check = check || touch_right;
-        input->set_input(PART_RIGHT, BUTTON_ACTION, check);
+        input->set_input(PART_RIGHT, BUTTON_ACTION, check, player);
     } else {
         // Note: 3DS maps right-side directions to face buttons.
-        input->set_input(PART_RIGHT, BUTTON_LEFT, y);
-        input->set_input(PART_RIGHT, BUTTON_RIGHT, a);
-        input->set_input(PART_RIGHT, BUTTON_UP, x);
-        input->set_input(PART_RIGHT, BUTTON_DOWN, b);
+        input->set_input(PART_RIGHT, BUTTON_LEFT, y, player);
+        input->set_input(PART_RIGHT, BUTTON_RIGHT, a, player);
+        input->set_input(PART_RIGHT, BUTTON_UP, x, player);
+        input->set_input(PART_RIGHT, BUTTON_DOWN, b, player);
     }
 }

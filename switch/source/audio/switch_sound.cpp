@@ -12,6 +12,13 @@ constexpr float LIMIT_SQUARE = 0.8f;
 constexpr int kVoiceId = 0;
 constexpr int kSampleRate = 48000;
 
+// Self-heal thresholds - see play_sample()'s doc comment for what these
+// guard against. Same values D.Smile NX's switch_audio.cpp settled on for
+// the identical underlying issue.
+constexpr int kStuckFramesThreshold = 180;  // ~3s @60fps - well past any normal backpressure drop
+constexpr int kRetryCooldownFrames = 300;   // ~5s @60fps between reinit attempts, so a genuinely
+                                             // dead audio service isn't hammered every frame
+
 void Virtual_Sound::configure_sound() {
     static const AudioRendererConfig arConfig = {
         .output_rate = AudioRendererOutputRate_48kHz,
@@ -65,6 +72,7 @@ void Virtual_Sound::initialize(uint32_t v_freq, uint32_t v_divide_freq, float v_
     }
 
     free_buffers();
+    stuck_frames = 0;
 
     base_freq = v_freq;
     divide_freq = v_divide_freq ? v_divide_freq : 1;
@@ -106,6 +114,15 @@ void Virtual_Sound::initialize(uint32_t v_freq, uint32_t v_divide_freq, float v_
     audrvUpdate(&drv);
 }
 
+// Full teardown + recreate of the renderer/driver/voice/buffers, restoring
+// the last-known per-game frequency/divide_freq/fps_screen (Exit() doesn't
+// touch those fields) - see play_sample()'s doc comment for when this runs.
+void Virtual_Sound::full_reinit() {
+    Exit();
+    configure_sound();
+    initialize(base_freq, divide_freq, fps_screen);
+}
+
 void Virtual_Sound::update_sound(SM5XX* cpu) {
     if (!voice_ok || !cpu) {
         return;
@@ -125,10 +142,47 @@ void Virtual_Sound::update_sound(SM5XX* cpu) {
     curr_value = false;
 }
 
+// Called once per rendered frame regardless of state, so it doubles as the
+// self-heal "tick": libnx's audrv/audren session (created once at startup
+// by configure_sound(), unlike the per-game initialize() call) has been
+// observed to get stuck - going silent for the rest of the process's life -
+// after the console is put to sleep and resumed, or after enough game loads
+// without a full relaunch. A relaunch (which re-runs configure_sound() from
+// scratch) always fixed it by hand; this automates that exact recovery
+// instead of requiring one. Ported from D.Smile NX's switch_audio.cpp
+// (switch_audio_push()), which hit and fixed the identical issue in its own
+// audrv-based Switch audio backend.
 void Virtual_Sound::play_sample() {
     if (!voice_ok) {
+        // Never initialized (or an earlier self-heal attempt also failed) -
+        // retry on a cooldown instead of every frame, so a genuinely dead
+        // audio service isn't hammered with reinit attempts 60 times/sec.
+        if (retry_cooldown > 0) {
+            retry_cooldown--;
+            return;
+        }
+        full_reinit();
+        if (!voice_ok) {
+            retry_cooldown = kRetryCooldownFrames;
+            return;
+        }
+    }
+
+    // Drop this frame's audio if the slot we'd reuse is still in flight,
+    // rather than overwriting a buffer audrv's own wavebuf queue may still
+    // be reading from (normal, occasional backpressure). But since this
+    // only ever retries the *same* slot (curr_buffer doesn't advance below
+    // on this path), staying stuck on one slot for way longer than a slow
+    // frame or two means that wavebuf's state will never come unstuck on
+    // its own - so if it drags on, self-heal the whole audio pipeline.
+    AudioDriverWaveBuf& wb = wavebuf[curr_buffer];
+    if (wb.state != AudioDriverWaveBufState_Free && wb.state != AudioDriverWaveBufState_Done) {
+        if (++stuck_frames > kStuckFramesThreshold) {
+            full_reinit();
+        }
         return;
     }
+    stuck_frames = 0;
 
     const int16_t last_value = (curr_sequence > 0) ? buffer_sound[curr_buffer][curr_sequence - 1] : 0;
     while (curr_sequence < curr_size_buffer[curr_buffer] && curr_sequence < length_max_sequence) {
@@ -137,7 +191,6 @@ void Virtual_Sound::play_sample() {
     }
 
     const size_t nsamples = curr_size_buffer[curr_buffer];
-    AudioDriverWaveBuf& wb = wavebuf[curr_buffer];
     wb.data_pcm16 = buffer_sound[curr_buffer];
     wb.size = nsamples * sizeof(int16_t);
     wb.start_sample_offset = 0;

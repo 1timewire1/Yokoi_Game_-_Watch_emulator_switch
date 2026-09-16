@@ -36,6 +36,7 @@ TARGET		:=	yokoi_switch
 BUILD		:=	build
 SOURCES		:=	source source/core source/input source/render source/audio source/third_party \
 			../source/std ../source/SM5XX ../source/SM5XX/SM5A ../source/SM5XX/SM510 ../source/SM5XX/SM511_SM512 \
+			../source/SM5XX/SM530 \
 			../source/std/David_And_John_ROM_rgds \
 			../source/David_and_John ../source/David_and_John/common \
 			../source/David_and_John/Avignon ../source/David_and_John/Climber \
@@ -50,7 +51,7 @@ INCLUDES	:=	source ../source ../source/std
 
 APP_TITLE		:=	Yokoi G&W Emulator
 APP_AUTHOR		:=	SenseiFromClubPenguin
-APP_VERSION		:=	1.0.3
+APP_VERSION		:=	1.0.4
 
 #---------------------------------------------------------------------------------
 # options for code generation

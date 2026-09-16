@@ -273,6 +273,7 @@ def _build_game_signature_and_hints(key: str, game_data: dict, *, prev_hints: di
         "mask": bool(game_data.get("mask", False)),
         "color_segment": bool(game_data.get("color_segment", False)),
         "two_in_one_screen": bool(game_data.get("2_in_one_screen", False)),
+        "multiply_segments": bool(game_data.get("multiply_segments", False)),
         "alpha_bright": float(game_data.get("alpha_bright", _context.get("default_alpha_bright", 1.7))),
         "fond_bright": float(game_data.get("fond_bright", _context.get("default_fond_bright", 1.35))),
         "background_keep_white": bool(game_data.get("background_keep_white", False)),
@@ -290,6 +291,7 @@ def _build_game_signature_and_hints(key: str, game_data: dict, *, prev_hints: di
     melody_path = str(game_data.get("Melody_Rom", ""))
     visuals = list(game_data.get("Visual", []) or [])
     backgrounds = list(game_data.get("Background", []) or [])
+    overlays = list(game_data.get("Overlay", []) or [])
     console_path = str(game_data.get("console", _context.get("default_console", r".\\rom\\default.png")))
 
     paths: list[str] = []
@@ -299,6 +301,7 @@ def _build_game_signature_and_hints(key: str, game_data: dict, *, prev_hints: di
         paths.append(melody_path)
     paths.extend([str(p) for p in visuals if p])
     paths.extend([str(p) for p in backgrounds if p])
+    paths.extend([str(p) for p in overlays if p])
     if console_path:
         paths.append(console_path)
 

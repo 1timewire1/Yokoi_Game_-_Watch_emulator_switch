@@ -1,8 +1,12 @@
 
 #pragma once
 
+#include "GW_ROM_RGDS/_25th_anniversary_konami.h"
+extern const GW_rom _25th_anniversary_konami;
 #include "GW_ROM_RGDS/aliens.h"
 extern const GW_rom aliens;
+#include "GW_ROM_RGDS/altair_nauchpribor.h"
+extern const GW_rom altair_nauchpribor;
 #include "GW_ROM_RGDS/altered_beast.h"
 extern const GW_rom altered_beast;
 #include "GW_ROM_RGDS/apollo_13.h"
@@ -19,22 +23,36 @@ extern const GW_rom ball;
 extern const GW_rom balloon_fight_crystal_screen;
 #include "GW_ROM_RGDS/balloon_fight_new_wide_screen.h"
 extern const GW_rom balloon_fight_new_wide_screen;
+#include "GW_ROM_RGDS/basketball_konami.h"
+extern const GW_rom basketball_konami;
+#include "GW_ROM_RGDS/bassmate_computer_telko_nintendo.h"
+extern const GW_rom bassmate_computer_telko_nintendo;
 #include "GW_ROM_RGDS/batman.h"
 extern const GW_rom batman;
 #include "GW_ROM_RGDS/battletoads.h"
 extern const GW_rom battletoads;
 #include "GW_ROM_RGDS/biathlon.h"
 extern const GW_rom biathlon;
+#include "GW_ROM_RGDS/bill_elliott_s_nascar_racing_konami.h"
+extern const GW_rom bill_elliott_s_nascar_racing_konami;
 #include "GW_ROM_RGDS/black_jack.h"
 extern const GW_rom black_jack;
+#include "GW_ROM_RGDS/blades_of_steel_konami.h"
+extern const GW_rom blades_of_steel_konami;
 #include "GW_ROM_RGDS/bomb_sweeper.h"
 extern const GW_rom bomb_sweeper;
+#include "GW_ROM_RGDS/bottom_of_the_ninth_konami.h"
+extern const GW_rom bottom_of_the_ninth_konami;
 #include "GW_ROM_RGDS/boxing.h"
 extern const GW_rom boxing;
+#include "GW_ROM_RGDS/bucky_o_hare_konami.h"
+extern const GW_rom bucky_o_hare_konami;
 #include "GW_ROM_RGDS/castlevania_ii_simon_s_quest.h"
 extern const GW_rom castlevania_ii_simon_s_quest;
 #include "GW_ROM_RGDS/chef.h"
 extern const GW_rom chef;
+#include "GW_ROM_RGDS/chequered_flag_konami.h"
+extern const GW_rom chequered_flag_konami;
 #include "GW_ROM_RGDS/circus_elektronika.h"
 extern const GW_rom circus_elektronika;
 #include "GW_ROM_RGDS/clever_chicken.h"
@@ -43,6 +61,8 @@ extern const GW_rom clever_chicken;
 extern const GW_rom climber_crystal_screen;
 #include "GW_ROM_RGDS/climber_new_wide_screen.h"
 extern const GW_rom climber_new_wide_screen;
+#include "GW_ROM_RGDS/contra_konami.h"
+extern const GW_rom contra_konami;
 #include "GW_ROM_RGDS/crab_grab.h"
 extern const GW_rom crab_grab;
 #include "GW_ROM_RGDS/dennis_the_menace.h"
@@ -69,8 +89,12 @@ extern const GW_rom double_dose_of_doom;
 extern const GW_rom double_dragon;
 #include "GW_ROM_RGDS/double_dragon_iii_the_rosetta_stone.h"
 extern const GW_rom double_dragon_iii_the_rosetta_stone;
+#include "GW_ROM_RGDS/double_dribble_konami.h"
+extern const GW_rom double_dribble_konami;
 #include "GW_ROM_RGDS/egg.h"
 extern const GW_rom egg;
+#include "GW_ROM_RGDS/electronic_number_muncher_vtech.h"
+extern const GW_rom electronic_number_muncher_vtech;
 #include "GW_ROM_RGDS/fire_attack.h"
 extern const GW_rom fire_attack;
 #include "GW_ROM_RGDS/fire_silver.h"
@@ -79,6 +103,8 @@ extern const GW_rom fire_silver;
 extern const GW_rom fire_wide_screen;
 #include "GW_ROM_RGDS/flagman.h"
 extern const GW_rom flagman;
+#include "GW_ROM_RGDS/garfield_konami.h"
+extern const GW_rom garfield_konami;
 #include "GW_ROM_RGDS/gauntlet.h"
 extern const GW_rom gauntlet;
 #include "GW_ROM_RGDS/generation_2.h"
@@ -89,6 +115,8 @@ extern const GW_rom gold_cliff;
 extern const GW_rom golden_axe;
 #include "GW_ROM_RGDS/goldeneye.h"
 extern const GW_rom goldeneye;
+#include "GW_ROM_RGDS/gradius_konami.h"
+extern const GW_rom gradius_konami;
 #include "GW_ROM_RGDS/green_house.h"
 extern const GW_rom green_house;
 #include "GW_ROM_RGDS/helmet_version_cn_07.h"
@@ -159,6 +187,8 @@ extern const GW_rom mighty_max;
 extern const GW_rom morskaja_ataka;
 #include "GW_ROM_RGDS/mortal_kombat.h"
 extern const GW_rom mortal_kombat;
+#include "GW_ROM_RGDS/nfl_football_konami.h"
+extern const GW_rom nfl_football_konami;
 #include "GW_ROM_RGDS/night_flight.h"
 extern const GW_rom night_flight;
 #include "GW_ROM_RGDS/nightmare_before_christmas.h"
@@ -197,6 +227,12 @@ extern const GW_rom robocop_2;
 extern const GW_rom robocop_3;
 #include "GW_ROM_RGDS/safe_buster.h"
 extern const GW_rom safe_buster;
+#include "GW_ROM_RGDS/second_mission_konami.h"
+extern const GW_rom second_mission_konami;
+#include "GW_ROM_RGDS/shredder_s_last_stand_konami.h"
+extern const GW_rom shredder_s_last_stand_konami;
+#include "GW_ROM_RGDS/skate_or_die_konami.h"
+extern const GW_rom skate_or_die_konami;
 #include "GW_ROM_RGDS/snoopy_panorama_screen.h"
 extern const GW_rom snoopy_panorama_screen;
 #include "GW_ROM_RGDS/snoopy_tennis.h"
@@ -219,8 +255,12 @@ extern const GW_rom spider_man;
 extern const GW_rom spider_tronica;
 #include "GW_ROM_RGDS/spitball_sparky.h"
 extern const GW_rom spitball_sparky;
+#include "GW_ROM_RGDS/splinter_speaks_konami.h"
+extern const GW_rom splinter_speaks_konami;
 #include "GW_ROM_RGDS/squish.h"
 extern const GW_rom squish;
+#include "GW_ROM_RGDS/star_fox_nelsonic.h"
+extern const GW_rom star_fox_nelsonic;
 #include "GW_ROM_RGDS/street_fighter_ii.h"
 extern const GW_rom street_fighter_ii;
 #include "GW_ROM_RGDS/strider.h"
@@ -229,18 +269,26 @@ extern const GW_rom strider;
 extern const GW_rom super_double_dragon;
 #include "GW_ROM_RGDS/super_goal_keeper.h"
 extern const GW_rom super_goal_keeper;
+#include "GW_ROM_RGDS/super_mario_bros_3_nelsonic.h"
+extern const GW_rom super_mario_bros_3_nelsonic;
 #include "GW_ROM_RGDS/super_mario_bros_crystal_screen.h"
 extern const GW_rom super_mario_bros_crystal_screen;
 #include "GW_ROM_RGDS/super_mario_bros_new_wide_screen.h"
 extern const GW_rom super_mario_bros_new_wide_screen;
+#include "GW_ROM_RGDS/super_mario_world_nelsonic.h"
+extern const GW_rom super_mario_world_nelsonic;
 #include "GW_ROM_RGDS/superman.h"
 extern const GW_rom superman;
 #include "GW_ROM_RGDS/swamp_thing.h"
 extern const GW_rom swamp_thing;
 #include "GW_ROM_RGDS/tayny_okeana.h"
 extern const GW_rom tayny_okeana;
+#include "GW_ROM_RGDS/teenage_mutant_ninja_turtles_konami.h"
+extern const GW_rom teenage_mutant_ninja_turtles_konami;
 #include "GW_ROM_RGDS/the_addams_family.h"
 extern const GW_rom the_addams_family;
+#include "GW_ROM_RGDS/the_adventures_of_bayou_billy_konami.h"
+extern const GW_rom the_adventures_of_bayou_billy_konami;
 #include "GW_ROM_RGDS/the_animated_series.h"
 extern const GW_rom the_animated_series;
 #include "GW_ROM_RGDS/the_dark_crusade.h"
@@ -251,18 +299,28 @@ extern const GW_rom the_final_fight;
 extern const GW_rom the_flash;
 #include "GW_ROM_RGDS/the_incredible_crash_dummies.h"
 extern const GW_rom the_incredible_crash_dummies;
+#include "GW_ROM_RGDS/the_lone_ranger_konami.h"
+extern const GW_rom the_lone_ranger_konami;
 #include "GW_ROM_RGDS/the_rocketeer.h"
 extern const GW_rom the_rocketeer;
 #include "GW_ROM_RGDS/the_shadow.h"
 extern const GW_rom the_shadow;
 #include "GW_ROM_RGDS/thunder_ball_tronica.h"
 extern const GW_rom thunder_ball_tronica;
+#include "GW_ROM_RGDS/top_gun_konami.h"
+extern const GW_rom top_gun_konami;
+#include "GW_ROM_RGDS/treasure_island_tronica.h"
+extern const GW_rom treasure_island_tronica;
 #include "GW_ROM_RGDS/tropical_fish.h"
 extern const GW_rom tropical_fish;
 #include "GW_ROM_RGDS/turtle_bridge.h"
 extern const GW_rom turtle_bridge;
+#include "GW_ROM_RGDS/uchitel_arifmetiki_elektronika.h"
+extern const GW_rom uchitel_arifmetiki_elektronika;
 #include "GW_ROM_RGDS/vermin.h"
 extern const GW_rom vermin;
+#include "GW_ROM_RGDS/vesolaya_arifmetika_elektronika.h"
+extern const GW_rom vesolaya_arifmetika_elektronika;
 #include "GW_ROM_RGDS/vesyolye_futbolisty.h"
 extern const GW_rom vesyolye_futbolisty;
 #include "GW_ROM_RGDS/vindicators.h"
@@ -279,6 +337,6 @@ extern const GW_rom zelda;
 
 
 
-const GW_rom* GW_list[] = {&aliens, &altered_beast, &apollo_13, &ataka_asteroidov, &autoslalom, &back_to_the_future, &ball, &balloon_fight_crystal_screen, &balloon_fight_new_wide_screen, &batman, &battletoads, &biathlon, &black_jack, &bomb_sweeper, &boxing, &castlevania_ii_simon_s_quest, &chef, &circus_elektronika, &clever_chicken, &climber_crystal_screen, &climber_new_wide_screen, &crab_grab, &dennis_the_menace, &diver_s_adventure, &donkey_kong, &donkey_kong_3, &donkey_kong_circus, &donkey_kong_hockey, &donkey_kong_ii, &donkey_kong_jr_new_wide_screen, &donkey_kong_jr_panorama_screen, &double_dose_of_doom, &double_dragon, &double_dragon_iii_the_rosetta_stone, &egg, &fire_attack, &fire_silver, &fire_wide_screen, &flagman, &gauntlet, &generation_2, &gold_cliff, &golden_axe, &goldeneye, &green_house, &helmet_version_cn_07, &helmet_version_cn_17, &hockey_elektronika, &home_alone, &hook, &independence_day, &judge_dredd, &judge_green_version, &judge_purple_version, &jurassic_park, &karnov, &kazaam, &kosmicheskiy_polyot, &kot_rybolov_elektronika, &kvaka_zadavaka, &life_boat, &lion, &lost_in_new_york, &manhole_gold, &manhole_new_wide_screen, &mario_bros, &mario_s_bombs_away, &mario_s_cement_factory_new_wide_screen, &mario_s_cement_factory_table_top_cm_72, &mario_s_cement_factory_table_top_cm_72a, &mario_the_juggler, &mc_hammer_u_can_t_touch_this, &mega_man_3, &mickey_donald, &mickey_mouse_panorama_screen, &mickey_mouse_wide_screen, &mighty_max, &morskaja_ataka, &mortal_kombat, &night_flight, &nightmare_before_christmas, &ninja_gaiden, &ninja_gaiden_iii, &nochnye_vorishki, &octopus, &oil_panic, &okhota, &parachute, &pinball, &pit_fighter, &popeye_panorama_screen, &popeye_wide_screen, &project_x, &rain_shower, &robin_hood, &robocop_2, &robocop_3, &safe_buster, &snoopy_panorama_screen, &snoopy_tennis, &sonic_the_hedgehog, &sonic_the_hedgehog_2, &space_adventure, &space_harrier_ii, &space_jam, &space_mission_tronica, &spider_man, &spider_tronica, &spitball_sparky, &squish, &street_fighter_ii, &strider, &super_double_dragon, &super_goal_keeper, &super_mario_bros_crystal_screen, &super_mario_bros_new_wide_screen, &superman, &swamp_thing, &tayny_okeana, &the_addams_family, &the_animated_series, &the_dark_crusade, &the_final_fight, &the_flash, &the_incredible_crash_dummies, &the_rocketeer, &the_shadow, &thunder_ball_tronica, &tropical_fish, &turtle_bridge, &vermin, &vesyolye_futbolisty, &vindicators, &vinni_pukh_panorama_screen, &wayne_s_world, &x_men, &zelda};
-const size_t nb_games = 137;
+const GW_rom* GW_list[] = {&_25th_anniversary_konami, &aliens, &altair_nauchpribor, &altered_beast, &apollo_13, &ataka_asteroidov, &autoslalom, &back_to_the_future, &ball, &balloon_fight_crystal_screen, &balloon_fight_new_wide_screen, &basketball_konami, &bassmate_computer_telko_nintendo, &batman, &battletoads, &biathlon, &bill_elliott_s_nascar_racing_konami, &black_jack, &blades_of_steel_konami, &bomb_sweeper, &bottom_of_the_ninth_konami, &boxing, &bucky_o_hare_konami, &castlevania_ii_simon_s_quest, &chef, &chequered_flag_konami, &circus_elektronika, &clever_chicken, &climber_crystal_screen, &climber_new_wide_screen, &contra_konami, &crab_grab, &dennis_the_menace, &diver_s_adventure, &donkey_kong, &donkey_kong_3, &donkey_kong_circus, &donkey_kong_hockey, &donkey_kong_ii, &donkey_kong_jr_new_wide_screen, &donkey_kong_jr_panorama_screen, &double_dose_of_doom, &double_dragon, &double_dragon_iii_the_rosetta_stone, &double_dribble_konami, &egg, &electronic_number_muncher_vtech, &fire_attack, &fire_silver, &fire_wide_screen, &flagman, &garfield_konami, &gauntlet, &generation_2, &gold_cliff, &golden_axe, &goldeneye, &gradius_konami, &green_house, &helmet_version_cn_07, &helmet_version_cn_17, &hockey_elektronika, &home_alone, &hook, &independence_day, &judge_dredd, &judge_green_version, &judge_purple_version, &jurassic_park, &karnov, &kazaam, &kosmicheskiy_polyot, &kot_rybolov_elektronika, &kvaka_zadavaka, &life_boat, &lion, &lost_in_new_york, &manhole_gold, &manhole_new_wide_screen, &mario_bros, &mario_s_bombs_away, &mario_s_cement_factory_new_wide_screen, &mario_s_cement_factory_table_top_cm_72, &mario_s_cement_factory_table_top_cm_72a, &mario_the_juggler, &mc_hammer_u_can_t_touch_this, &mega_man_3, &mickey_donald, &mickey_mouse_panorama_screen, &mickey_mouse_wide_screen, &mighty_max, &morskaja_ataka, &mortal_kombat, &nfl_football_konami, &night_flight, &nightmare_before_christmas, &ninja_gaiden, &ninja_gaiden_iii, &nochnye_vorishki, &octopus, &oil_panic, &okhota, &parachute, &pinball, &pit_fighter, &popeye_panorama_screen, &popeye_wide_screen, &project_x, &rain_shower, &robin_hood, &robocop_2, &robocop_3, &safe_buster, &second_mission_konami, &shredder_s_last_stand_konami, &skate_or_die_konami, &snoopy_panorama_screen, &snoopy_tennis, &sonic_the_hedgehog, &sonic_the_hedgehog_2, &space_adventure, &space_harrier_ii, &space_jam, &space_mission_tronica, &spider_man, &spider_tronica, &spitball_sparky, &splinter_speaks_konami, &squish, &star_fox_nelsonic, &street_fighter_ii, &strider, &super_double_dragon, &super_goal_keeper, &super_mario_bros_3_nelsonic, &super_mario_bros_crystal_screen, &super_mario_bros_new_wide_screen, &super_mario_world_nelsonic, &superman, &swamp_thing, &tayny_okeana, &teenage_mutant_ninja_turtles_konami, &the_addams_family, &the_adventures_of_bayou_billy_konami, &the_animated_series, &the_dark_crusade, &the_final_fight, &the_flash, &the_incredible_crash_dummies, &the_lone_ranger_konami, &the_rocketeer, &the_shadow, &thunder_ball_tronica, &top_gun_konami, &treasure_island_tronica, &tropical_fish, &turtle_bridge, &uchitel_arifmetiki_elektronika, &vermin, &vesolaya_arifmetika_elektronika, &vesyolye_futbolisty, &vindicators, &vinni_pukh_panorama_screen, &wayne_s_world, &x_men, &zelda};
+const size_t nb_games = 166;
 

@@ -629,7 +629,8 @@ bool load(const std::string& path, std::string* error_out) {
             bg_info_ptr,
             path_console,
             cs_info_ptr,
-            (uint8_t)manufacturer_id));
+            (uint8_t)manufacturer_id,
+            rec.storage.background_info.size()));
 
         g_games.push_back(std::move(rec));
     }

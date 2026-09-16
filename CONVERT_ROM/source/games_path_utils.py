@@ -61,6 +61,7 @@ class GameEntry:
 	mask: bool = False
 	shadow: bool = True
 	color_segment: bool = False
+	multiply_segments: bool = False
 	alpha_bright: float = default_alpha_bright
 	fond_bright: float = default_fond_bright
 	rotate: bool = False
@@ -70,6 +71,11 @@ class GameEntry:
 	background_white_keep_threshold: int = 245
 	# Numeric manufacturer id (matches source/std/GW_ROM.h constants).
 	manufacturer: int = MANUFACTURER_NINTENDO
+	# Drawn AFTER the LCD segments at a fixed alpha (see convert_switch.py's
+	# overlay_data_file) - for games whose real hardware composites a
+	# translucent label layer over lit segments rather than baking it into
+	# the static background. Empty for every game except ones that need it.
+	overlay_paths: List[Path] = field(default_factory=list)
 
 	def format_lines(self, script_dir: Path) -> List[str]:
 		"""Format this entry using the house style used by the generator."""
@@ -87,6 +93,8 @@ class GameEntry:
 
 		lines.extend(_format_path_list("Visual", self.visual_paths, script_dir))
 		lines.extend(_format_path_list("Background", self.background_paths, script_dir))
+		if self.overlay_paths:
+			lines.extend(_format_path_list("Overlay", self.overlay_paths, script_dir))
 		lines.append(
 			f'{INDENT_FIELD}, "transform_visual" : {_format_transform(self.transform_visual)}'
 		)
@@ -109,6 +117,9 @@ class GameEntry:
 
 		if self.color_segment:
 			lines.append(f'{INDENT_FIELD}, "color_segment" : True')
+
+		if self.multiply_segments:
+			lines.append(f'{INDENT_FIELD}, "multiply_segments" : True')
 
 		# Only emit non-default brightness / rotation values to keep
 		# backwards compatibility with existing games_path entries.
@@ -294,11 +305,13 @@ def _dict_to_entries(games_path: Dict[str, Any], script_root: Path) -> List[Game
 		rom_path = _to_path(data.get("Rom"))
 		visual_values = data.get("Visual") or []
 		background_values = data.get("Background") or []
+		overlay_values = data.get("Overlay") or []
 		console_value = data.get("console")
 		melody_value = data.get("Melody_Rom")
 
 		visual_paths = [_to_path(p) for p in visual_values]
 		background_paths = [_to_path(p) for p in background_values]
+		overlay_paths = [_to_path(p) for p in overlay_values]
 		console_path = _to_path(console_value) if console_value else None
 		melody_path = _to_path(melody_value) if melody_value else None
 
@@ -308,6 +321,7 @@ def _dict_to_entries(games_path: Dict[str, Any], script_root: Path) -> List[Game
 		mask = bool(data.get("mask", False))
 		shadow = bool(data.get("shadow", True))
 		color_segment = bool(data.get("color_segment", False))
+		multiply_segments = bool(data.get("multiply_segments", False))
 		alpha_bright = float(data.get("alpha_bright", default_alpha_bright))
 		fond_bright = float(data.get("fond_bright", default_fond_bright))
 		rotate = bool(data.get("rotate", False))
@@ -331,6 +345,7 @@ def _dict_to_entries(games_path: Dict[str, Any], script_root: Path) -> List[Game
 				rom_path=rom_path,
 				visual_paths=visual_paths,
 				background_paths=background_paths,
+				overlay_paths=overlay_paths,
 				console_path=console_path,
 				melody_path=melody_path,
 				date=date,
@@ -340,6 +355,7 @@ def _dict_to_entries(games_path: Dict[str, Any], script_root: Path) -> List[Game
 				mask=mask,
 				shadow=shadow,
 				color_segment=color_segment,
+				multiply_segments=multiply_segments,
 				alpha_bright=alpha_bright,
 				fond_bright=fond_bright,
 				rotate=rotate,

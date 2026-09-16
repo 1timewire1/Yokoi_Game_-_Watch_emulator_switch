@@ -29,15 +29,18 @@ extern std::vector<Segment> g_segments;
 extern std::vector<uint8_t> g_seg_on;
 extern std::vector<uint8_t> g_seg_raw_prev;
 
-extern uint16_t g_segment_info[8];
+// Sized for up to 3 screens (the widest known device, Tronica's tri-screen
+// "Super Tri-Screen" units - see rebuild_layout_from_game()): 4 header ints
+// + 2 per screen.
+extern uint16_t g_segment_info[10];
 extern bool g_double_in_one_screen;
 extern uint8_t g_nb_screen;
 extern bool g_split_two_screens_to_panels;
 
 extern float g_canvas_w;
 extern float g_canvas_h;
-extern float g_screen_off_x[2];
-extern float g_screen_off_y[2];
+extern float g_screen_off_x[3];
+extern float g_screen_off_y[3];
 
 extern float g_top_canvas_w;
 extern float g_top_canvas_h;
@@ -55,6 +58,18 @@ constexpr int kTimeSetGracePeriod = 500;
 extern int g_time_set_grace_counter;
 
 constexpr float kTargetFps = 60.0f;
+
+// Frames left to keep calling SM5XX::reassert_combined_hour() after a game
+// loads - separate from kTimeSetGracePeriod above (which re-runs the full,
+// syscall-driven yokoi_cpu_set_time_if_needed() for a much shorter window,
+// counted in executed instructions rather than frames). Sized in real time
+// since the SM530 Nelsonic games' boot-default hour reset this exists to
+// outlast fires 3-5 real seconds after load regardless of instruction
+// count; reassert_combined_hour() itself is cheap (no syscalls, just two
+// RAM writes) and a no-op for every other game, so a generous 8-second
+// margin here costs nothing.
+constexpr int kHourReassertGraceFrames = (int)(8.0f * kTargetFps);
+extern int g_hour_reassert_grace_frames;
 
 // GAME A / GAME B short-press pulses, fed into yokoi_input_apply_controller_mask.
 extern std::atomic<int> g_gamea_pulse_frames;

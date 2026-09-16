@@ -22,6 +22,7 @@ from source.game_processor.nintendo.spitball_sparky_game_processor import Spitba
 from source.game_processor.tronica.space_adventure_game_processor import SpaceAdventureGameProcessor
 from source.game_processor.tronica.spider_tronica_game_processor import SpiderTronicaGameProcessor
 from source.game_processor.tronica.diver_s_adventure_game_processor import DiversAdventureGameProcessor
+from source.game_processor.tronica.treasure_island_game_processor import TreasureIslandGameProcessor
 from source.game_processor.elektronika.kosmicheskiy_most_game_processor import KosmicheskiyMostGameProcessor
 from source.game_processor.elektronika.kosmicheskiy_polyot_game_processor import KosmicheskiyPolyotGameProcessor
 from source.game_processor.elektronika.hockey_game_processor import HockeyGameProcessor
@@ -34,6 +35,10 @@ from source.game_processor.nintendo.oil_panic_game_processor import OilPanicGame
 from source.game_processor.nintendo.rain_shower_game_processor import RainShowerGameProcessor
 from source.game_processor.nintendo.life_boat_game_processor import LifeBoatGameProcessor
 from source.game_processor.nintendo.pinball_game_processor import PinballGameProcessor
+from source.game_processor.nintendo.bassmate_game_processor import BassmateGameProcessor
+from source.game_processor.nelsonic.star_fox_game_processor import StarFoxGameProcessor
+from source.game_processor.nelsonic.super_mario_bros_3_game_processor import SuperMarioBros3GameProcessor
+from source.game_processor.nelsonic.super_mario_world_game_processor import SuperMarioWorldGameProcessor
 
 
 def main() -> int:
@@ -65,7 +70,10 @@ def main() -> int:
                   NuPogodiGameProcessor(args.target),
                   TurtleBridgeGameProcessor(args.target), FireAttackGameProcessor(args.target),
                   OilPanicGameProcessor(args.target), RainShowerGameProcessor(args.target),
-                  LifeBoatGameProcessor(args.target), PinballGameProcessor(args.target)]
+                  LifeBoatGameProcessor(args.target), PinballGameProcessor(args.target),
+                  BassmateGameProcessor(args.target), TreasureIslandGameProcessor(args.target),
+                  StarFoxGameProcessor(args.target), SuperMarioBros3GameProcessor(args.target),
+                  SuperMarioWorldGameProcessor(args.target)]
     for processor in processors:
         if processor.load_info():
             processor.post_process()

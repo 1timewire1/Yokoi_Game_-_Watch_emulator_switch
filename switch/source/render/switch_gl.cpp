@@ -68,10 +68,22 @@ void switch_gl_init_resources(GlResources& r) {
         "uniform sampler2D uTex;\n"
         "uniform vec4 uMul;\n"
         "uniform float uAlphaOnly;\n"
+        "uniform float uMultiplyDarken;\n"
         "out vec4 fragColor;\n"
         "void main() {\n"
         "  vec4 t = texture(uTex, vUv);\n"
-        "  if (uAlphaOnly > 0.5) {\n"
+        "  if (uMultiplyDarken > 0.5) {\n"
+        // Multiply-blend mode (paired with glBlendFunc(GL_DST_COLOR,
+        // GL_ZERO) at the call site): outside the segment's shape (alpha
+        // 0) this must multiply the destination by 1.0 (no-op), and
+        // inside it (alpha 1) by uMul's tint - darkening whatever's
+        // already drawn there (background colour + label) in place
+        // instead of replacing it, matching how MAME's own artwork
+        // compositing (and the real LCD ink over a printed backdrop)
+        // looks. Always opaque so the multiply blend applies uniformly
+        // across the whole quad, not just the "on" pixels.
+        "    fragColor = vec4(mix(vec3(1.0), uMul.rgb, t.a), 1.0);\n"
+        "  } else if (uAlphaOnly > 0.5) {\n"
         "    float m = max(t.a, max(t.r, max(t.g, t.b)));\n"
         "    fragColor = vec4(uMul.rgb, m * uMul.a);\n"
         "  } else {\n"
@@ -97,6 +109,7 @@ void switch_gl_init_resources(GlResources& r) {
     r.uTex = glGetUniformLocation(r.program, "uTex");
     r.uMul = glGetUniformLocation(r.program, "uMul");
     r.uAlphaOnly = glGetUniformLocation(r.program, "uAlphaOnly");
+    r.uMultiplyDarken = glGetUniformLocation(r.program, "uMultiplyDarken");
     r.uScale = glGetUniformLocation(r.program, "uScale");
     r.uOffset = glGetUniformLocation(r.program, "uOffset");
     r.uRotCosSin = glGetUniformLocation(r.program, "uRotCosSin");
