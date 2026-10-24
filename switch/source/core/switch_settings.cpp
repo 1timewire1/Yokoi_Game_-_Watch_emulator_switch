@@ -15,9 +15,9 @@ LoadStateBehavior g_load_state_behavior = LoadStateBehavior::Ask;
 CloneFilterMode g_clone_filter_mode = CloneFilterMode::ShowAll;
 bool g_log_file_enabled = false;
 std::string g_last_game_played_ref;
-bool g_betagames_enabled = false;
+bool g_experimental_games_enabled = false;
 uint8_t g_panel_gap_percent = 0;
-bool g_experimental_enabled = false;
+bool g_experimental_features_enabled = false;
 bool g_debug_mode = false;
 uint8_t g_dosimeter_reading = 0;
 TimeSetMode g_time_set_mode = TimeSetMode::Automatic;
@@ -38,9 +38,9 @@ void switch_settings_load() {
     g_clone_filter_mode = CloneFilterMode::ShowAll;
     g_log_file_enabled = false;
     g_last_game_played_ref.clear();
-    g_betagames_enabled = false;
+    g_experimental_games_enabled = false;
     g_panel_gap_percent = 0;
-    g_experimental_enabled = false;
+    g_experimental_features_enabled = false;
     g_debug_mode = false;
     g_dosimeter_reading = 0;
     g_time_set_mode = TimeSetMode::Automatic;
@@ -97,15 +97,25 @@ void switch_settings_load() {
                 ref.pop_back();
             }
             g_last_game_played_ref = ref;
-        } else if (strcmp(line, "betagames") == 0) {
-            g_betagames_enabled = (value != 0);
+        } else if (strcmp(line, "experimentalgames") == 0 || strcmp(line, "betagames") == 0) {
+            // "betagames" is the pre-rename key (the old "Tiger / David and
+            // John games (Beta)" toggle, which this setting replaced) -
+            // still read so an existing settings file keeps its choice.
+            g_experimental_games_enabled = (value != 0);
         } else if (strcmp(line, "panelgap") == 0) {
             long v = value;
             if (v < 0) v = 0;
             if (v > 30) v = 30;
             g_panel_gap_percent = (uint8_t)v;
+        } else if (strcmp(line, "experimentalfeatures") == 0) {
+            g_experimental_features_enabled = (value != 0);
         } else if (strcmp(line, "experimental") == 0) {
-            g_experimental_enabled = (value != 0);
+            // Pre-rename key: the old "Experimental Features" toggle also
+            // showed the Konami/Nelsonic/VTech/etc. games that "Experimental
+            // Games" now covers, so someone who had it on had opted into
+            // exactly those games - carry that over rather than hiding them.
+            g_experimental_features_enabled = (value != 0);
+            if (value != 0) g_experimental_games_enabled = true;
         } else if (strcmp(line, "debug") == 0) {
             // Hidden/manual-only - never written back, see switch_settings_save().
             g_debug_mode = (value != 0);
@@ -124,12 +134,12 @@ void switch_settings_load() {
     // value itself - see g_debug_mode's doc comment in switch_settings.h.
     debug_log::set_enabled(g_log_file_enabled || g_debug_mode);
     YOKOI_LOG("switch_settings: loaded from '%s' (background_color=0x%06x, segment_marking_alpha=%u, rotation=%u, "
-              "hide_console_art=%d, loadstate=%u, enable_log=%d, lastgameplayed='%s', betagames=%d, panelgap=%u, "
-              "clonefilter=%u, experimental=%d, debug=%d, dosimeterreading=%u, timesetmode=%u)",
+              "hide_console_art=%d, loadstate=%u, enable_log=%d, lastgameplayed='%s', experimentalgames=%d, panelgap=%u, "
+              "clonefilter=%u, experimentalfeatures=%d, debug=%d, dosimeterreading=%u, timesetmode=%u)",
               path.c_str(), (unsigned)g_settings.background_color, (unsigned)g_settings.segment_marking_alpha,
               (unsigned)g_screen_rotation, (int)g_hide_console_art, (unsigned)g_load_state_behavior,
-              (int)g_log_file_enabled, g_last_game_played_ref.c_str(), (int)g_betagames_enabled,
-              (unsigned)g_panel_gap_percent, (unsigned)g_clone_filter_mode, (int)g_experimental_enabled, (int)g_debug_mode,
+              (int)g_log_file_enabled, g_last_game_played_ref.c_str(), (int)g_experimental_games_enabled,
+              (unsigned)g_panel_gap_percent, (unsigned)g_clone_filter_mode, (int)g_experimental_features_enabled, (int)g_debug_mode,
               (unsigned)g_dosimeter_reading, (unsigned)g_time_set_mode);
 }
 
@@ -156,9 +166,9 @@ void switch_settings_save() {
     if (!g_last_game_played_ref.empty()) {
         fprintf(file, "lastgameplayed=%s\n", g_last_game_played_ref.c_str());
     }
-    fprintf(file, "betagames=%d\n", g_betagames_enabled ? 1 : 0);
+    fprintf(file, "experimentalgames=%d\n", g_experimental_games_enabled ? 1 : 0);
     fprintf(file, "panelgap=%u\n", (unsigned)g_panel_gap_percent);
-    fprintf(file, "experimental=%d\n", g_experimental_enabled ? 1 : 0);
+    fprintf(file, "experimentalfeatures=%d\n", g_experimental_features_enabled ? 1 : 0);
     fprintf(file, "dosimeterreading=%u\n", (unsigned)g_dosimeter_reading);
     fprintf(file, "timesetmode=%u\n", (unsigned)g_time_set_mode);
     fclose(file);

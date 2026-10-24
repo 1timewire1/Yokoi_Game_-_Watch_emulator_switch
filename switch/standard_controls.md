@@ -1,7 +1,7 @@
 # Standard games — control reference
 
 Per-game button mappings for every **fully-supported** game (everything
-*except* the Experimental Tiger titles — see
+*except* the post-launch Tiger, Konami, Nelsonic and V-Tech titles — see
 [`experimental_controls.md`](experimental_controls.md) for those). Read
 straight off each game's `Virtual_Input` subclass in
 [`../source/virtual_i_o/virtual_input.h`](../source/virtual_i_o/virtual_input.h),
@@ -372,6 +372,146 @@ Console: 4-way d-pad + single action button.
 | − | Max Score |
 
 ---
+
+## McDonald's (LCDonald ports)
+
+Twenty games ported from the [LCDonald](https://github.com/Difegue/LCDonald)
+project (McDonald's Sonic-branded Happy Meal LCD games, 2003-2005) - logic
+hand-simulated in C# there rather than emulated from a MAME ROM dump (no
+real MCU exists to dump), ported to this project's `LCDonald_fake_cpu`
+(see [`../source/LCDonald/`](../source/LCDonald/)). Their own manufacturer
+bucket (`MANUFACTURER_MCDONALDS`) - hidden, like Tiger/Konami/etc., until
+the **Experimental Games** setting is on. Controls don't fit this doc's usual
+shape/side convention (these are named single-purpose buttons, not a
+generic directional G&W layout), so they get their own table instead.
+
+Every game declares its own small set of named inputs
+(`LCDonald_program::get_available_inputs()`); the Switch mapping is one
+uniform rule covering all twenty rather than a per-game table
+(`switch/source/input/lcdonald_input_map.cpp`):
+
+| Declared input | Switch input |
+|---|---|
+| "Left" / "Right" | D-Pad Left/Right (mirrored by the left stick, same as everywhere else) |
+| "Up" / "Down" | D-Pad Up/Down (same mirroring) |
+| Anything else (the game's one action button) | **A** |
+
+| Ref | Title | Movement | Action (A) |
+|---|---|---|---|
+| `sagame` | Sonic Action Game | — | Jump |
+| `tskypatrol` | Tails Sky Patrol | Up/Down | — |
+| `ksoccer` | Knuckles Soccer | Left/Right | — |
+| `sgrinder` | Shadow Grinder | — | Jump |
+| `sspeedway` | Sonic's Speedway | Left/Right | — |
+| `abanana` | AiAi Banana Catch | Left/Right | — |
+| `sxtremeboard` | Sonic Extreme Boarding | Left/Right | — |
+| `tsoccer` | Tails Soccer | Left/Right | — |
+| `kbaseball` | Knuckles Baseball | Up/Down | — |
+| `shockey` | Shadow Hockey | Left/Right | Shoot a puck |
+| `arvolleyball` | Amy & Rouge Volleyball | Left/Right | Hit the ball |
+| `cflower` | Cream Flower Catch | Left/Right | — |
+| `bfishing` | Big's Fishing | Up/Down (rod) | Reel in fish |
+| `sskateboard` | Sonic Skateboard | Left/Right | — |
+| `tskyadventure` | Tails Sky Adventure | Left/Right | Shoot a projectile |
+| `ktreasure` | Knuckles Treasure Hunt | Left/Right | — |
+| `sbasketball` | Shadow Basketball | Left/Right | Make a basket |
+| `artennis` | Amy & Rouge Tennis | Left/Right | Hit the ball |
+| `cflower2` | Cream Flower Catch | Left/Right | — |
+| `bgiantegg` | Billy's Giant Egg | Left/Right | — |
+
+**Variant entries** share identical controls with their base game listed
+above (same `LCDonald_program` subclass, just different display metadata
+and/or art - see `GNW_LIST.md`'s McDonald's section for the full research
+behind which entry is primary vs duplicate/clone and why):
+- **International duplicates** (`ksoccer_intl`, `sgrinder_intl`,
+  `sspeedway_intl`, `sxtremeboard_intl`) and the silver-body
+  "Search for the Silver Game" contest duplicate (`shockey_rare`) differ in box art only, reusing their
+  base game's segment/background art directly.
+- **ESPN25 clones** (`sspeedway_espn`, `tsoccer_espn`, `kbaseball_espn`,
+  `sskateboard_espn`, `sbasketball_espn`, `artennis_espn`) ship a genuinely
+  different segment SVG under the same element names (different character
+  art, same game logic - see `generate_lcdonald_pack.py`'s `ESPN_SEG_PNG_SRC`
+  doc comment) plus their own in-unit background print, so they get their
+  own independent segment atlas rather than reusing the base game's.
+  `kbaseball_espn` is the one exception in the menu's clone/duplicate
+  tiering - it released before `kbaseball` itself, so it's the *origin*
+  game there, not the clone (same controls either way).
+- **Clone-tier base games** (`tsoccer`, `cflower`, `cflower2`,
+  `sskateboard`, `sbasketball`, `artennis`) are re-skins of an earlier,
+  differently-named McDonald's game (Knuckles Soccer, AiAi Banana Catch,
+  Sonic Extreme Boarding, Shadow Hockey, and Amy & Rouge Volleyball
+  respectively) - full, independently-ported games with their own row
+  above, just categorized as clones for the menu's filter, not a
+  cosmetic-only variant of anything on this list.
+
+**Starting a game: Plus = Normal, Minus = Endless.** A McDonald's game
+loads onto its all-segments-lit screen and waits, like a Game & Watch before
+you pick Game A or Game B; the bottom-right corner shows the two prompts.
+Pressing **+** starts the normal game (`start_game(false)`); pressing **-**
+starts **Endless mode** (`start_game(true)`), the same game with no levels or
+win, which draws a running score in an italic seven-segment counter in the
+top-right corner (`render/lcdonald_hud.cpp`) - a plain `000` readout, like
+LCDonald's own. The score is the number of `increment_score()` calls the
+game makes, exactly as the original counts its `Scored` event. Each game's
+game-over/victory routine plays its closing animation and then calls
+`LCDonald_program::stop()` (deferred until the animation has finished - see
+that function), which lands back on the all-lit screen with the final score
+still showing; **+** or **-** there starts a fresh run. Both buttons are
+gated on the game being stopped (`is_stopped()`) so a stray press mid-run
+can't reset it, and neither is otherwise used during gameplay (these games
+aren't in `virtual_input.h`'s `get_input_config()`, so the normal Game A/B
+bindings never apply). High scores are **not stored** - a possible later
+feature.
+
+**Sound.** LCDonald's sound effects are real `.ogg` files bundled in the
+pack (`sound_lcd_*`), decoded with stb_vorbis on first use and played
+through their own libnx audrv voices (`switch/source/audio/lcdonald_sound.cpp`),
+so overlapping effects mix instead of cutting each other off.
+
+### Burger Bard (LCDonald's white label)
+
+Under its own **BURGER BARD** heading in the menu: LCDonald's `#if BURGER`
+re-skin of 16 of the McDonald's games (plus three art-only duplicates -
+`platform2`, `treasure2`, `eggcatch2`; the last is password-locked in the
+original app and simply unlocked here) as a fictional brand,
+"Burger Bard Crystalectrics" - the manufacturer named on its instruction
+sheets. Each is the same ported game logic as its McDonald's counterpart, so
+**controls are identical** to that game's row in the table above, and the
+start flow is the same too (**+** normal, **-** Endless, score in the
+top-right corner). All 19 are marked clones (of the McDonald's game they
+re-skin, following the same "ultimate origin" chain), so "Hide All Clones"
+hides the whole group.
+
+| Ref folder | Title | Movement | Action (A) |
+|---|---|---|---|
+| `volleyball` | Curly & Frenchie's Volleyball | Left/Right | Hit the ball |
+| `fishing` | Burger Bard Fishing | Up/Down (rod) | Reel in fish |
+| `eggcatch` | Halmon's Egg Catch | Left/Right | — |
+| `heartmooncatch` | Honey's Heart-Moon Catch | Left/Right | — |
+| `football` | King Beareon's Football Catch | Up/Down | — |
+| `treasure` | Bard's Burger Hunt | Left/Right | — |
+| `treasure2` | Halmon's Egg Hunt | Left/Right | — |
+| `platform` | Kola Bear's Platform Adventure | — | Jump |
+| `platform2` | Burger Bard's Platform Adventure | — | Jump |
+| `wbasketball` | Gloomy Wolf Basketball | Left/Right | Make a basket |
+| `railgrinder` | Vibes Rail Grinder | — | Jump |
+| `magicbattle` | Bat Magic's Magic Battle | Left/Right | Shoot a puck |
+| `skateboard` | Vibes Skateboarding | Left/Right | — |
+| `speedway` | Burger Bard Speedway Racing | Left/Right | — |
+| `extremeboard` | Vibes Extreme Skateboarding | Left/Right | — |
+| `targetshoot` | Taco Sal's Target Shooting | Left/Right | Shoot a projectile |
+| `seashell` | Soakey's Shell Catch | Up/Down | — |
+| `kosoccer` | Kola Bear's Soccer | Left/Right | — |
+| `eggcatch2` | Barry's Treasure Hunt | Left/Right | — |
+
+Burger-only behaviour, from LCDonald's own `#if BURGER` code, is switched on
+by `LCDonald_program::set_burger()`: a "WINNER" image in victory animations;
+Volleyball's hands group (and the bat staying out until the next update);
+Extreme Boarding moving the hang-position fix into the main cycle;
+Kola Bear's Soccer's longer miss blink; Egg Catch's extra "common" group and
+egg blinks; and a rare hidden flash of the `score-1` group (a 1-in-9 chance
+per update, once per game, for about 50ms) - a tiny easter egg. See
+`GNW_LIST.md`'s Burger Bard section for the research notes.
 
 ## Games always exempt from the Panel Gap setting
 

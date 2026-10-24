@@ -53,14 +53,15 @@ uint8_t g_selected_index = 0;
 // (game loads fresh, same as always) when no save exists for that game.
 bool g_load_prompt_active = false;
 
-// Beta-games enable confirmation, layered on top of the settings screen
-// (g_settings_active stays true throughout) when the Beta Games row is about
-// to flip Off -> On - see the row handler in update_settings_menu(). Turning
-// it back Off never goes through this, only enabling does.
-bool g_betagames_confirm_active = false;
+// Experimental Games enable confirmation, layered on top of the settings
+// screen (g_settings_active stays true throughout) when that row is about to
+// flip Off -> On - see the row handler in update_settings_menu(). Turning it
+// back Off never goes through this, only enabling does.
+bool g_experimental_games_confirm_active = false;
 
-// Same idea as g_betagames_confirm_active, for the Experimental row.
-bool g_experimental_confirm_active = false;
+// Same idea as g_experimental_games_confirm_active, for the Experimental
+// Features row.
+bool g_experimental_features_confirm_active = false;
 
 // Settings sub-screen, opened with Plus from the game list (Plus is free
 // there - during gameplay it's mapped to the G&W "A" button instead, and
@@ -103,7 +104,7 @@ std::string g_panelgap_custom_text; // raw entered decimal 0-30; empty = not yet
 // actually appear varies: BackgroundCustomEntry/SegmentsCustomEntry/
 // PanelGapCustomEntry only show up while their parent row is in Custom mode
 // (see build_settings_rows()), and ConsoleArt/LoadStateBehavior/LogFile/
-// BetaGames/Experimental vs. ReturnToMenu depend on g_settings_from_gameplay,
+// ExperimentalGames/ExperimentalFeatures vs. ReturnToMenu depend on g_settings_from_gameplay,
 // same as before. Panel Gap is unconditional like Rotation/Background/
 // Segments above it - see g_panel_gap_percent's doc comment in
 // switch_settings.h for why it applies live instead of needing a reload.
@@ -120,8 +121,8 @@ enum class SettingsRow : uint8_t {
     CloneFilter,
     TimeSetMode,
     LogFile,
-    BetaGames,
-    Experimental,
+    ExperimentalGames,
+    ExperimentalFeatures,
     DosimeterReading,
     ReturnToMenu,
 };
@@ -142,7 +143,7 @@ std::vector<SettingsRow> build_settings_rows() {
     if (g_settings_from_gameplay) {
         // Only while Altair itself is loaded and Experimental Features is
         // on - see g_dosimeter_reading's doc comment in switch_settings.h.
-        if (g_game && g_game->ref == "NALTAIR" && g_experimental_enabled) {
+        if (g_game && g_game->ref == "NALTAIR" && g_experimental_features_enabled) {
             rows.push_back(SettingsRow::DosimeterReading);
         }
         rows.push_back(SettingsRow::ReturnToMenu);
@@ -152,8 +153,8 @@ std::vector<SettingsRow> build_settings_rows() {
         rows.push_back(SettingsRow::CloneFilter);
         rows.push_back(SettingsRow::TimeSetMode);
         rows.push_back(SettingsRow::LogFile);
-        rows.push_back(SettingsRow::BetaGames);
-        rows.push_back(SettingsRow::Experimental);
+        rows.push_back(SettingsRow::ExperimentalGames);
+        rows.push_back(SettingsRow::ExperimentalFeatures);
     }
     return rows;
 }
@@ -414,7 +415,7 @@ LoadStateBehavior cycle_load_state_behavior(LoadStateBehavior cur, int dir) {
 // Resolves a saved ref back to a pack index, distinguishing "found at index
 // 0" from "not found" via out_found (load_game(0)'s ref matching would
 // otherwise look identical to a failed search) - used to check whether
-// g_last_game_played_ref points at a beta game when that setting gets turned
+// g_last_game_played_ref points at an experimental game when that setting gets turned
 // off (see update_settings_menu()'s row 6 handler).
 uint8_t find_game_index_by_ref(const std::string& ref, bool* out_found) {
     *out_found = false;
@@ -429,8 +430,15 @@ uint8_t find_game_index_by_ref(const std::string& ref, bool* out_found) {
     return 0;
 }
 
-enum class SortMode : uint8_t { Manufacturer, Alphabetical, Date };
-SortMode g_sort_mode = SortMode::Manufacturer;
+// The two Maker modes keep each manufacturer's games together (groups in
+// mfr_rank() order) and sort *within* each group the same consistent way -
+// by name or by release date - instead of the pack's own per-manufacturer
+// ordering, which differed from maker to maker. Name/Date ignore the
+// manufacturer entirely and sort the whole list. Minus cycles them in this
+// order.
+enum class SortMode : uint8_t { MakerName, MakerDate, Name, Date };
+constexpr int kSortModeCount = 4;
+SortMode g_sort_mode = SortMode::MakerName;
 // Permutation of [0, get_nb_name()) in the current sort mode's order. Left/
 // Right and the Up/Down group-jump both walk this instead of raw indices,
 // so "next"/"first of the next group" have one implementation shared by
@@ -548,36 +556,60 @@ const char* mfr_name(uint8_t mfr) {
     if (mfr == GW_rom::MANUFACTURER_TRONICA) return "TRONICA";
     if (mfr == GW_rom::MANUFACTURER_ELEKTRONIKA) return "ELEKTRONIKA";
     if (mfr == GW_rom::MANUFACTURER_TIGER) return "TIGER";
+    if (mfr == GW_rom::MANUFACTURER_KONAMI) return "KONAMI";
+    if (mfr == GW_rom::MANUFACTURER_NELSONIC) return "NELSONIC";
+    if (mfr == GW_rom::MANUFACTURER_VTECH) return "V-TECH";
     if (mfr == GW_rom::MANUFACTURER_DAVID_AND_JOHN) return "DAVID AND JOHN";
-    // No longer Tiger-only (see MANUFACTURER_EXPERIMENTAL's doc comment in
-    // GW_ROM.h) - each game's actual original manufacturer is recorded in
-    // its display name instead ("Title (Manufacturer)"), so this group
-    // heading just says what it is: an experimental bucket.
-    if (mfr == GW_rom::MANUFACTURER_EXPERIMENTAL) return "EXPERIMENTAL";
+    if (mfr == GW_rom::MANUFACTURER_MCDONALDS) return "MCDONALD'S";
+    // LCDonald's white-label re-skin, credited as "Burger Bard" on its
+    // (fictional) instruction sheets - see MANUFACTURER_BURGER_BARD in GW_ROM.h.
+    if (mfr == GW_rom::MANUFACTURER_BURGER_BARD) return "BURGER BARD";
     return "NINTENDO";
 }
 
-bool is_beta_manufacturer(uint8_t mfr) {
-    return mfr == GW_rom::MANUFACTURER_TIGER || mfr == GW_rom::MANUFACTURER_DAVID_AND_JOHN;
+// Menu display order of the manufacturer groups (Manufacturer sort, and the
+// Up/Down group jump). The ids stored in the pack aren't in this order and
+// must never change, so the order lives here: the three always-visible
+// manufacturers first, then everything the "Experimental Games" setting
+// hides.
+int mfr_rank(uint8_t mfr) {
+    switch (mfr) {
+        case GW_rom::MANUFACTURER_NINTENDO:       return 0;
+        case GW_rom::MANUFACTURER_TRONICA:        return 1;
+        case GW_rom::MANUFACTURER_ELEKTRONIKA:    return 2;
+        case GW_rom::MANUFACTURER_TIGER:          return 3;
+        case GW_rom::MANUFACTURER_KONAMI:         return 4;
+        case GW_rom::MANUFACTURER_NELSONIC:       return 5;
+        case GW_rom::MANUFACTURER_VTECH:          return 6;
+        case GW_rom::MANUFACTURER_DAVID_AND_JOHN: return 7;
+        case GW_rom::MANUFACTURER_MCDONALDS:      return 8;
+        case GW_rom::MANUFACTURER_BURGER_BARD:    return 9;
+        default:                                  return 100 + (int)mfr;
+    }
 }
 
-// g_debug_mode force-shows beta games the same way it force-enables logging
-// (see its doc comment in switch_settings.h) - without touching the stored
-// g_betagames_enabled value either.
-bool betagames_visible() {
-    return g_betagames_enabled || g_debug_mode;
+// Every manufacturer except Nintendo, Tronica and Elektronika (the original,
+// long-tested library) is hidden until "Experimental Games" is turned on.
+bool is_experimental_games_manufacturer(uint8_t mfr) {
+    switch (mfr) {
+        case GW_rom::MANUFACTURER_TIGER:
+        case GW_rom::MANUFACTURER_KONAMI:
+        case GW_rom::MANUFACTURER_NELSONIC:
+        case GW_rom::MANUFACTURER_VTECH:
+        case GW_rom::MANUFACTURER_DAVID_AND_JOHN:
+        case GW_rom::MANUFACTURER_MCDONALDS:
+        case GW_rom::MANUFACTURER_BURGER_BARD:
+            return true;
+        default:
+            return false;
+    }
 }
 
-// Separate bucket from is_beta_manufacturer() - see g_experimental_enabled's
-// doc comment in switch_settings.h.
-bool is_experimental_manufacturer(uint8_t mfr) {
-    return mfr == GW_rom::MANUFACTURER_EXPERIMENTAL;
-}
-
-// Mirrors betagames_visible() - g_debug_mode force-shows experimental games
-// the same way, without touching the stored g_experimental_enabled value.
-bool experimental_visible() {
-    return g_experimental_enabled || g_debug_mode;
+// g_debug_mode force-shows experimental games the same way it force-enables
+// logging (see its doc comment in switch_settings.h) - without touching the
+// stored g_experimental_games_enabled value either.
+bool experimental_games_visible() {
+    return g_experimental_games_enabled || g_debug_mode;
 }
 
 // See g_clone_filter_mode's doc comment in switch_settings.h for what these
@@ -594,22 +626,59 @@ bool experimental_visible() {
 //   Cement Factory.
 constexpr const char* kKnownDuplicateRefs[] = {
     "CN_07", "IP_05", "CM_72A",
+    // LCDonald "International" entries - same US-vs-international
+    // box art tier as the three above, see standard_controls.md's McDonald's
+    // section and GNW_LIST.md's LCDonald notes.
+    "KSOCCER_INTL", "SGRINDER_INTL", "SSPEEDWAY_INTL", "SXTREMEBOARD_INTL",
+    // Silver-body "Search for the Silver Game" contest unit - box art only
+    // (shockey.lay's "Front (Rare)"/"Back (Rare)" views), same tier as the
+    // International entries above.
+    "SHOCKEY_RARE",
 };
 
 // kKnownCloneRefs - every entry GNW_LIST.md's "Clone Of" column marks as a
-// clone of another entry, as of when this list was written (30 entries) -
-// a strict superset of kKnownDuplicateRefs above. Most of these are
-// legitimately distinct, differently-titled games (Elektronika bootlegs,
-// Tiger titles reusing another game's ports) that just happen to reuse
-// another entry's hardware/ports in the build pipeline, not simple re-
-// releases of the same game - hiding all of them is a much bigger hammer
-// than kKnownDuplicateRefs.
+// clone of another entry - a strict superset of kKnownDuplicateRefs above.
+// Most of these are legitimately distinct, differently-titled games
+// (Elektronika bootlegs, Tiger titles reusing another game's ports) that
+// just happen to reuse another entry's hardware/ports in the build
+// pipeline, not simple re-releases of the same game - hiding all of them
+// is a much bigger hammer than kKnownDuplicateRefs.
 constexpr const char* kKnownCloneRefs[] = {
     "BF_107", "DR_106", "MK_96", "EG_26", "CN_07", "IP_05", "CM_72A", "YM_105",
     "TG_18", "CC_38V", "SG_21", "FR_23",
     "IM_53", "IM_19", "IM_11", "IM_10", "IM_09", "IM_50", "IM_32", "IM_33",
     "IM_51", "IM_49", "IM_02", "IM_16", "IM_13", "IM_03", "IM_04", "IM_22", "IM_12",
     "TSUPERMAN", "TROBHOOD", "TROCKTEER",
+    // LCDonald entries - both tiers, since this list is a superset of
+    // kKnownDuplicateRefs (International + Silver Game box-art variants)
+    // plus genuine clones: the ESPN25 cross-promotion editions (same game/
+    // segments/logic as their Sonic-branded counterpart - or, for
+    // KBASEBALL_ESPN, the actual origin; see below), and the 5 base games
+    // that turned out to be re-skins of an earlier, differently-named
+    // McDonald's game once real release dates were confirmed against
+    // McDonald's own press releases (see GNW_LIST.md's LCDonald notes for
+    // the full research and per-game dates):
+    //   TSOCCER clones KSOCCER, CFLOWER/CFLOWER2 clone ABANANA,
+    //   SSKATEBOARD clones SXTREMEBOARD, SBASKETBALL clones SHOCKEY,
+    //   ARTENNIS clones ARVOLLEYBALL.
+    "KSOCCER_INTL", "SGRINDER_INTL", "SSPEEDWAY_INTL", "SXTREMEBOARD_INTL", "SHOCKEY_RARE",
+    "SSPEEDWAY_ESPN", "TSOCCER_ESPN", "SSKATEBOARD_ESPN",
+    "SBASKETBALL_ESPN", "ARTENNIS_ESPN",
+    "TSOCCER", "CFLOWER", "CFLOWER2", "SSKATEBOARD", "SBASKETBALL", "ARTENNIS",
+    // KBASEBALL_ESPN ("ESPN25: Michael Vick - Football", 2004-04-30) is the
+    // real origin here - Knuckles Baseball itself didn't release until
+    // 2005-03-18, so KBASEBALL is the clone, not KBASEBALL_ESPN (the only
+    // ESPN25 entry in this file that isn't itself the clone tier).
+    "KBASEBALL",
+    // Burger Bard (LCDonald's white-label build) - every entry is a re-skin
+    // of a McDonald's game (or, for the *2 entries, of another Burger game's
+    // art), so all 19 are clones of their ultimate-origin McDonald's game -
+    // see GNW_LIST.md's Burger Bard notes. Under "Hide All Clones" the whole
+    // Burger Bard group therefore disappears.
+    "BB_VOLLEYBALL", "BB_FISHING", "BB_EGGCATCH", "BB_HEARTMOON", "BB_FOOTBALL",
+    "BB_TREASURE", "BB_TREASURE2", "BB_PLATFORM", "BB_PLATFORM2", "BB_WBASKETBALL",
+    "BB_RAILGRINDER", "BB_MAGICBATTLE", "BB_SKATEBOARD", "BB_SPEEDWAY",
+    "BB_EXTREMEBOARD", "BB_TARGETSHOOT", "BB_SEASHELL", "BB_KOSOCCER", "BB_EGGCATCH2",
 };
 
 bool ref_in_list(const std::string& ref, const char* const* list, size_t count) {
@@ -663,16 +732,17 @@ TimeSetMode cycle_time_set_mode(TimeSetMode cur, int dir) {
 
 const char* sort_mode_label(SortMode m) {
     switch (m) {
-        case SortMode::Alphabetical: return "Sort by: Name";
+        case SortMode::Name: return "Sort by: Name";
         case SortMode::Date: return "Sort by: Date";
-        default: return "Sort by: Maker";
+        case SortMode::MakerDate: return "Sort by: Maker (Date)";
+        default: return "Sort by: Maker (Name)";
     }
 }
 
 // What Up/Down jumps by in the current sort mode - shown in the hint bar.
 const char* sort_mode_group_label(SortMode m) {
     switch (m) {
-        case SortMode::Alphabetical: return "Letter";
+        case SortMode::Name: return "Letter";
         case SortMode::Date: return "Year";
         default: return "Manufacturer";
     }
@@ -715,43 +785,39 @@ int parse_year(const std::string& date) {
     return y;
 }
 
-// The value Up/Down groups by in the current sort mode - manufacturer id,
+// The value Up/Down groups by in the current sort mode - manufacturer rank,
 // first letter (uppercased), or year. Same-key entries must be contiguous in
 // g_sorted_order for select_next_other_group() below to work, which holds by
 // construction since rebuild_sorted_order() sorts by exactly this key first.
 int group_key(uint8_t idx) {
     switch (g_sort_mode) {
-        case SortMode::Alphabetical: {
+        case SortMode::Name: {
             const std::string n = name_of(idx);
             return n.empty() ? 0 : std::toupper((unsigned char)n[0]);
         }
         case SortMode::Date:
             return parse_year(date_of(idx));
         default:
-            return (int)get_mfr(idx);
+            return mfr_rank(get_mfr(idx));
     }
 }
 
 // Rebuilds g_sorted_order - the single list every bit of navigation, the
 // bottom counter, and Up/Down group-jumping all walk (see select_next(),
-// select_next_other_group(), position_of_selected() below). Filtering beta
-// games, experimental games, and duplicate/clone entries out here, rather
+// select_next_other_group(), position_of_selected() below). Filtering
+// experimental games and duplicate/clone entries out here, rather
 // than skipping them individually at each call site, is what makes them
 // disappear from navigation *and* the visible count at the same time with
 // no other code needing to know about it.
 void rebuild_sorted_order() {
     const size_t n = get_nb_name();
-    const bool show_beta = betagames_visible();
-    const bool show_experimental = experimental_visible();
+    const bool show_experimental_games = experimental_games_visible();
 
     g_sorted_order.clear();
     g_sorted_order.reserve(n);
     for (size_t i = 0; i < n; i++) {
         const uint8_t mfr = get_mfr((uint8_t)i);
-        if (!show_beta && is_beta_manufacturer(mfr)) {
-            continue;
-        }
-        if (!show_experimental && is_experimental_manufacturer(mfr)) {
+        if (!show_experimental_games && is_experimental_games_manufacturer(mfr)) {
             continue;
         }
         if (clone_hidden_under(ref_of((uint8_t)i), g_clone_filter_mode)) {
@@ -760,27 +826,41 @@ void rebuild_sorted_order() {
         g_sorted_order.push_back((uint8_t)i);
     }
 
+    // Date order everywhere: ISO date strings sort chronologically as text,
+    // ties broken by name so equal-date games always land in a stable,
+    // predictable order.
+    auto date_then_name = [](uint8_t a, uint8_t b) {
+        const std::string da = date_of(a), db = date_of(b);
+        if (da != db) return da < db;
+        return name_less_ci(name_of(a), name_of(b));
+    };
+
     switch (g_sort_mode) {
-        case SortMode::Alphabetical:
+        case SortMode::Name:
             std::stable_sort(g_sorted_order.begin(), g_sorted_order.end(), [](uint8_t a, uint8_t b) {
                 return name_less_ci(name_of(a), name_of(b));
             });
             break;
         case SortMode::Date:
-            std::stable_sort(g_sorted_order.begin(), g_sorted_order.end(), [](uint8_t a, uint8_t b) {
-                const std::string da = date_of(a), db = date_of(b);
-                if (da != db) return da < db; // ISO date strings sort chronologically as text
-                return name_less_ci(name_of(a), name_of(b));
+            std::stable_sort(g_sorted_order.begin(), g_sorted_order.end(), date_then_name);
+            break;
+        case SortMode::MakerDate:
+            std::stable_sort(g_sorted_order.begin(), g_sorted_order.end(), [&](uint8_t a, uint8_t b) {
+                const int ra = mfr_rank(get_mfr(a)), rb = mfr_rank(get_mfr(b));
+                if (ra != rb) return ra < rb;
+                return date_then_name(a, b);
             });
             break;
-        default: // Manufacturer - stable so within-manufacturer order matches pack order
+        default: // MakerName
             std::stable_sort(g_sorted_order.begin(), g_sorted_order.end(), [](uint8_t a, uint8_t b) {
-                return get_mfr(a) < get_mfr(b);
+                const int ra = mfr_rank(get_mfr(a)), rb = mfr_rank(get_mfr(b));
+                if (ra != rb) return ra < rb;
+                return name_less_ci(name_of(a), name_of(b));
             });
             break;
     }
 
-    // g_selected_index can point at a game that just got filtered out (beta
+    // g_selected_index can point at a game that just got filtered out (experimental
     // games toggled off while one was selected) - land on whatever's first
     // in the new order instead of leaving it dangling on something hidden.
     bool selected_visible = false;
@@ -869,8 +949,8 @@ const char* settings_row_label(SettingsRow row) {
         case SettingsRow::CloneFilter:               return "Duplicate & Clone Games";
         case SettingsRow::TimeSetMode:                return "Time Set Mode";
         case SettingsRow::LogFile:                   return "Log File";
-        case SettingsRow::BetaGames:                  return "Tiger / David and John games (Beta)";
-        case SettingsRow::Experimental:                return "Experimental Features";
+        case SettingsRow::ExperimentalGames:                  return "Experimental Games";
+        case SettingsRow::ExperimentalFeatures:                return "Experimental Features";
         case SettingsRow::DosimeterReading:            return "Dosimeter Reading";
         case SettingsRow::ReturnToMenu:                return "Return to Main Menu";
     }
@@ -905,10 +985,10 @@ std::string settings_row_value(SettingsRow row) {
             return time_set_mode_label(g_time_set_mode);
         case SettingsRow::LogFile:
             return g_log_file_enabled ? "On" : "Off";
-        case SettingsRow::BetaGames:
-            return g_betagames_enabled ? "On" : "Off";
-        case SettingsRow::Experimental:
-            return g_experimental_enabled ? "On" : "Off";
+        case SettingsRow::ExperimentalGames:
+            return g_experimental_games_enabled ? "On" : "Off";
+        case SettingsRow::ExperimentalFeatures:
+            return g_experimental_features_enabled ? "On" : "Off";
         case SettingsRow::DosimeterReading:
             return std::to_string((unsigned)g_dosimeter_reading);
         default:
@@ -1081,23 +1161,17 @@ void render_load_prompt(int logical_w, int logical_h) {
 // render_settings_rows()/render_load_prompt() above. switch_ui has no text
 // wrapping, so the warning is pre-split into fixed lines sized to fit the
 // menu's usual content width rather than measured/wrapped at draw time.
-void render_betagames_confirm(int logical_w, int logical_h) {
-    static const char* kLines[] = {
-        "WARNING: Support for these games is",
-        "still in beta and you may experience",
-        "issues while playing them.",
-        "Do you still wish to enable?",
-    };
-    constexpr int kNumLines = 4;
-
+// Both enable-confirmation screens (Experimental Games / Experimental
+// Features) share this layout and only differ in their warning text.
+void render_enable_confirm(int logical_w, int logical_h, const char* const* lines, int num_lines) {
     const float cx = (float)logical_w * 0.5f;
     const float line_size = 26.0f;
     const float line_gap = 10.0f;
     float y = (float)logical_h * 0.5f - 150.0f;
 
-    for (int i = 0; i < kNumLines; i++) {
-        const float w = switch_ui_text_width(kLines[i], line_size);
-        switch_ui_draw_text(cx - w * 0.5f, y, line_size, kTextR, kTextG, kTextB, 1.0f, kLines[i]);
+    for (int i = 0; i < num_lines; i++) {
+        const float w = switch_ui_text_width(lines[i], line_size);
+        switch_ui_draw_text(cx - w * 0.5f, y, line_size, kTextR, kTextG, kTextB, 1.0f, lines[i]);
         y += line_size + line_gap;
     }
 
@@ -1118,43 +1192,24 @@ void render_betagames_confirm(int logical_w, int logical_h) {
     draw_option(opt_y2, SwitchButtonIcon::B, "Cancel");
 }
 
-// Mirrors render_betagames_confirm() above - see its comment for the layout
-// notes (rotation-swapped logical_w/logical_h, pre-split fixed lines).
-void render_experimental_confirm(int logical_w, int logical_h) {
-    static const char* kLines[] = {
+void render_experimental_games_confirm(int logical_w, int logical_h) {
+    static const char* const kLines[] = {
         "WARNING: These games are experimental",
         "and largely untested. You may experience",
         "unexpected issues while playing them.",
         "Do you still wish to enable?",
     };
-    constexpr int kNumLines = 4;
+    render_enable_confirm(logical_w, logical_h, kLines, 4);
+}
 
-    const float cx = (float)logical_w * 0.5f;
-    const float line_size = 26.0f;
-    const float line_gap = 10.0f;
-    float y = (float)logical_h * 0.5f - 150.0f;
-
-    for (int i = 0; i < kNumLines; i++) {
-        const float w = switch_ui_text_width(kLines[i], line_size);
-        switch_ui_draw_text(cx - w * 0.5f, y, line_size, kTextR, kTextG, kTextB, 1.0f, kLines[i]);
-        y += line_size + line_gap;
-    }
-
-    const float opt_size = 28.0f;
-    const float icon_pad = 10.0f;
-    const float opt_y1 = y + 30.0f;
-    const float opt_y2 = opt_y1 + 50.0f;
-
-    auto draw_option = [&](float oy, SwitchButtonIcon icon, const std::string& text) {
-        const float w = switch_ui_button_icon_width(opt_size, icon) + icon_pad + switch_ui_text_width(text, opt_size);
-        float x = cx - w * 0.5f;
-        switch_ui_draw_button_icon(x, oy, opt_size, kTextR, kTextG, kTextB, 1.0f, icon);
-        x += switch_ui_button_icon_width(opt_size, icon) + icon_pad;
-        switch_ui_draw_text(x, oy, opt_size, kTextR, kTextG, kTextB, 1.0f, text);
+void render_experimental_features_confirm(int logical_w, int logical_h) {
+    static const char* const kLines[] = {
+        "WARNING: These features are experimental",
+        "and largely untested. You may experience",
+        "unexpected issues while using them.",
+        "Do you still wish to enable?",
     };
-
-    draw_option(opt_y1, SwitchButtonIcon::A, "Enable");
-    draw_option(opt_y2, SwitchButtonIcon::B, "Cancel");
+    render_enable_confirm(logical_w, logical_h, kLines, 4);
 }
 
 } // namespace
@@ -1224,30 +1279,30 @@ static void update_load_prompt(uint64_t kDown) {
     }
 }
 
-static void update_betagames_confirm(uint64_t kDown) {
-    if (kDown & HidNpadButton_A) {
-        YOKOI_LOG("switch_menu: beta games enable confirmed");
-        g_betagames_enabled = true;
-        switch_settings_save();
-        g_betagames_confirm_active = false;
-        rebuild_sorted_order(); // newly-visible games need to enter the navigable set
-    } else if (kDown & HidNpadButton_B) {
-        YOKOI_LOG("switch_menu: beta games enable cancelled");
-        g_betagames_confirm_active = false;
-    }
-}
-
-// Mirrors update_betagames_confirm() above.
-static void update_experimental_confirm(uint64_t kDown) {
+static void update_experimental_games_confirm(uint64_t kDown) {
     if (kDown & HidNpadButton_A) {
         YOKOI_LOG("switch_menu: experimental games enable confirmed");
-        g_experimental_enabled = true;
+        g_experimental_games_enabled = true;
         switch_settings_save();
-        g_experimental_confirm_active = false;
+        g_experimental_games_confirm_active = false;
         rebuild_sorted_order(); // newly-visible games need to enter the navigable set
     } else if (kDown & HidNpadButton_B) {
         YOKOI_LOG("switch_menu: experimental games enable cancelled");
-        g_experimental_confirm_active = false;
+        g_experimental_games_confirm_active = false;
+    }
+}
+
+// Mirrors update_experimental_games_confirm() above - except there's no
+// game list to rebuild: Experimental Features only gates features, never games.
+static void update_experimental_features_confirm(uint64_t kDown) {
+    if (kDown & HidNpadButton_A) {
+        YOKOI_LOG("switch_menu: experimental features enable confirmed");
+        g_experimental_features_enabled = true;
+        switch_settings_save();
+        g_experimental_features_confirm_active = false;
+    } else if (kDown & HidNpadButton_B) {
+        YOKOI_LOG("switch_menu: experimental features enable cancelled");
+        g_experimental_features_confirm_active = false;
     }
 }
 
@@ -1360,7 +1415,7 @@ static void update_settings_menu(uint64_t kDown) {
                     bool found = false;
                     const uint8_t idx = find_game_index_by_ref(g_last_game_played_ref, &found);
                     if (found && clone_hidden_under(ref_of(idx), g_clone_filter_mode)) {
-                        // Same idea as BetaGames/Experimental below - the
+                        // Same idea as ExperimentalGames below - the
                         // saved last-played game just became hidden under
                         // the new filter tier, so point lastgameplayed
                         // somewhere still visible instead of leaving a
@@ -1378,22 +1433,22 @@ static void update_settings_menu(uint64_t kDown) {
                 g_log_file_enabled = !g_log_file_enabled;
                 debug_log::set_enabled(g_log_file_enabled);
                 break;
-            case SettingsRow::BetaGames:
-                if (!g_betagames_enabled) {
+            case SettingsRow::ExperimentalGames:
+                if (!g_experimental_games_enabled) {
                     // Turning ON needs confirmation first - don't flip yet,
-                    // see update_betagames_confirm(). The trailing
+                    // see update_experimental_games_confirm(). The trailing
                     // switch_settings_save() below still runs, harmlessly
                     // rewriting the same unchanged values (same as any other
                     // row's Left/Right press that happens not to change
                     // anything, e.g. Rotation already at 0°).
-                    g_betagames_confirm_active = true;
+                    g_experimental_games_confirm_active = true;
                 } else {
                     // Turning OFF is instant, no confirmation.
-                    g_betagames_enabled = false;
+                    g_experimental_games_enabled = false;
                     if (!g_last_game_played_ref.empty()) {
                         bool found = false;
                         const uint8_t idx = find_game_index_by_ref(g_last_game_played_ref, &found);
-                        if (found && is_beta_manufacturer(get_mfr(idx))) {
+                        if (found && is_experimental_games_manufacturer(get_mfr(idx))) {
                             // The saved last-played game just became hidden -
                             // point lastgameplayed at a known-safe game
                             // instead of leaving a technically-invalid
@@ -1406,22 +1461,15 @@ static void update_settings_menu(uint64_t kDown) {
                     rebuild_sorted_order();
                 }
                 break;
-            case SettingsRow::Experimental:
-                if (!g_experimental_enabled) {
-                    // Same flow as BetaGames above - confirmation gates
-                    // enabling, see update_experimental_confirm().
-                    g_experimental_confirm_active = true;
+            case SettingsRow::ExperimentalFeatures:
+                if (!g_experimental_features_enabled) {
+                    // Same flow as ExperimentalGames above - confirmation
+                    // gates enabling, see update_experimental_features_confirm().
+                    g_experimental_features_confirm_active = true;
                 } else {
-                    // Turning OFF is instant, no confirmation.
-                    g_experimental_enabled = false;
-                    if (!g_last_game_played_ref.empty()) {
-                        bool found = false;
-                        const uint8_t idx = find_game_index_by_ref(g_last_game_played_ref, &found);
-                        if (found && is_experimental_manufacturer(get_mfr(idx))) {
-                            g_last_game_played_ref = "AC_01";
-                        }
-                    }
-                    rebuild_sorted_order();
+                    // Turning OFF is instant, no confirmation. Nothing to
+                    // hide from the game list - features only.
+                    g_experimental_features_enabled = false;
                 }
                 break;
             case SettingsRow::DosimeterReading:
@@ -1492,13 +1540,13 @@ void switch_menu_update(uint64_t kDown, uint64_t kHeld) {
     // Checked before g_settings_active - this is a modal layered on top of
     // the settings screen (which stays active underneath), not a separate
     // top-level screen like the load prompt above.
-    if (g_betagames_confirm_active) {
-        update_betagames_confirm(kDown);
+    if (g_experimental_games_confirm_active) {
+        update_experimental_games_confirm(kDown);
         return;
     }
 
-    if (g_experimental_confirm_active) {
-        update_experimental_confirm(kDown);
+    if (g_experimental_features_confirm_active) {
+        update_experimental_features_confirm(kDown);
         return;
     }
 
@@ -1520,7 +1568,7 @@ void switch_menu_update(uint64_t kDown, uint64_t kHeld) {
     if (kDown & HidNpadButton_Down) select_next_other_group(-1);
 
     if (kDown & HidNpadButton_Minus) {
-        g_sort_mode = (SortMode)(((int)g_sort_mode + 1) % 3);
+        g_sort_mode = (SortMode)(((int)g_sort_mode + 1) % kSortModeCount);
         rebuild_sorted_order();
     }
 
@@ -1529,7 +1577,13 @@ void switch_menu_update(uint64_t kDown, uint64_t kHeld) {
         // doc comment in switch_settings.h) - forcing has_save false here is
         // enough to route straight to the always-fresh path below, same as a
         // game with no save at all.
-        const bool has_save = !g_debug_mode && save_state_exists(g_selected_index);
+        // McDonald's / Burger Bard games have no save-state support yet (see
+        // switch_unload_current_game()), so they never offer a load - which
+        // also ignores the header-only stub files earlier builds left behind
+        // for them on the SD card.
+        const bool has_save = !g_debug_mode
+                              && !GW_rom::is_lcdonald_family(get_mfr(g_selected_index))
+                              && save_state_exists(g_selected_index);
 
         if (has_save && g_load_state_behavior == LoadStateBehavior::Ask) {
             YOKOI_LOG("switch_menu: A pressed on index %u, save exists (Ask) - showing load prompt", (unsigned)g_selected_index);
@@ -1610,13 +1664,13 @@ void switch_menu_render(int viewport_w, int viewport_h) {
         return;
     }
 
-    if (g_betagames_confirm_active) {
-        render_betagames_confirm(logical_w, logical_h);
+    if (g_experimental_games_confirm_active) {
+        render_experimental_games_confirm(logical_w, logical_h);
         return;
     }
 
-    if (g_experimental_confirm_active) {
-        render_experimental_confirm(logical_w, logical_h);
+    if (g_experimental_features_confirm_active) {
+        render_experimental_features_confirm(logical_w, logical_h);
         return;
     }
 
@@ -1682,7 +1736,7 @@ void switch_menu_render(int viewport_w, int viewport_h) {
     // otherwise this wouldn't track what Left/Right is actually stepping
     // through once sort mode isn't Manufacturer. Same reasoning extends to
     // the total: g_sorted_order.size() is the visible-game count (it already
-    // excludes hidden beta games - see rebuild_sorted_order()), not
+    // excludes hidden experimental games - see rebuild_sorted_order()), not
     // get_nb_name()'s raw total including anything currently hidden.
     snprintf(counter, sizeof(counter), "%u / %u", (unsigned)(position_of_selected() + 1), (unsigned)g_sorted_order.size());
     const std::string counter_str(counter);

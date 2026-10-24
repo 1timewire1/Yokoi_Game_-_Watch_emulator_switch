@@ -8,6 +8,7 @@
 #include "SM5XX/SM511_SM512/SM511_2.h"
 #include "SM5XX/SM530/SM530.h"
 #include "David_and_John/David_And_John_fake_cpu.h"
+#include "LCDonald/LCDonald_fake_cpu.h"
 
 void yokoi_cpu_set_time_if_needed(SM5XX* cpu) {
     if (!cpu || cpu->is_time_set()) {
@@ -32,6 +33,14 @@ bool yokoi_cpu_create_instance(std::unique_ptr<SM5XX>& out, const uint8_t* rom, 
     if (size_rom == 4) { // No real CPU - "David and John" original/open-source games
         if (rom[0] == 0xFF && rom[1] == 0xFF && rom[2] == 0xFF) {
             out = std::make_unique<David_And_John_fake_cpu>();
+            return true;
+        }
+        // No real CPU either - LCDonald-derived McDonald's games (see
+        // GW_ROM_RGDS/lcd_*.cpp). Distinguished from David and John's dummy
+        // ROM by byte 2 (0xFE vs 0xFF) so the two "no real ROM" families
+        // never collide; load_rom() picks which of the 20 games from byte 3.
+        if (rom[0] == 0xFF && rom[1] == 0xFF && rom[2] == 0xFE) {
+            out = std::make_unique<LCDonald_fake_cpu>();
             return true;
         }
     }

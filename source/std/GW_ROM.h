@@ -7,23 +7,44 @@
 #include "segment.h"
 
 struct GW_rom {
+    // Manufacturer buckets - what the menu groups by. Ids are stored in the
+    // rompack (GameEntryV2's manufacturer_id) so they must never be
+    // renumbered without bumping the pack's content_version (see
+    // CONVERT_ROM/convert_switch.py's ROMPACK_CONTENT_VERSION), and they
+    // don't encode display order (switch_menu.cpp's mfr_rank() does) or
+    // which ones the "Experimental Games" setting hides
+    // (switch_menu.cpp's is_experimental_games_manufacturer()).
     static constexpr uint8_t MANUFACTURER_NINTENDO = 0;
     static constexpr uint8_t MANUFACTURER_TRONICA = 1;
     static constexpr uint8_t MANUFACTURER_ELEKTRONIKA = 2;
     static constexpr uint8_t MANUFACTURER_TIGER = 3;
     static constexpr uint8_t MANUFACTURER_DAVID_AND_JOHN = 4;
-    // Games added post-launch, gated behind the Switch-only "Experimental
-    // Features" toggle (switch_menu.cpp) rather than the Beta toggle - not
-    // yet verified to the same degree as the other manufacturer buckets
-    // above. Originally Tiger-only (hence the old name,
-    // MANUFACTURER_TIGER_EXPERIMENTAL), but now also covers other
-    // manufacturers (Konami, Tronica, Elektronika, Telko/Nintendo, ...)
-    // that don't otherwise have their own bucket - their real manufacturer
-    // is recorded in the display name itself ("Title (Manufacturer)"),
-    // since this field only has room for one bucket per game and none of
-    // these have enough titles yet to justify their own.
-    static constexpr uint8_t MANUFACTURER_EXPERIMENTAL = 5;
-    static constexpr uint8_t MANUFACTURER_COUNT = 6;
+    // 5 is retired: it used to be MANUFACTURER_EXPERIMENTAL, a catch-all
+    // bucket for post-launch games (Tiger, Konami, Nelsonic, VTech, ...)
+    // gated behind their own toggle. Every game in it now lives under its
+    // real manufacturer below (or an existing one), and the number is
+    // deliberately not reused so a stale pack can never be misread.
+    // McDonald's Happy Meal LCD games (2003-2005), ported from the LCDonald
+    // project (github.com/Difegue/LCDonald) rather than emulated from a
+    // MAME-dumped ROM - see source/LCDonald/.
+    static constexpr uint8_t MANUFACTURER_MCDONALDS = 6;
+    // "Burger Bard" - LCDonald's white-label re-skin of the McDonald's games
+    // (its `#if BURGER` build, "Burger Bard Crystalectrics"; the manufacturer
+    // named on its fictional instruction sheets) - see source/LCDonald/.
+    static constexpr uint8_t MANUFACTURER_BURGER_BARD = 7;
+    static constexpr uint8_t MANUFACTURER_KONAMI = 8;
+    static constexpr uint8_t MANUFACTURER_NELSONIC = 9;
+    // VTech currently has a single supported device (Electronic Number
+    // Muncher); more are expected.
+    static constexpr uint8_t MANUFACTURER_VTECH = 10;
+    static constexpr uint8_t MANUFACTURER_COUNT = 11;
+
+    // Both LCDonald-derived buckets run on LCDonald_fake_cpu (see
+    // source/LCDonald/), so the Switch layer's LCDonald-specific handling
+    // (named-input model, .ogg playback, Endless-mode HUD) keys off this.
+    static constexpr bool is_lcdonald_family(uint8_t mfr) {
+        return mfr == MANUFACTURER_MCDONALDS || mfr == MANUFACTURER_BURGER_BARD;
+    }
 
     const std::string name;
     const std::string ref;

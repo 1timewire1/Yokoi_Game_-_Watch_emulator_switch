@@ -8,7 +8,10 @@ option(YOKOI_EMBEDDED_ASSETS "Build with compiled-in ROMs/assets (embedded build
 
 # Minimum external pack content version that this build accepts.
 # Bump this when the app expects newer pack contents (textures/layout/etc.).
-set(YOKOI_ROMPACK_REQUIRED_CONTENT_VERSION "3" CACHE STRING "Minimum required ROM pack content version")
+# Matches switch/Makefile's YOKOI_ROMPACK_REQUIRED_CONTENT_VERSION and
+# CONVERT_ROM/convert_switch.py's ROMPACK_CONTENT_VERSION (both bumped
+# together - see that constant's own comment for why).
+set(YOKOI_ROMPACK_REQUIRED_CONTENT_VERSION "5" CACHE STRING "Minimum required ROM pack content version")
 
 # Repo root from android/app/src/main/cpp
 set(YOKOI_ROOT "${CMAKE_CURRENT_LIST_DIR}/../../../../..")

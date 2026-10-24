@@ -22,6 +22,21 @@ class Virtual_Sound {
         void Quit_Game();
         void Exit();
 
+        // Grants lcdonald_sound.cpp access to the one shared AudioDriver for
+        // its own second voice + mempool (real decoded PCM samples, not a
+        // procedurally generated tone - see that file's own doc comment).
+        // Switch only supports one AudioRenderer session per process (see
+        // configure_sound()), so a fully independent driver isn't an option;
+        // nullptr until configure_sound() succeeds.
+        AudioDriver* driver() { return driver_ok ? &drv : nullptr; }
+
+        // Bumped every full_reinit() (see play_sample()'s self-heal doc
+        // comment). full_reinit() tears down and recreates `drv` wholesale
+        // via audrvClose(), which silently invalidates any voice/mempool
+        // lcdonald_sound.cpp added to it - it compares this against what it
+        // last saw to know its own state needs recreating too.
+        uint32_t reinit_generation() const { return reinit_generation_; }
+
     private:
         void free_buffers();
         void full_reinit();
@@ -55,6 +70,8 @@ class Virtual_Sound {
         // fixed the exact same "audio silently dies until relaunch" issue).
         int stuck_frames = 0;
         int retry_cooldown = 0;
+
+        uint32_t reinit_generation_ = 0;
 };
 
 extern Virtual_Sound g_sound;

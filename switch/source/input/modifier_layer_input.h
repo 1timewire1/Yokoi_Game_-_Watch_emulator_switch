@@ -40,7 +40,7 @@ void apply_modifier_layer_input(SM5XX* cpu, const ModLayerTarget table[36]);
 // changes the game's own input behavior in a way the original port
 // didn't (holding a math operator can, e.g., feed a "cheat"-like value
 // into gameplay), so unlike the two calculator-only games above this is
-// gated behind Experimental Features (see g_experimental_enabled) rather
+// gated behind Experimental Features (see g_experimental_features_enabled) rather
 // than always on - main.cpp checks that before calling this at all.
 //
 // table[(layer-1)*12 + slot], layer 1 = ZL held, 2 = ZR held - no base

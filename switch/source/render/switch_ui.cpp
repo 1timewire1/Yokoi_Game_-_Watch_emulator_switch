@@ -329,6 +329,24 @@ void switch_ui_draw_rect(float x, float y, float w, float h, float r, float g, f
     draw_quad(g_gl.tex_white, verts);
 }
 
+void switch_ui_draw_polygon(const float* xy, int n, float r, float g, float b, float a) {
+    if (g_gl.program == 0 || g_gl.tex_white == 0 || !xy || n < 3) return;
+    const float cw = g_viewport_w > 0 ? (float)g_viewport_w : 1.0f;
+    const float ch = g_viewport_h > 0 ? (float)g_viewport_h : 1.0f;
+    auto ndc = [&](int i) {
+        return RenderVertex{(xy[2 * i] / cw) * 2.0f - 1.0f, 1.0f - (xy[2 * i + 1] / ch) * 2.0f, 0.5f, 0.5f};
+    };
+    glUniform4f(g_gl.uMul, r, g, b, a);
+    std::vector<RenderVertex> verts;
+    verts.reserve((size_t)(n - 2) * 3);
+    for (int i = 1; i + 1 < n; i++) {
+        verts.push_back(ndc(0));
+        verts.push_back(ndc(i));
+        verts.push_back(ndc(i + 1));
+    }
+    draw_quad(g_gl.tex_white, verts);
+}
+
 void switch_ui_draw_texture(uint32_t gl_tex, float x, float y, float w, float h,
                              float tex_w, float tex_h, float src_x, float src_y, float src_w, float src_h) {
     if (g_gl.program == 0 || gl_tex == 0) return;

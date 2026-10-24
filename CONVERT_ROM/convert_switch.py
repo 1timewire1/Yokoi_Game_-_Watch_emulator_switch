@@ -28,35 +28,31 @@ from source import game_cache
 from source.target_profiles import get_target
 from source.manufacturer_ids import (
     MANUFACTURER_NINTENDO,
-    MANUFACTURER_TRONICA,
-    MANUFACTURER_ELEKTRONIKA,
     MANUFACTURER_TIGER,
-    MANUFACTURER_EXPERIMENTAL,
+    MANUFACTURER_KONAMI,
+    MANUFACTURER_CPP_SYMBOLS,
     normalize_manufacturer_id,
 )
 
-# MANUFACTURER_EXPERIMENTAL started out Tiger-only and later grew to also
-# cover Konami/Tronica/Elektronika/Telko-Nintendo titles that don't have
-# their own bucket (see GW_ROM.h). The Tiger-tuned brightness defaults just
-# below only make sense for the originally-Tiger subset, and since
-# MANUFACTURER_EXPERIMENTAL alone can no longer tell them apart (their real
-# manufacturer lives in the display name string, not a separate field),
-# this hardcodes exactly which experimental refs are Tiger-origin - the 41
-# entries added before the bucket opened up to other manufacturers. New
-# non-Tiger experimental games correctly fall through to the plain
-# defaults below without needing to be listed here.
-TIGER_ORIGIN_EXPERIMENTAL_REFS = frozenset({
-    "TBATMAN", "TSPIDMAN", "TMKOMBAT", "TXMEN", "TSUPERMAN", "TBTOADS",
-    "TKARNOV", "THOOK", "TBTTF", "TTRANSF2", "TVINDICTR", "TJPARK",
-    "TSKELWARR", "TGARGNF", "TADDAMS", "TAPOLLO13", "TBATFOR", "TBATMANA",
-    "TDENNIS", "TDUMMIES", "TFLASH", "TGOLDEYE", "THALONE", "THALONE2",
-    "TINDAY", "TJDREDD", "TKAZAAM", "TMIGMAX", "TNMAREBC", "TOPALIENS",
-    "TPITFIGHT", "TROBHOOD", "TROBOCOP2", "TROCKTEER", "TROBOCOP3",
-    "TSF2010", "TSHADOW", "TSJAM", "TSWAMPT", "TWWORLD", "TXMENPX",
-})
-
 ROMPACK_FORMAT_VERSION = 3
-ROMPACK_CONTENT_VERSION = 3
+# Bump whenever a pack built at the OLD value would be missing content this
+# codebase now expects to find - not on every asset tweak, only when older
+# packs would meaningfully break/degrade without a rebuild. Overdue for the
+# McDonald's (LCDonald) games' art (added without a bump); bumped now to 4
+# to also cover their .ogg sound effects (see generate_lcdonald_pack.py's
+# bundle_sounds() and switch/source/audio/lcdonald_sound.cpp) landing right
+# after; bumped again to 5 when the old "Experimental" manufacturer bucket
+# was dissolved into real per-manufacturer ones (Tiger/Konami/Nelsonic/VTech/
+# ...) - every pack game's stored manufacturer_id changed meaning, so a
+# pack built at 4 would file 70 games under the wrong (or a retired) group.
+# Keep in lockstep with the *_REQUIRED_CONTENT_VERSION build-side
+# constants that gate loading (switch/Makefile, root Makefile's
+# ROMPACK_CONTENT_VERSION_REQUIRED, android/app/src/main/cpp/CMakeLists.txt)
+# - only the rgds ones (switch/Android), not the 3DS root Makefile, since
+# this pipeline's rgds/PNG output (this script) is the only one McDonald's
+# content has ever been generated for; 3DS's own convert_3ds.py-built pack
+# tracks its own, independent numbering.
+ROMPACK_CONTENT_VERSION = 5
 
 # Configurable external apps.
 # Configure them by copying CONVERT_ROM/external_apps_template.py -> CONVERT_ROM/external_apps.py.
@@ -315,7 +311,17 @@ def find_best_parquet(rects: list):
             packer.add_rect(*rect)
         packer.add_bin(w, h)
         packer.pack()
-        abin = next(iter(packer))
+        # rectpack emits zero bins (not an empty one) when not even the
+        # single smallest rect fits this candidate - every existing game's
+        # segments include something under the smallest candidate size, so
+        # this never came up before LCDonald's comparatively large, few-per-
+        # screen segments (its smallest segment can still exceed 32x32,
+        # this profile's smallest candidate). Skip straight to the next,
+        # larger candidate instead of crashing on next(iter(packer)).
+        try:
+            abin = next(iter(packer))
+        except StopIteration:
+            continue
         used_rects = len(list(abin))
         if used_rects == len(rects):
             return packer, (w, h)
@@ -721,16 +727,7 @@ def generate_game_file(destination_game_file, name, display_name, ref, date
     c_file += "\n\n"
     
     manufacturer_id = _manufacturer_to_id(manufacturer)
-    if manufacturer_id == MANUFACTURER_TRONICA:
-        manufacturer_cpp = "GW_rom::MANUFACTURER_TRONICA"
-    elif manufacturer_id == MANUFACTURER_ELEKTRONIKA:
-        manufacturer_cpp = "GW_rom::MANUFACTURER_ELEKTRONIKA"
-    elif manufacturer_id == MANUFACTURER_TIGER:
-        manufacturer_cpp = "GW_rom::MANUFACTURER_TIGER"
-    elif manufacturer_id == MANUFACTURER_EXPERIMENTAL:
-        manufacturer_cpp = "GW_rom::MANUFACTURER_EXPERIMENTAL"
-    else:
-        manufacturer_cpp = "GW_rom::MANUFACTURER_NINTENDO"
+    manufacturer_cpp = MANUFACTURER_CPP_SYMBOLS.get(manufacturer_id, MANUFACTURER_CPP_SYMBOLS[MANUFACTURER_NINTENDO])
 
     c_file += f'''
 const GW_rom {name} (
@@ -1358,19 +1355,12 @@ if __name__ == "__main__":
         
         # Set defaults
         mfr_for_defaults = game_data.get("manufacturer", 0)
-        ref_norm_for_defaults = str(game_data.get("ref", "")).replace('-', '_').upper()
-        is_tiger_origin = (mfr_for_defaults == MANUFACTURER_TIGER) or (
-            mfr_for_defaults == MANUFACTURER_EXPERIMENTAL and ref_norm_for_defaults in TIGER_ORIGIN_EXPERIMENTAL_REFS
-        )
-        # Konami's Experimental-bucket entries (all "K"-prefixed refs; the
-        # only other manufacturers sharing that bucket - Tronica's trtreisl,
-        # Elektronika's vesarif - don't use this prefix, and Bassmate
-        # already sets its own explicit alpha_bright/fond_bright via its
-        # processor so it never reaches this default path). Same painted-
-        # illustration art style as Tiger's, same fix needed - see below.
-        is_konami_origin = (
-            mfr_for_defaults == MANUFACTURER_EXPERIMENTAL and ref_norm_for_defaults.startswith('K')
-        )
+        is_tiger_origin = (mfr_for_defaults == MANUFACTURER_TIGER)
+        # Konami's entries (Bassmate - Nintendo/Telko - already sets its own
+        # explicit alpha_bright/fond_bright via its processor so it never
+        # reaches this default path). Same painted-illustration art style as
+        # Tiger's, same fix needed - see below.
+        is_konami_origin = (mfr_for_defaults == MANUFACTURER_KONAMI)
         if is_tiger_origin:
             if 'alpha_bright' not in game_data: game_data['alpha_bright'] = tiger_default_alpha_bright
             if 'fond_bright' not in game_data: game_data['fond_bright'] = tiger_default_fond_bright

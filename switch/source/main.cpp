@@ -42,6 +42,10 @@
 #include "input/uchitari_clock_setup.h"
 #include "input/vesarif_clock_setup.h"
 #include "input/auto_confirm_press.h"
+#include "input/lcdonald_input_map.h"
+#include "audio/lcdonald_sound.h"
+#include "render/lcdonald_hud.h"
+#include "LCDonald/LCDonald_fake_cpu.h"
 #include "render/switch_screen.h"
 
 namespace {
@@ -377,6 +381,35 @@ int main(int argc, char* argv[]) {
             }
         }
 
+        // McDonald's (LCDonald-ported) games read a small named-input
+        // vocabulary ("Jump", "Left", ...) rather than the normal col/line
+        // keypad, so - same reasoning as NUMMUNCH/UCHITARI above - they're
+        // not registered in virtual_input.h's get_input_config() (g_input
+        // stays null, the standard call above is already skipped) and get
+        // their own dedicated call here instead. static_cast is safe (not
+        // dynamic_cast - this build is -fno-rtti): manufacturer already
+        // tells us g_cpu is genuinely a LCDonald_fake_cpu.
+        if (g_cpu && g_game && GW_rom::is_lcdonald_family(g_game->manufacturer)) {
+            LCDonald_fake_cpu* lcd_cpu = static_cast<LCDonald_fake_cpu*>(g_cpu.get());
+            apply_lcdonald_input(lcd_cpu);
+
+            // A freshly loaded game waits on the all-lit screen (as does a
+            // finished one, once its game_over()/victory() closing
+            // animation ends and it stop()s) - Plus starts the normal game
+            // ("Game A"), Minus starts Endless mode ("Game B"). Neither
+            // button is used during gameplay for these games (they're not
+            // registered in virtual_input.h's get_input_config(), so the
+            // normal Game A/B bindings never apply here), and both are gated
+            // on is_stopped() so a stray press can't reset a run in progress.
+            if (lcd_cpu->is_stopped()) {
+                if (kDown & HidNpadButton_Plus) {
+                    lcd_cpu->start_game(false);
+                } else if (kDown & HidNpadButton_Minus) {
+                    lcd_cpu->start_game(true);
+                }
+            }
+        }
+
         // SPACE_ADVENTURE/SHUTTLE_VOYAGE/THIEF_IN_GARDEN: real calculator
         // keypad, layered on TOP of the normal controls above via ZL/ZR
         // rather than replacing them (see apply_calculator_modifier_input()'s
@@ -384,7 +417,7 @@ int main(int argc, char* argv[]) {
         // it changes these games' input behavior beyond how they originally
         // shipped in this codebase, unlike NUMMUNCH/UCHITARI above (which
         // have no normal controls to begin with).
-        if (g_cpu && g_game && g_experimental_enabled) {
+        if (g_cpu && g_game && g_experimental_features_enabled) {
             if (g_game->ref == "SA_12") {
                 apply_calculator_modifier_input(g_cpu.get(), kSpaceAdventureCalcLayout);
             } else if (g_game->ref == "MG_8" || g_game->ref == "TG_18") {
@@ -421,9 +454,21 @@ int main(int argc, char* argv[]) {
                 g_sound.update_sound(g_cpu.get());
                 steps--;
             }
+
+            // Drains whatever this frame's tick()/custom_update() calls
+            // above just queued (LCDonald_program::queue_sound()) and plays
+            // each as a real decoded .ogg sample - see lcdonald_sound.h's
+            // doc comment for why this needs to run every frame rather than
+            // less often (take_queued_sounds() drains, it doesn't accumulate).
+            if (g_game && GW_rom::is_lcdonald_family(g_game->manufacturer)) {
+                lcdonald_sound_play_queued(static_cast<LCDonald_fake_cpu*>(g_cpu.get()));
+            }
         }
 
         switch_screen_render();
+        if (g_cpu && g_game && GW_rom::is_lcdonald_family(g_game->manufacturer)) {
+            lcdonald_hud_render(viewport_w, viewport_h, static_cast<LCDonald_fake_cpu*>(g_cpu.get()));
+        }
         eglSwapBuffers(s_display, s_surface);
     }
 

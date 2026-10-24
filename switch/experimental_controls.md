@@ -1,13 +1,19 @@
 # Experimental games — control reference
 
-Per-game button mappings for the titles gated behind the Switch-only
-**Experimental Features** toggle (`MANUFACTURER_EXPERIMENTAL`, see
-[`../CONVERT_ROM/GNW_LIST.md`](../CONVERT_ROM/GNW_LIST.md)'s "Experimental"
-section). Originally just the Tiger Electronics catalog, this bucket now
-also covers a batch of Konami handhelds plus a few Tronica/Elektronika
-stragglers and one non-game novelty device - every title's *original*
-manufacturer is still recorded in its display name (in parentheses), this
-manufacturer id just controls the Switch-side gating. Each game gets its
+Per-game button mappings for the titles added after launch, gated behind
+the Switch app's **Experimental Games** setting (for the ones now under the
+Tiger, Konami, Nelsonic and V-Tech groups - see
+[`../CONVERT_ROM/GNW_LIST.md`](../CONVERT_ROM/GNW_LIST.md)). This file used to
+document a single catch-all "Experimental" manufacturer bucket
+(`MANUFACTURER_EXPERIMENTAL`, id 5 - now retired); its games were split out to
+their real manufacturers: the post-launch Tiger titles under Tiger, the
+Konami handhelds under Konami, the Nelsonic Game Watches under Nelsonic,
+Electronic Number Muncher under V-Tech, Treasure Island under Tronica, Vesolaya
+arifmetika / Uchitel' arifmetiki / Altair under Elektronika and Bassmate
+Computer under Nintendo (the last five aren't hidden by any setting). The
+"Experimental" name below is kept only as this document's section title.
+Every title's *original* manufacturer is still recorded in its display name
+(in parentheses). Each game gets its
 own hand-authored `Virtual_Input` subclass in
 [`../source/virtual_i_o/virtual_input.h`](../source/virtual_i_o/virtual_input.h);
 this file exists purely as a human-readable index of what each subclass
@@ -704,9 +710,10 @@ Console: 4-way d-pad + two stacked 2-way rockers ("H PUNCH L" over
 
 Everything that was left over from the "no artwork yet" Konami/stragglers
 audit and turned out to be straightforward button-mapping work rather than
-a real driver/hardware blocker. Filed under the same `MANUFACTURER_EXPERIMENTAL`
-id as the Tiger games above, with each one's real manufacturer recorded in
-its display name instead (e.g. "Double Dribble (Konami)").
+a real driver/hardware blocker. Originally filed under the same
+`MANUFACTURER_EXPERIMENTAL` id as the Tiger games above (now split out to a real
+Konami group), with each one's real manufacturer recorded in its display name
+(e.g. "Double Dribble (Konami)").
 
 ## Double Dribble (`kdribble`)
 
@@ -1180,17 +1187,17 @@ All 41 Tiger Electronics romsets identified as having usable local
 artwork are implemented (14 from the first two batches + 27 from the
 third), plus 23 more from the fourth batch above (Konami classics, one
 Tronica straggler, one Elektronika straggler, and the Bassmate novelty
-device) — 64 games total, matching `GNW_LIST.md`'s "Experimental" section
-row count as of the fourth batch. Every game listed there has a working
+device) — 64 games total, matching the old "Experimental" section's row
+count in `GNW_LIST.md` as of the fourth batch. Every game listed there has a working
 `Virtual_Input` class and can be played with a controller. Further
 additions since then aren't reflected in that count: `naltair` (SM5A,
 documented directly in `virtual_input.h` instead of here since it reuses
 `MC_25`'s button layout verbatim), the fifth batch above (SM530, 3 games),
 and the sixth batch above (2 games, modifier-key scheme instead of
-`Virtual_Input`) — `GNW_LIST.md`'s "Experimental" section now has 70 rows
-total.
+`Virtual_Input`) — the old "Experimental" section had 70 rows in total
+(since dissolved into per-manufacturer sections).
 
-**Intentionally excluded from this manufacturer id**: 8 further "t"-prefixed
+**Intentionally excluded from the old experimental bucket**: 8 further "t"-prefixed
 romsets with local artwork (`trclchick`, `trdivadv`, `trsgkeep`,
 `trspacadv`, `trspacmis`, `trspider`, `trthuball`) turned out to
 be manufactured by **Tronica**, not Tiger Electronics, per their own MAME

@@ -16,12 +16,12 @@ from PIL import Image
 try:
     # When imported as part of the 'source' package
     from source.games_path_utils import GameEntry, write_games_path
-    from source.manufacturer_ids import MANUFACTURER_NINTENDO, MANUFACTURER_TRONICA, MANUFACTURER_ELEKTRONIKA, MANUFACTURER_TIGER, MANUFACTURER_DAVID_AND_JOHN, MANUFACTURER_EXPERIMENTAL
+    from source.manufacturer_ids import MANUFACTURER_NINTENDO, MANUFACTURER_TRONICA, MANUFACTURER_ELEKTRONIKA, MANUFACTURER_TIGER, MANUFACTURER_DAVID_AND_JOHN, MANUFACTURER_MCDONALDS, MANUFACTURER_BURGER_BARD, MANUFACTURER_KONAMI, MANUFACTURER_NELSONIC, MANUFACTURER_VTECH
     from source.target_profiles import get_target
 except ImportError:
     # When run directly from the 'source' directory
     from games_path_utils import GameEntry, write_games_path
-    from manufacturer_ids import MANUFACTURER_NINTENDO, MANUFACTURER_TRONICA, MANUFACTURER_ELEKTRONIKA, MANUFACTURER_TIGER, MANUFACTURER_DAVID_AND_JOHN, MANUFACTURER_EXPERIMENTAL
+    from manufacturer_ids import MANUFACTURER_NINTENDO, MANUFACTURER_TRONICA, MANUFACTURER_ELEKTRONIKA, MANUFACTURER_TIGER, MANUFACTURER_DAVID_AND_JOHN, MANUFACTURER_MCDONALDS, MANUFACTURER_BURGER_BARD, MANUFACTURER_KONAMI, MANUFACTURER_NELSONIC, MANUFACTURER_VTECH
     from target_profiles import get_target
 
 # Preferred background views ordered by desirability. Boolean marks multi-screen views.
@@ -111,12 +111,18 @@ class SurfaceData:
     background_file: Optional[str]
 
 
+# Series prefixes dropped from display names ("Game & Watch: Fire" -> "Fire").
+# Only these - a colon elsewhere is part of the real title ("Batman: The
+# Animated Series", "Top Gun: Second Mission") and must be kept.
+_STRIPPED_TITLE_PREFIXES = ("Game & Watch:", "Micro Vs. System:")
+
+
 def _strip_title_prefix(title: str) -> str:
     cleaned = title.strip()
-    if not cleaned:
-        return cleaned
-    head, sep, tail = cleaned.partition(":")
-    return tail.strip() if sep else cleaned
+    for prefix in _STRIPPED_TITLE_PREFIXES:
+        if cleaned.startswith(prefix):
+            return cleaned[len(prefix):].strip()
+    return cleaned
 
 
 def _normalize_release_date(raw: str) -> Optional[str]:
@@ -151,13 +157,10 @@ def _load_game_metadata(script_dir: Path) -> Dict[str, GameMetadata]:
             heading = stripped.lstrip("#").strip().lower()
             # Heading-driven manufacturer:
             # - Nintendo section headings usually include "Game & Watch"
-            # - Tronica section headings include "Tronica"
-            # - Elektronika section headings include "Elektronika"
-            # - The "Experimental" section (checked before the plain "Tiger"
-            #   one below - it used to be "Tiger (Experimental)", but now
-            #   covers other manufacturers too, recorded in each game's
-            #   display name instead of via a per-manufacturer heading) maps
-            #   to MANUFACTURER_EXPERIMENTAL regardless of manufacturer.
+            # - Tronica / Elektronika / Tiger / Konami / Nelsonic / V-Tech
+            #   headings include the manufacturer's name
+            # (There used to be a catch-all "Experimental" heading; every game
+            # in it now sits under its real manufacturer's heading instead.)
             # Keep the current value for unrelated headings like "Special Editions".
             in_table = False
             if "tronica" in heading:
@@ -166,10 +169,18 @@ def _load_game_metadata(script_dir: Path) -> Dict[str, GameMetadata]:
                 current_manufacturer = MANUFACTURER_ELEKTRONIKA
             elif "game & watch" in heading or "game and watch" in heading:
                 current_manufacturer = MANUFACTURER_NINTENDO
-            elif "experimental" in heading:
-                current_manufacturer = MANUFACTURER_EXPERIMENTAL
             elif "tiger" in heading:
                 current_manufacturer = MANUFACTURER_TIGER
+            elif "konami" in heading:
+                current_manufacturer = MANUFACTURER_KONAMI
+            elif "nelsonic" in heading:
+                current_manufacturer = MANUFACTURER_NELSONIC
+            elif "v-tech" in heading or "vtech" in heading:
+                current_manufacturer = MANUFACTURER_VTECH
+            elif "mcdonald" in heading:
+                current_manufacturer = MANUFACTURER_MCDONALDS
+            elif "burger bard" in heading:
+                current_manufacturer = MANUFACTURER_BURGER_BARD
             continue
 
         if stripped.startswith("| No.") and "Filename" in stripped:

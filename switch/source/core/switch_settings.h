@@ -96,18 +96,22 @@ extern bool g_log_file_enabled;
 // the first game is ever saved (or forever, under g_debug_mode).
 extern std::string g_last_game_played_ref;
 
-// Shows/hides Tiger and David & John games from the game list, including the
-// visible game count - see rebuild_sorted_order() in switch_menu.cpp, which
-// filters the navigable index list by manufacturer whenever this (or
-// g_debug_mode) is false. Defaults off. Enabling requires confirming a
-// beta-support warning in the settings menu first (switch_menu.cpp's
-// g_betagames_confirm_active); disabling is instant, no confirmation. Save
-// files for beta games are never touched by this - only visibility - though
-// disabling does reset g_last_game_played_ref away from one if it was
-// pointing at a now-hidden beta game (see the settings-row handler in
-// switch_menu.cpp). Only ever shown/changeable from the game list's settings
-// screen.
-extern bool g_betagames_enabled;
+// "Experimental Games" - shows/hides every manufacturer except Nintendo,
+// Tronica and Elektronika (Tiger, Konami, Nelsonic, V-Tech, David & John,
+// McDonald's, Burger Bard) from the game list, including the visible game
+// count - see rebuild_sorted_order() and is_experimental_games_manufacturer()
+// in switch_menu.cpp, which filter the navigable index list by manufacturer
+// whenever this (or g_debug_mode) is false. Defaults off. Enabling requires
+// confirming an "experimental and largely untested" warning in the settings
+// menu first (switch_menu.cpp's g_experimental_games_confirm_active);
+// disabling is instant, no confirmation. Save files for these games are never
+// touched by this - only visibility - though disabling does reset
+// g_last_game_played_ref away from one if it was pointing at a now-hidden
+// game (see the settings-row handler in switch_menu.cpp). Only ever
+// shown/changeable from the game list's settings screen. Stored as
+// "experimentalgames" (older files used "betagames" for the setting this
+// replaced - still read).
+extern bool g_experimental_games_enabled;
 
 // Percentage (of the top panel's own height) of empty space inserted below
 // it - between a true dual-screen game's two real panels, or between a
@@ -130,16 +134,17 @@ extern bool g_betagames_enabled;
 // clamped to that range).
 extern uint8_t g_panel_gap_percent;
 
-// Same idea as g_betagames_enabled, for a separate bucket of games (starting
-// with a batch of Tiger titles added after launch, later joined by Konami/
-// Tronica/Elektronika/Telko-Nintendo titles that don't have their own
-// manufacturer bucket - see MANUFACTURER_EXPERIMENTAL in GW_ROM.h) that
-// haven't seen the same testing as the Beta-gated set. Kept as its own
-// flag/confirm-gate rather than folded into g_betagames_enabled so the two
-// can be toggled independently. See is_experimental_manufacturer()/
-// experimental_visible() and g_experimental_confirm_active in
-// switch_menu.cpp.
-extern bool g_experimental_enabled;
+// "Experimental Features" - gates FEATURES only, never games (games are
+// g_experimental_games_enabled above): today the Altair dosimeter row (see
+// g_dosimeter_reading) and the ZL/ZR calculator-keypad layer for Space
+// Adventure / Shuttle Voyage / Thief in Garden (main.cpp,
+// input/modifier_layer_input.h). Same confirm-before-enabling flow, with
+// its own warning text (switch_menu.cpp's
+// g_experimental_features_confirm_active); disabling is instant. Stored as
+// "experimentalfeatures" (older files used "experimental", which also
+// covered games - when read from an old file with a value of 1 it turns
+// g_experimental_games_enabled on as well, see switch_settings_load()).
+extern bool g_experimental_features_enabled;
 
 // Simulated reading (0-15) fed continuously into Altair's (GW_rom::ref
 // "naltair") 4-bit "Dosimeter Reading" dial input every frame that game is
@@ -189,31 +194,29 @@ extern uint8_t g_dosimeter_reading;
 //    changing that stored value - see switch_settings_load()'s debug_log::
 //    set_enabled() call. Meant for inspecting a run without also having to
 //    edit enable_log (which would itself be blocked from saving anyway).
-//  - Beta games (Tiger, David & John) and experimental games are force-
-//    visible the same way, and for the same reason - see
-//    rebuild_sorted_order()'s betagames-visible/experimental-visible checks
-//    in switch_menu.cpp, which OR this in right alongside
-//    g_betagames_enabled/g_experimental_enabled without touching either
-//    stored value.
+//  - Experimental games are force-visible the same way, and for the same
+//    reason - see rebuild_sorted_order()'s experimental_games_visible()
+//    check in switch_menu.cpp, which ORs this in right alongside
+//    g_experimental_games_enabled without touching the stored value.
 extern bool g_debug_mode;
 
 // Loads yokoi_settings.txt if present (applying background_color/
 // segment_marking_alpha into g_settings, rotation into g_screen_rotation,
 // hide_console_art into g_hide_console_art, loadstate into
 // g_load_state_behavior, enable_log into g_log_file_enabled, lastgameplayed
-// into g_last_game_played_ref, betagames into g_betagames_enabled, panelgap
+// into g_last_game_played_ref, experimentalgames into g_experimental_games_enabled, panelgap
 // into g_panel_gap_percent, clonefilter into g_clone_filter_mode, timesetmode
 // into g_time_set_mode, and the hidden debug flag into g_debug_mode - which
 // also then force-enables debug_log regardless of enable_log); otherwise
 // resets to AppSettings' compiled-in defaults, ScreenRotation::Deg0, hidden
-// console art, Ask, logging off, no last-played game, beta games off, no
+// console art, Ask, logging off, no last-played game, experimental games off, no
 // panel gap, clone filter off (show all), time set mode Automatic, and
 // debug mode off.
 void switch_settings_load();
 
 // Writes the current g_settings fields + g_screen_rotation +
 // g_hide_console_art + g_load_state_behavior + g_log_file_enabled +
-// g_last_game_played_ref + g_betagames_enabled + g_dosimeter_reading +
+// g_last_game_played_ref + g_experimental_games_enabled + g_dosimeter_reading +
 // g_time_set_mode back out. No-op when g_debug_mode is set - see its doc
 // comment above.
 void switch_settings_save();

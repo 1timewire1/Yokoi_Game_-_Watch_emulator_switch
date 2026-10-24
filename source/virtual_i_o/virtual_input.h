@@ -2281,7 +2281,7 @@ class TSHARR2 : public Virtual_Input{
 };
 
 
-////////// Experimental games (MANUFACTURER_EXPERIMENTAL) //////////
+////////// Experimental games (Konami, Nelsonic, VTech and the Tiger titles added post-launch) //////////
 // Button assignments derived directly from MAME's hh_sm510.cpp INPUT_PORTS
 // definitions for each romset (IN.N port index -> group, bit position ->
 // line - e.g. bit 0x04 is line 2 - confirmed against TSFIGHT2/TMCHAMMER

@@ -24,6 +24,12 @@ void switch_ui_begin_frame(int viewport_w, int viewport_h);
 
 void switch_ui_draw_rect(float x, float y, float w, float h, float r, float g, float b, float a);
 
+// Filled convex polygon from `n` (x,y) pixel-space points (xy has 2*n floats,
+// n >= 3), drawn as a triangle fan around the first point - for shapes an
+// axis-aligned rect can't make (e.g. the slanted segments of the endless-mode
+// score display, lcdonald_hud.cpp).
+void switch_ui_draw_polygon(const float* xy, int n, float r, float g, float b, float a);
+
 // Blits a sub-rect (src_x/src_y/src_w/src_h, in source pixel coordinates) of
 // an already-uploaded GL texture into a pixel-space destination rect,
 // preserving aspect is the caller's job - this just stretches src into dst.

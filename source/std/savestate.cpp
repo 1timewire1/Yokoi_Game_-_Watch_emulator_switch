@@ -76,7 +76,11 @@ bool save_game_state(SM5XX* cpu, uint8_t game_index) {
     
     // Write CPU-specific state
     if(!cpu->save_state(file)) {
+        // A CPU that can't save (e.g. LCDonald_fake_cpu's stub) must not leave
+        // the header-only file above behind: save_state_exists() would report
+        // a save that can never load, and the menu would offer it every launch.
         fclose(file);
+        remove(path);
         return false;
     }
     

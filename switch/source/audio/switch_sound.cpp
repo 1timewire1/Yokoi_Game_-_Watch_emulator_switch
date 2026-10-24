@@ -22,7 +22,14 @@ constexpr int kRetryCooldownFrames = 300;   // ~5s @60fps between reinit attempt
 void Virtual_Sound::configure_sound() {
     static const AudioRendererConfig arConfig = {
         .output_rate = AudioRendererOutputRate_48kHz,
-        .num_voices = 4,
+        // Voice 0 is the tone synth (mono, 1 channel); lcdonald_sound.cpp
+        // uses voices 1..8 as stereo sample voices. The renderer budgets
+        // one "channel resource" per configured voice slot and each
+        // channel of an initialized voice consumes one, so a stereo voice
+        // costs two: with num_voices = 8 only voices 1-3 came up
+        // (1 + 3*2 = 7 of 8) and voices 4-6 failed audrvVoiceInit() -
+        // confirmed from a real log. 1 + 8*2 = 17, so 20 leaves headroom.
+        .num_voices = 20,
         .num_effects = 0,
         .num_sinks = 1,
         .num_mix_objs = 1,
@@ -121,6 +128,7 @@ void Virtual_Sound::full_reinit() {
     Exit();
     configure_sound();
     initialize(base_freq, divide_freq, fps_screen);
+    reinit_generation_++;
 }
 
 void Virtual_Sound::update_sound(SM5XX* cpu) {

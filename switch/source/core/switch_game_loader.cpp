@@ -16,6 +16,7 @@
 #undef get_input_config
 
 #include "audio/switch_sound.h"
+#include "audio/lcdonald_sound.h"
 #include "yokoi_cpu_utils.h"
 #include "switch_layout.h"
 #include "switch_runtime_state.h"
@@ -156,6 +157,14 @@ void switch_load_game_by_index_and_init(uint8_t idx) {
     YOKOI_LOG("switch_load_game_by_index_and_init: cpu->init() done");
     g_cpu->load_rom(g_game->rom, g_game->size_rom);
     YOKOI_LOG("switch_load_game_by_index_and_init: cpu->load_rom() done");
+    if (GW_rom::is_lcdonald_family(g_game->manufacturer)) {
+        // Drop any decoded .ogg samples cached for whichever McDonald's
+        // game was previously loaded (see lcdonald_sound_reset()'s doc
+        // comment) - harmless no-op the first time or for every other
+        // manufacturer, so this is unconditional rather than diffing
+        // against the previous game's ref.
+        lcdonald_sound_reset();
+    }
     g_cpu->load_rom_melody(g_game->melody, g_game->size_melody);
     g_cpu->load_rom_time_addresses(g_game->ref);
 
@@ -261,9 +270,21 @@ void switch_unload_current_game() {
         YOKOI_LOG("switch_unload_current_game: debug mode, skipping save for idx=%u ref='%s'",
                   (unsigned)g_game_index, g_game ? g_game->ref.c_str() : "?");
     } else {
-        YOKOI_LOG("switch_unload_current_game: saving state for idx=%u ref='%s'",
-                  (unsigned)g_game_index, g_game ? g_game->ref.c_str() : "?");
-        save_game_state(g_cpu.get(), g_game_index);
+        if (g_game && GW_rom::is_lcdonald_family(g_game->manufacturer)) {
+            // McDonald's / Burger Bard games (LCDonald_fake_cpu) don't support
+            // save states yet - their save_state()/load_state() are stubs that
+            // return false, and saving anyway used to leave a header-only file
+            // behind that made the "Load Save State?" prompt appear on every
+            // later launch. TODO: real save-state support for these games
+            // (each LCDonald_program subclass would need its per-game fields
+            // persisted) - see GNW_LIST.md's McDonald's section.
+            YOKOI_LOG("switch_unload_current_game: LCDonald-family game, no save-state support - skipping save for idx=%u ref='%s'",
+                      (unsigned)g_game_index, g_game->ref.c_str());
+        } else {
+            YOKOI_LOG("switch_unload_current_game: saving state for idx=%u ref='%s'",
+                      (unsigned)g_game_index, g_game ? g_game->ref.c_str() : "?");
+            save_game_state(g_cpu.get(), g_game_index);
+        }
         if (g_game) {
             g_last_game_played_ref = g_game->ref;
             switch_settings_save();

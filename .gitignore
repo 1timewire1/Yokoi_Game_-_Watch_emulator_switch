@@ -86,3 +86,6 @@ switch/*.nacp
 switch/*.elf
 
 *.ykp
+
+# Backups the pack-patching scripts leave next to a pack (e.g. .pre_mfr, .bak).
+*.ykp.*
