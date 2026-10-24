@@ -53,6 +53,37 @@ void LCDonald_program::start(bool is_endless) {
     is_stopped_ = false;
 }
 
+bool LCDonald_program::serialize_state(LCDonaldStateIO& io) {
+    io.io(custom_update_speed_);
+    io.io(blocked_custom_updates_);
+    io.io(input_blocked_);
+    io.io(is_endless_mode_);
+    io.io(is_paused_);
+    io.io(is_stopped_);
+    io.io(blinking_elements_);
+    io.io(current_animation_);
+    uint64_t anim_index = (uint64_t)animation_index_;
+    io.io(anim_index);
+    animation_index_ = (size_t)anim_index;
+    io.io(has_animation_);
+    io.io(stop_pending_);
+    io.io(score_events_);
+    io.io(has_triggered_hidden_group_);
+    visit_state(io);
+    if (!io.writing()) {
+        queued_sounds_.clear();
+        // The hidden-group flash is a real-time window; a restored game
+        // never resumes mid-flash.
+        hidden_group_until_us_ = 0;
+        if (has_animation_ && animation_index_ >= current_animation_.size()) {
+            has_animation_ = false;
+            current_animation_.clear();
+            animation_index_ = 0;
+        }
+    }
+    return io.ok();
+}
+
 void LCDonald_program::pause() {
     if (!is_paused_ && !is_stopped_) {
         is_paused_ = true;

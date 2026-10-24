@@ -18,6 +18,16 @@ public:
     void custom_update() override;
 
 protected:
+    // Save-state fields, in a fixed order (see LCDonald_program::visit_state()).
+    void visit_state(LCDonaldStateIO& io) override {
+        io.io(billy_position_);
+        io.io(fruits_collected_);
+        io.io(bombs_hit_);
+        io.io(level_);
+        io.io(bomb_positions_);
+        io.io(fruit_positions_);
+    }
+
     std::vector<std::string> get_visible_elements() override;
     void update_core() override;
 

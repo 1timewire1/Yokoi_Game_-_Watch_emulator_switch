@@ -182,4 +182,7 @@ private:
     bool endless_ = false;
     int endless_score_ = 0;
     bool hidden_group_shown_ = false;
+    // The dummy ROM's game id (see load_rom()) - kept so a failed state load
+    // can rebuild a fresh program for the same game.
+    uint8_t game_id_ = 0;
 };

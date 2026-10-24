@@ -21,6 +21,16 @@ public:
     void custom_update() override;
 
 protected:
+    // Save-state fields, in a fixed order (see LCDonald_program::visit_state()).
+    void visit_state(LCDonaldStateIO& io) override {
+        io.io(shadow_position_);
+        io.io(gaps_dodged_);
+        io.io(misses_);
+        io.io(level_);
+        io.io(spawn_first_gap_);
+        io.io(rail_positions_);
+    }
+
     std::vector<std::string> get_visible_elements() override;
     void update_core() override {}  // Unused in this game.
 

@@ -207,7 +207,8 @@ void LCDonald_fake_cpu::select_game(uint8_t game_id) {
 
 void LCDonald_fake_cpu::load_rom(const uint8_t* file_hex, size_t size_hex) {
     if (file_hex && size_hex > 0) {
-        select_game(file_hex[size_hex - 1]);
+        game_id_ = file_hex[size_hex - 1];
+        select_game(game_id_);
     }
     // Deliberately NOT started here: a freshly loaded game sits on the
     // all-segments-lit "stopped" screen (LCDonald_program::is_stopped_ is
@@ -348,15 +349,52 @@ void LCDonald_fake_cpu::start_game(bool endless) {
     refresh_visible_cache();
 }
 
+namespace {
+// "LCDS" + a version, so an incompatible future layout is rejected cleanly
+// instead of being misread.
+constexpr uint32_t kStateMagic = 0x5344434C;
+constexpr uint32_t kStateVersion = 1;
+}  // namespace
+
+// The game itself (which LCDonald_program, and Burger or not) comes from the
+// ROM/load_rom() on load, same as every other core - only the running state
+// is stored. Real-time timers aren't: a restored game resumes with fresh
+// tick/custom-update timestamps, as if just started.
 bool LCDonald_fake_cpu::save_state(FILE* file) {
-    // Not yet implemented - LCDonald games don't participate in save
-    // states yet (no persisted fields defined here). Returning false
-    // rather than silently no-opping true, so callers can tell.
-    (void)file;
-    return false;
+    if (!file || !program_) return false;
+    LCDonaldStateIO io(file, true);
+    uint32_t magic = kStateMagic, version = kStateVersion;
+    uint64_t hdr = ((uint64_t)version << 32) | magic;
+    io.io(hdr);
+    io.io(endless_);
+    io.io(endless_score_);
+    return program_->serialize_state(io);
 }
 
 bool LCDonald_fake_cpu::load_state(FILE* file) {
-    (void)file;
-    return false;
+    if (!file || !program_) return false;
+    LCDonaldStateIO io(file, false);
+    uint64_t hdr = 0;
+    io.io(hdr);
+    if (!io.ok() || (uint32_t)hdr != kStateMagic || (uint32_t)(hdr >> 32) != kStateVersion) return false;
+    io.io(endless_);
+    io.io(endless_score_);
+    if (!program_->serialize_state(io)) {
+        // Part of the state may already have been overwritten - start over
+        // from a freshly constructed program (the just-loaded, not-yet-
+        // started screen) rather than leave the game half-restored.
+        select_game(game_id_);
+        endless_ = false;
+        endless_score_ = 0;
+        refresh_visible_cache();
+        return false;
+    }
+    buffered_inputs_.clear();
+    pending_inputs_.clear();
+    last_tick_time_us_ = 0;
+    last_custom_update_time_us_ = 0;
+    last_input_poll_time_us_ = 0;
+    hidden_group_shown_ = false;
+    refresh_visible_cache();
+    return true;
 }

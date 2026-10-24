@@ -23,6 +23,7 @@
 #include "switch_runtime_state.h"
 #include "switch_segments_state.h"
 #include "switch_settings.h"
+#include "high_scores.h"
 #include "input/uchitari_clock_setup.h"
 #include "input/vesarif_clock_setup.h"
 #include "input/auto_confirm_press.h"
@@ -282,21 +283,10 @@ void switch_unload_current_game() {
         YOKOI_LOG("switch_unload_current_game: debug mode, skipping save for idx=%u ref='%s'",
                   (unsigned)g_game_index, g_game ? g_game->ref.c_str() : "?");
     } else {
-        if (g_game && GW_rom::is_lcdonald_family(g_game->manufacturer)) {
-            // McDonald's / Burger Bard games (LCDonald_fake_cpu) don't support
-            // save states yet - their save_state()/load_state() are stubs that
-            // return false, and saving anyway used to leave a header-only file
-            // behind that made the "Load Save State?" prompt appear on every
-            // later launch. TODO: real save-state support for these games
-            // (each LCDonald_program subclass would need its per-game fields
-            // persisted) - see GNW_LIST.md's McDonald's section.
-            YOKOI_LOG("switch_unload_current_game: LCDonald-family game, no save-state support - skipping save for idx=%u ref='%s'",
-                      (unsigned)g_game_index, g_game->ref.c_str());
-        } else {
-            YOKOI_LOG("switch_unload_current_game: saving state for idx=%u ref='%s'",
-                      (unsigned)g_game_index, g_game ? g_game->ref.c_str() : "?");
-            save_game_state(g_cpu.get(), g_game_index);
-        }
+        YOKOI_LOG("switch_unload_current_game: saving state for idx=%u ref='%s'",
+                  (unsigned)g_game_index, g_game ? g_game->ref.c_str() : "?");
+        save_game_state(g_cpu.get(), g_game_index);
+        high_score_flush();
         if (g_game) {
             g_last_game_played_ref = g_game->ref;
             switch_settings_save();

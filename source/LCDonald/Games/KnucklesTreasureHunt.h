@@ -22,6 +22,23 @@ public:
     void custom_update() override;
 
 protected:
+    // Save-state fields, in a fixed order (see LCDonald_program::visit_state()).
+    void visit_state(LCDonaldStateIO& io) override {
+        io.io(knuckles_position_);
+        io.io(life_count_);
+        io.io(level_);
+        io.io(emeralds_collected_);
+        io.io(emerald_time_limit_);
+        io.io(platform_positions_);
+        io.io(emerald_positions_);
+        io.io(platforms_to_move_next_update_);
+        io.io(current_left_spawn_);
+        io.io(current_right_spawn_);
+        io.io(is_falling_);
+        io.io(is_first_emerald_);
+        io.io(has_knuckles_moved_);
+    }
+
     std::vector<std::string> get_visible_elements() override;
     void update_core() override;
 

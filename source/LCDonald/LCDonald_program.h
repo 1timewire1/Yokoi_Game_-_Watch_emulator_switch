@@ -7,6 +7,7 @@
 #include <vector>
 
 #include "std/timer.h"
+#include "LCDonald_state_io.h"
 
 // Base class for porting LCDonald (https://github.com/Difegue/LCDonald) game
 // logic - McDonald's Sonic-branded LCD games, simulated in C# there rather
@@ -110,7 +111,18 @@ public:
     // custom_update() itself, not the tick after.
     void step_custom_update();
 
+    // Save states: writes/reads the shared base-class state, then the game's
+    // own fields via visit_state(). Returns false on a short/corrupt file.
+    // Not saved: queued sounds (transient) and the RNG (reseeded from the
+    // clock at construction - a restored game just continues with fresh
+    // randomness).
+    bool serialize_state(LCDonaldStateIO& io);
+
 protected:
+    // Each game lists its own state fields here, in a fixed order; the same
+    // function both saves and loads them (see LCDonaldStateIO).
+    virtual void visit_state(LCDonaldStateIO& io) = 0;
+
     // Returns this frame's visible elements, before blink/animation
     // overrides are applied - equivalent to GetVisibleElements() (C#).
     virtual std::vector<std::string> get_visible_elements() = 0;

@@ -1696,13 +1696,7 @@ void switch_menu_update(uint64_t kDown, uint64_t kHeld) {
         // doc comment in switch_settings.h) - forcing has_save false here is
         // enough to route straight to the always-fresh path below, same as a
         // game with no save at all.
-        // McDonald's / Burger Bard games have no save-state support yet (see
-        // switch_unload_current_game()), so they never offer a load - which
-        // also ignores the header-only stub files earlier builds left behind
-        // for them on the SD card.
-        const bool has_save = !g_debug_mode
-                              && !GW_rom::is_lcdonald_family(get_mfr(g_selected_index))
-                              && save_state_exists(g_selected_index);
+        const bool has_save = !g_debug_mode && save_state_exists(g_selected_index);
 
         if (has_save && g_load_state_behavior == LoadStateBehavior::Ask) {
             YOKOI_LOG("switch_menu: A pressed on index %u, save exists (Ask) - showing load prompt", (unsigned)g_selected_index);

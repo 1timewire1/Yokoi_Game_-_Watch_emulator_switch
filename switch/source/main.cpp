@@ -44,6 +44,7 @@
 #include "input/auto_confirm_press.h"
 #include "input/lcdonald_input_map.h"
 #include "input/rzone_input_map.h"
+#include "core/high_scores.h"
 #include "virtual_i_o/rzone_io.h"
 #include "audio/lcdonald_sound.h"
 #include "render/lcdonald_hud.h"
@@ -410,7 +411,13 @@ int main(int argc, char* argv[]) {
             // registered in virtual_input.h's get_input_config(), so the
             // normal Game A/B bindings never apply here), and both are gated
             // on is_stopped() so a stray press can't reset a run in progress.
+            // Endless high score: tracked live, written to disk once the run
+            // ends (and on unload - see switch_unload_current_game()).
+            if (lcd_cpu->is_endless()) {
+                high_score_note(g_game->ref, "endless", (uint32_t)lcd_cpu->endless_score());
+            }
             if (lcd_cpu->is_stopped()) {
+                high_score_flush();
                 if (kDown & HidNpadButton_Plus) {
                     lcd_cpu->start_game(false);
                 } else if (kDown & HidNpadButton_Minus) {
@@ -476,7 +483,8 @@ int main(int argc, char* argv[]) {
 
         switch_screen_render();
         if (g_cpu && g_game && GW_rom::is_lcdonald_family(g_game->manufacturer)) {
-            lcdonald_hud_render(viewport_w, viewport_h, static_cast<LCDonald_fake_cpu*>(g_cpu.get()));
+            lcdonald_hud_render(viewport_w, viewport_h, static_cast<LCDonald_fake_cpu*>(g_cpu.get()),
+                                high_score_get(g_game->ref, "endless"));
         }
         eglSwapBuffers(s_display, s_surface);
     }
