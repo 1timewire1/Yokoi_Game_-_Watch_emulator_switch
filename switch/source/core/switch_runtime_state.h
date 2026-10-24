@@ -16,8 +16,13 @@
 
 class SM5XX;
 class Virtual_Input;
+class RZoneIO;
 
 extern std::unique_ptr<SM5XX> g_cpu;
+// Tiger R-Zone cartridge I/O (source/virtual_i_o/rzone_io.h), attached to
+// g_cpu as its port_device for the three R-Zone games, null otherwise. Set up
+// by switch_load_game_by_index_and_init(); owned here, not by the CPU.
+extern std::unique_ptr<RZoneIO> g_rzone_io;
 extern const GW_rom* g_game;
 extern std::unique_ptr<Virtual_Input> g_input;
 extern uint8_t g_game_index;

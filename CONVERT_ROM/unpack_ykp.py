@@ -47,6 +47,11 @@ MANUFACTURER_NAMES = {
     2: "Elektronika",
     3: "Tiger",
     4: "David and John",
+    6: "McDonald's",
+    7: "Burger Bard",
+    8: "Konami",
+    9: "Nelsonic",
+    10: "V-Tech",
 }
 
 # Field order matches the struct.pack("<" + "I"*25, ...) call in

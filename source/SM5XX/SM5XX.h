@@ -9,6 +9,24 @@
 constexpr uint8_t ROM_WORD = 63; // each SM5XX have 63 rom word -> it's why program counter is the same
 constexpr uint32_t FREQUENCY_CPU = 32768; // Hz = 32,768 kHZ => 30.517us 1 cycle => 61us for almost instruction
 
+// Optional external circuitry wired to the CPU's R/S output pins and K input
+// pins, for hardware where those pins don't connect straight to a button
+// matrix and a buzzer - e.g. Tiger R-Zone (source/virtual_i_o/rzone_io.h),
+// which reads all its buttons serially through a 74165 shift register clocked
+// by R/S writes and sampled on K1. Unset (nullptr) on every other game, which
+// keeps the CPUs' normal multiplexed-K / buzzer behaviour unchanged.
+class SM5XXPortDevice {
+public:
+    virtual ~SM5XXPortDevice() = default;
+    virtual void write_r(uint8_t /*r*/) {}
+    virtual void write_s(uint8_t /*s*/) {}
+    // Replaces the K-port read entirely (low 4 bits used).
+    virtual uint8_t read_k() = 0;
+    // Lets the device drive the speaker itself (cpu_sound = what the CPU's own
+    // buzzer/melody logic would have output); default = leave it alone.
+    virtual bool sound(bool cpu_sound) { return cpu_sound; }
+};
+
 
 
 class SM5XX {
@@ -21,6 +39,8 @@ public :
 
 public:
     std::string name_cpu;
+    // See SM5XXPortDevice above. Not owned by the CPU.
+    SM5XXPortDevice* port_device = nullptr;
     bool stop_cpu = false;
     bool segments_state_are_update = false;
     //bool input_no_multiplex = false;

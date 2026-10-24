@@ -200,6 +200,15 @@ Real R-Zone had far more titles - MAME only has these three dumped. Caveats:
 
 Best next step by a wide margin: no new CPU work, same segment pipeline.
 
+**Done (2026-10-23):** all three ported - see `standard_controls.md`'s R-Zone
+section. The core gained an optional `SM5XXPortDevice` hook (R/S writes, K
+read, speaker) that `source/virtual_i_o/rzone_io.h` implements; MAME's raw
+SVGs needed their segments wrapped in a `segs` layer (`wrap_svg_segs.py` ->
+`<game>_segs.svg`), and
+the games were built with `convert_switch.py --game` and merged into the pack
+with `merge_pack_games.py`. Still open: background/console artwork, the LED,
+and saving the shift-register state in save states.
+
 ### Also SVG-driven, but each needs a new CPU core
 
 Everything else in the search that is a handheld game is already covered in the

@@ -117,6 +117,7 @@ void SM5XX::input_set(int group, int line, bool state, bool not_multiplex){
 bool SM5XX::check_button_pressed(){ // used for detect wake up
     uint8_t result = 0x00;
     for(int i = 0; i < 8; i++){ result |= k_input[i]; }
+    if (port_device) result |= port_device->read_k();
     result |= k_input_sp_not_multiplex; // SM530's K register is a single non-multiplexed 8-bit input (see input_set's not_multiplex param) - without this, pressing a button while asleep would never wake the CPU until the next 1s gamma tick
     if(!alpha_input || !beta_input){ result |= 0x01; }
     return (result != 0x00);

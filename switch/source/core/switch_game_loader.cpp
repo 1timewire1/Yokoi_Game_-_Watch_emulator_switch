@@ -13,6 +13,7 @@
 
 #define get_input_config get_input_config__switch_game_loader_tu
 #include "virtual_i_o/virtual_input.h"
+#include "virtual_i_o/rzone_io.h"
 #undef get_input_config
 
 #include "audio/switch_sound.h"
@@ -155,6 +156,17 @@ void switch_load_game_by_index_and_init(uint8_t idx) {
 
     g_cpu->init();
     YOKOI_LOG("switch_load_game_by_index_and_init: cpu->init() done");
+
+    // Tiger R-Zone cartridges read their buttons through a 74165 shift
+    // register on the CPU's R/S/K pins instead of a direct button matrix -
+    // see source/virtual_i_o/rzone_io.h. Every other game: no port device.
+    g_rzone_io.reset();
+    RZoneIO::Type rzone_type;
+    if (RZoneIO::type_for_ref(g_game->ref, rzone_type)) {
+        g_rzone_io = std::make_unique<RZoneIO>(rzone_type);
+        g_cpu->port_device = g_rzone_io.get();
+        YOKOI_LOG("switch_load_game_by_index_and_init: R-Zone I/O attached (type %d)", rzone_type == RZoneIO::Type::Type1 ? 1 : 2);
+    }
     g_cpu->load_rom(g_game->rom, g_game->size_rom);
     YOKOI_LOG("switch_load_game_by_index_and_init: cpu->load_rom() done");
     if (GW_rom::is_lcdonald_family(g_game->manufacturer)) {
@@ -292,6 +304,7 @@ void switch_unload_current_game() {
     }
 
     g_cpu.reset();
+    g_rzone_io.reset();  // after the CPU that points at it
     g_input.reset();
     g_game = nullptr;
     g_segments.clear();

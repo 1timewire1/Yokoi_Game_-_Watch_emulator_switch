@@ -183,11 +183,13 @@ void SM510::op_excd()
     op_decb();
 };
 
-void SM510::op_wr(){ w_shift_register = w_shift_register << 1; };
-void SM510::op_ws(){ w_shift_register =(w_shift_register << 1) | 0x01; };
+// On SM510 the W shift register drives the S output pins directly.
+void SM510::op_wr(){ w_shift_register = w_shift_register << 1; if (port_device) port_device->write_s(w_shift_register); };
+void SM510::op_ws(){ w_shift_register =(w_shift_register << 1) | 0x01; if (port_device) port_device->write_s(w_shift_register); };
 
 // ----- input - output instructions
 void SM510::op_kta(){
+    if (port_device) { accumulator = port_device->read_k() & 0x0f; return; }
     accumulator = 0x00;
     for(int i = 0; i < 8; i++){
         if( ((w_shift_register >> i) & 0x01) == 0x01){ // multiplexage by S
@@ -200,7 +202,7 @@ void SM510::op_kta(){
 void SM510::op_atbp(){ bp_lcd_blackplate = accumulator & 0x01; };
 void SM510::op_atl(){ l_bs = accumulator; };
 void SM510::op_atfc(){ y_bs = accumulator; };
-void SM510::op_atr(){ r_buzzer_control = accumulator & 0x03; };
+void SM510::op_atr(){ r_buzzer_control = accumulator & 0x03; if (port_device) port_device->write_r(r_buzzer_control); };
 
 
 // ----- Arithmetic

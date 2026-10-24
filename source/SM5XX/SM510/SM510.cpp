@@ -198,6 +198,11 @@ void SM510::update_sound(){
 }
 
 bool SM510::get_active_sound(){
+    if (port_device) return port_device->sound(sm510_buzzer_sound());
+    return sm510_buzzer_sound();
+}
+
+bool SM510::sm510_buzzer_sound(){
     //return (r_buzzer_control & 0x01) | ((r_buzzer_control >> 1) & 0x01);
     //return (r_buzzer_output & 0x01) | ((r_buzzer_output >> 1) & 0x01);
     //if( ((f_clock_divider>>3)& 0x01) == 0x01){ return (r_buzzer_control & 0x01); }

@@ -2,8 +2,10 @@
 
 #include "SM5XX/SM5XX.h"
 #include "virtual_i_o/virtual_input.h"
+#include "virtual_i_o/rzone_io.h"
 
 std::unique_ptr<SM5XX> g_cpu;
+std::unique_ptr<RZoneIO> g_rzone_io;
 const GW_rom* g_game = nullptr;
 std::unique_ptr<Virtual_Input> g_input;
 uint8_t g_game_index = 0;

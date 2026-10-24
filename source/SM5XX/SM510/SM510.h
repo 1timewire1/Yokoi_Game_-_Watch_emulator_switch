@@ -32,6 +32,8 @@ public:
     bool screen_is_on() override;
     bool get_segments_state(uint8_t col, uint8_t line, uint8_t word) override;
     bool get_active_sound() override;
+    // The R-pin buzzer output as the stock SM510 drives it (clock-modulated).
+    bool sm510_buzzer_sound();
 
     // Save/Load state
     bool save_state(FILE* file) override;

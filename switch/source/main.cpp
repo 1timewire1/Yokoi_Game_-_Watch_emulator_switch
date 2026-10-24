@@ -43,6 +43,8 @@
 #include "input/vesarif_clock_setup.h"
 #include "input/auto_confirm_press.h"
 #include "input/lcdonald_input_map.h"
+#include "input/rzone_input_map.h"
+#include "virtual_i_o/rzone_io.h"
 #include "audio/lcdonald_sound.h"
 #include "render/lcdonald_hud.h"
 #include "LCDonald/LCDonald_fake_cpu.h"
@@ -379,6 +381,13 @@ int main(int argc, char* argv[]) {
             } else {
                 apply_modifier_layer_input(g_cpu.get(), kUchitariLayout);
             }
+        }
+
+        // Tiger R-Zone: buttons go through the cartridge's 74165 shift
+        // register (see rzone_io.h), not the col/line keypad - g_input is
+        // null for these, same as the special cases above.
+        if (g_cpu && g_rzone_io) {
+            apply_rzone_input(g_rzone_io.get());
         }
 
         // McDonald's (LCDonald-ported) games read a small named-input

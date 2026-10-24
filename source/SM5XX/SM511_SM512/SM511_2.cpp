@@ -278,7 +278,8 @@ void SM511_2::update_sound(){ // NOT FINISH
 
 
 bool SM511_2::get_active_sound(){
-    return me_melody_activate && ((curr_phase&0x01) == 0x01); // phase impair -> Activate buzzer
+    const bool melody = me_melody_activate && ((curr_phase&0x01) == 0x01); // phase impair -> Activate buzzer
+    return port_device ? port_device->sound(melody) : melody;
 }
 
 

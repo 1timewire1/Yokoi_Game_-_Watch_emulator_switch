@@ -188,6 +188,9 @@ Special editions are not supported in the emulator, refer to the Notes column fo
 | 56  | tswampt | tswampt.zip         | Swamp Thing                                                  | 1991.01.01   | SM510 |  |
 | 57  | twworld | twworld.zip         | Wayne's World                                                | 1992.01.01   | SM510 |  |
 | 58  | txmenpx | txmenpx.zip         | X-Men: Project X                                             | 1993.01.01   | SM510 |  |
+| 59  | rzbatfor| rzbatfor.zip        | R-Zone: Batman Forever                                       | 1995.01.01   | SM512 |  |
+| 60  | rztoshden| rztoshden.zip       | R-Zone: Battle Arena Toshinden                               | 1996.01.01   | SM510 |  |
+| 61  | rzindy500| rzindy500.zip       | R-Zone: Indy 500                                             | 1996.01.01   | SM510 |  |
 
 ## Konami
 

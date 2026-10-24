@@ -198,7 +198,7 @@ void SM511_2::op_excd()
 };
 
 
-void SM511_2::op_ptw(){ s_pin = w_shift_register; }; // push register w to s pin for multiplexage input
+void SM511_2::op_ptw(){ s_pin = w_shift_register; if (port_device) port_device->write_s(s_pin); }; // push register w to s pin for multiplexage input
 
 void SM511_2::op_wr(){ w_shift_register = w_shift_register << 1; };
 void SM511_2::op_ws(){ w_shift_register =(w_shift_register << 1) | 0x01; };
@@ -209,6 +209,7 @@ void SM511_2::op_dta(){ // not find on sharp doc but on mame and rom (Super Mari
 
 // ----- input - output instructions
 void SM511_2::op_kta(){
+    if (port_device) { accumulator = port_device->read_k() & 0x0f; return; }
     accumulator = 0x00;
     for(int i = 0; i < 8; i++){
         if( ((s_pin >> i) & 0x01) == 0x01){ // multiplexage by S
