@@ -134,6 +134,21 @@ extern bool g_experimental_games_enabled;
 // clamped to that range).
 extern uint8_t g_panel_gap_percent;
 
+// "Segment Color" - the colour lit LCD segments are drawn in (0xRRGGBB), or
+// kSegmentColorAuto (the default) for the long-standing look: a dark tint of
+// the game background colour (lightened instead on dark backgrounds, so they
+// never vanish). Lets e.g. Tiger R-Zone games be shown red-on-black like the
+// real HeadGear screen. Switch-only (stored as "segment_color" in
+// yokoi_settings.txt, "auto" or 0xRRGGBB). Has no effect on the panorama/mask
+// games, whose segments carry their own printed colours, or on the two games
+// with per-segment colours.
+constexpr uint32_t kSegmentColorAuto = 0xFFFFFFFFu;
+extern uint32_t g_segment_color;
+
+// The segment colour to actually draw with for a given background colour -
+// resolves kSegmentColorAuto. Shared by the renderer and the settings menu.
+uint32_t effective_segment_color(uint32_t background_rgb);
+
 // "Experimental Features" - gates FEATURES only, never games (games are
 // g_experimental_games_enabled above): today the Altair dosimeter row (see
 // g_dosimeter_reading) and the ZL/ZR calculator-keypad layer for Space

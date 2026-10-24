@@ -95,6 +95,8 @@ bool g_settings_from_gameplay = false;
 // from the loaded settings at boot.
 bool g_bg_custom_selected = false;
 std::string g_bg_custom_text;  // raw entered hex (no '#'), uppercase; empty = not yet entered
+bool g_segcolor_custom_selected = false;
+std::string g_segcolor_custom_text;  // same format as g_bg_custom_text
 bool g_seg_custom_selected = false;
 std::string g_seg_custom_text; // raw entered decimal 0-255; empty = not yet entered
 bool g_panelgap_custom_selected = false;
@@ -112,6 +114,8 @@ enum class SettingsRow : uint8_t {
     Rotation,
     Background,
     BackgroundCustomEntry,
+    SegmentColor,
+    SegmentColorCustomEntry,
     Segments,
     SegmentsCustomEntry,
     ConsoleArt,
@@ -136,6 +140,8 @@ std::vector<SettingsRow> build_settings_rows() {
     rows.push_back(SettingsRow::Rotation);
     rows.push_back(SettingsRow::Background);
     if (g_bg_custom_selected) rows.push_back(SettingsRow::BackgroundCustomEntry);
+    rows.push_back(SettingsRow::SegmentColor);
+    if (g_segcolor_custom_selected) rows.push_back(SettingsRow::SegmentColorCustomEntry);
     rows.push_back(SettingsRow::Segments);
     if (g_seg_custom_selected) rows.push_back(SettingsRow::SegmentsCustomEntry);
     rows.push_back(SettingsRow::PanelGap);
@@ -165,6 +171,7 @@ std::vector<SettingsRow> build_settings_rows() {
 bool settings_row_is_action(SettingsRow row) {
     return row == SettingsRow::ReturnToMenu
         || row == SettingsRow::BackgroundCustomEntry
+        || row == SettingsRow::SegmentColorCustomEntry
         || row == SettingsRow::SegmentsCustomEntry
         || row == SettingsRow::PanelGapCustomEntry;
 }
@@ -189,9 +196,64 @@ constexpr const char* kPanelGapPresetNames[3] = {"None", "Small", "Large"};
 // this matters under g_debug_mode, where a hand-edited yokoi_settings.txt can
 // legitimately hold a value outside the normal presets (see its doc comment
 // in switch_settings.h).
+// Game Background Color presets: the shared list (std/settings.h, also used
+// by 3DS) plus Black, which is Switch-only - only this build has a Segment
+// Color setting to pair it with (3DS would draw black segments on black).
+struct SwitchColorPreset {
+    const char* name;
+    uint32_t color;
+};
+const SwitchColorPreset kBgPresets[] = {
+    {BACKGROUND_PRESETS[0].name, BACKGROUND_PRESETS[0].color},
+    {BACKGROUND_PRESETS[1].name, BACKGROUND_PRESETS[1].color},
+    {BACKGROUND_PRESETS[2].name, BACKGROUND_PRESETS[2].color},
+    {BACKGROUND_PRESETS[3].name, BACKGROUND_PRESETS[3].color},
+    {BACKGROUND_PRESETS[4].name, BACKGROUND_PRESETS[4].color},
+    {BACKGROUND_PRESETS[5].name, BACKGROUND_PRESETS[5].color},
+    {"Black", 0x000000},
+};
+constexpr int kNumBgPresets = sizeof(kBgPresets) / sizeof(kBgPresets[0]);
+static_assert(NUM_BG_PRESETS == 6, "kBgPresets mirrors the shared list - update it too");
+
+// Segment Color presets (see g_segment_color in switch_settings.h). Auto is
+// the default and the original look; Red pairs with the Black background for
+// Tiger R-Zone's red-on-black screen.
+const SwitchColorPreset kSegColorPresets[] = {
+    {"Auto", kSegmentColorAuto},
+    {"Black", 0x000000},
+    {"Red", 0xFF2A1A},
+    {"Green", 0x20C040},
+    {"Blue", 0x2A5CFF},
+    {"White", 0xFFFFFF},
+};
+constexpr int kNumSegColorPresets = sizeof(kSegColorPresets) / sizeof(kSegColorPresets[0]);
+
+int find_segcolor_preset_index(uint32_t color) {
+    for (int i = 0; i < kNumSegColorPresets; i++) {
+        if (kSegColorPresets[i].color == color) return i;
+    }
+    return 0;
+}
+
+bool segcolor_matches_any_preset(uint32_t color) {
+    for (int i = 0; i < kNumSegColorPresets; i++) {
+        if (kSegColorPresets[i].color == color) return true;
+    }
+    return false;
+}
+
+std::string segcolor_display(uint32_t color) {
+    for (int i = 0; i < kNumSegColorPresets; i++) {
+        if (kSegColorPresets[i].color == color) return kSegColorPresets[i].name;
+    }
+    char buf[16];
+    snprintf(buf, sizeof(buf), "#%06X", (unsigned)(color & 0xFFFFFFu));
+    return std::string(buf);
+}
+
 int find_bg_preset_index(uint32_t color) {
-    for (int i = 0; i < NUM_BG_PRESETS; i++) {
-        if (BACKGROUND_PRESETS[i].color == color) return i;
+    for (int i = 0; i < kNumBgPresets; i++) {
+        if (kBgPresets[i].color == color) return i;
     }
     return 0;
 }
@@ -217,8 +279,8 @@ int find_panelgap_preset_index(uint8_t percent) {
 // boot (see switch_menu_init()): a value that doesn't match any preset can
 // only have gotten there via a custom entry.
 bool bg_matches_any_preset(uint32_t color) {
-    for (int i = 0; i < NUM_BG_PRESETS; i++) {
-        if (BACKGROUND_PRESETS[i].color == color) return true;
+    for (int i = 0; i < kNumBgPresets; i++) {
+        if (kBgPresets[i].color == color) return true;
     }
     return false;
 }
@@ -238,8 +300,8 @@ bool panelgap_matches_any_preset(uint8_t percent) {
 }
 
 std::string bg_color_display(uint32_t color) {
-    for (int i = 0; i < NUM_BG_PRESETS; i++) {
-        if (BACKGROUND_PRESETS[i].color == color) return BACKGROUND_PRESETS[i].name;
+    for (int i = 0; i < kNumBgPresets; i++) {
+        if (kBgPresets[i].color == color) return kBgPresets[i].name;
     }
     char buf[16];
     snprintf(buf, sizeof(buf), "#%06X", (unsigned)(color & 0xFFFFFFu));
@@ -321,6 +383,32 @@ void open_background_custom_keyboard() {
     } else {
         g_bg_custom_text.clear();
         g_settings.background_color = BACKGROUND_PRESETS[0].color; // Light Yellow
+    }
+    switch_settings_save();
+}
+
+// Same as open_background_custom_keyboard(), for Segment Color - invalid
+// input falls back to Auto.
+void open_segment_color_custom_keyboard() {
+    std::string text;
+    if (!show_keyboard(SwkbdType_Normal, "Custom Segment Color", "RRGGBB", g_segcolor_custom_text, 6, text)) {
+        return; // cancelled
+    }
+
+    bool valid = (text.size() == 6);
+    if (valid) {
+        for (unsigned char c : text) {
+            if (!std::isxdigit(c)) { valid = false; break; }
+        }
+    }
+
+    if (valid) {
+        for (char& c : text) c = (char)std::toupper((unsigned char)c);
+        g_segcolor_custom_text = text;
+        g_segment_color = (uint32_t)strtoul(text.c_str(), nullptr, 16);
+    } else {
+        g_segcolor_custom_text.clear();
+        g_segment_color = kSegmentColorAuto;
     }
     switch_settings_save();
 }
@@ -940,7 +1028,9 @@ const char* settings_row_label(SettingsRow row) {
         case SettingsRow::Rotation:              return "Rotation";
         case SettingsRow::Background:             return "Game Background Color";
         case SettingsRow::BackgroundCustomEntry:  return "Enter Custom Color";
-        case SettingsRow::Segments:                return "Segments";
+        case SettingsRow::SegmentColor:            return "Segment Color";
+        case SettingsRow::SegmentColorCustomEntry: return "Enter Custom Color";
+        case SettingsRow::Segments:                return "Segment Marking";
         case SettingsRow::SegmentsCustomEntry:     return "Enter Custom Value";
         case SettingsRow::ConsoleArt:               return "Display Single Screen Console Art";
         case SettingsRow::PanelGap:                 return "Panel Gap";
@@ -967,6 +1057,10 @@ std::string settings_row_value(SettingsRow row) {
             return g_bg_custom_selected
                 ? (g_bg_custom_text.empty() ? std::string("Custom") : ("Custom: #" + g_bg_custom_text))
                 : bg_color_display(g_settings.background_color);
+        case SettingsRow::SegmentColor:
+            return g_segcolor_custom_selected
+                ? (g_segcolor_custom_text.empty() ? std::string("Custom") : ("Custom: #" + g_segcolor_custom_text))
+                : segcolor_display(g_segment_color);
         case SettingsRow::Segments:
             return g_seg_custom_selected
                 ? (g_seg_custom_text.empty() ? std::string("Custom") : ("Custom: " + g_seg_custom_text))
@@ -1075,7 +1169,8 @@ void render_settings_rows(int logical_w, int logical_h) {
         const bool locked = g_debug_mode && row != SettingsRow::Rotation && row != SettingsRow::ReturnToMenu;
         // The three Custom-entry rows read as nested under their parent -
         // indent the label only, keep the selection highlight full-width.
-        const bool nested = (row == SettingsRow::BackgroundCustomEntry) || (row == SettingsRow::SegmentsCustomEntry)
+        const bool nested = (row == SettingsRow::BackgroundCustomEntry) || (row == SettingsRow::SegmentColorCustomEntry)
+            || (row == SettingsRow::SegmentsCustomEntry)
             || (row == SettingsRow::PanelGapCustomEntry);
         const float indent = nested ? 24.0f : 0.0f;
 
@@ -1230,6 +1325,12 @@ void switch_menu_init() {
         snprintf(buf, sizeof(buf), "%06X", (unsigned)(g_settings.background_color & 0xFFFFFFu));
         g_bg_custom_text = buf;
     }
+    g_segcolor_custom_selected = !segcolor_matches_any_preset(g_segment_color);
+    if (g_segcolor_custom_selected) {
+        char buf[8];
+        snprintf(buf, sizeof(buf), "%06X", (unsigned)(g_segment_color & 0xFFFFFFu));
+        g_segcolor_custom_text = buf;
+    }
     g_seg_custom_selected = !seg_matches_any_preset(g_settings.segment_marking_alpha);
     if (g_seg_custom_selected) {
         char buf[8];
@@ -1346,9 +1447,9 @@ static void update_settings_menu(uint64_t kDown) {
                 // it doesn't open the keyboard by itself, it just reveals the
                 // BackgroundCustomEntry row below (see build_settings_rows())
                 // for that.
-                int slot = g_bg_custom_selected ? NUM_BG_PRESETS : find_bg_preset_index(g_settings.background_color);
-                slot = (slot + dir + (NUM_BG_PRESETS + 1)) % (NUM_BG_PRESETS + 1);
-                if (slot == NUM_BG_PRESETS) {
+                int slot = g_bg_custom_selected ? kNumBgPresets : find_bg_preset_index(g_settings.background_color);
+                slot = (slot + dir + (kNumBgPresets + 1)) % (kNumBgPresets + 1);
+                if (slot == kNumBgPresets) {
                     g_bg_custom_selected = true;
                     // No value typed yet this session - default to Light
                     // Yellow per explicit spec until one is. A remembered
@@ -1358,7 +1459,23 @@ static void update_settings_menu(uint64_t kDown) {
                         : (uint32_t)strtoul(g_bg_custom_text.c_str(), nullptr, 16);
                 } else {
                     g_bg_custom_selected = false;
-                    g_settings.background_color = BACKGROUND_PRESETS[slot].color;
+                    g_settings.background_color = kBgPresets[slot].color;
+                }
+                break;
+            }
+            case SettingsRow::SegmentColor: {
+                // Same Custom-slot flow as Background above; no value typed
+                // yet this session means Auto until one is.
+                int slot = g_segcolor_custom_selected ? kNumSegColorPresets : find_segcolor_preset_index(g_segment_color);
+                slot = (slot + dir + (kNumSegColorPresets + 1)) % (kNumSegColorPresets + 1);
+                if (slot == kNumSegColorPresets) {
+                    g_segcolor_custom_selected = true;
+                    g_segment_color = g_segcolor_custom_text.empty()
+                        ? kSegmentColorAuto
+                        : (uint32_t)strtoul(g_segcolor_custom_text.c_str(), nullptr, 16);
+                } else {
+                    g_segcolor_custom_selected = false;
+                    g_segment_color = kSegColorPresets[slot].color;
                 }
                 break;
             }
@@ -1501,6 +1618,8 @@ static void update_settings_menu(uint64_t kDown) {
         if (!row_locked) {
             if (row == SettingsRow::BackgroundCustomEntry) {
                 open_background_custom_keyboard();
+            } else if (row == SettingsRow::SegmentColorCustomEntry) {
+                open_segment_color_custom_keyboard();
             } else if (row == SettingsRow::SegmentsCustomEntry) {
                 open_segments_custom_keyboard();
             } else if (row == SettingsRow::PanelGapCustomEntry) {
@@ -1711,7 +1830,7 @@ void switch_menu_render(int viewport_w, int viewport_h) {
         // either Custom-entry row) - shown whenever one of those can
         // currently be reached, not just in the from-gameplay case that used
         // to be the only source of one.
-        if (g_settings_from_gameplay || g_bg_custom_selected || g_seg_custom_selected || g_panelgap_custom_selected) {
+        if (g_settings_from_gameplay || g_bg_custom_selected || g_segcolor_custom_selected || g_seg_custom_selected || g_panelgap_custom_selected) {
             put_icon(SwitchButtonIcon::A);
             put_text("Confirm");
         }

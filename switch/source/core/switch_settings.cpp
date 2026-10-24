@@ -17,6 +17,7 @@ bool g_log_file_enabled = false;
 std::string g_last_game_played_ref;
 bool g_experimental_games_enabled = false;
 uint8_t g_panel_gap_percent = 0;
+uint32_t g_segment_color = kSegmentColorAuto;
 bool g_experimental_features_enabled = false;
 bool g_debug_mode = false;
 uint8_t g_dosimeter_reading = 0;
@@ -40,6 +41,7 @@ void switch_settings_load() {
     g_last_game_played_ref.clear();
     g_experimental_games_enabled = false;
     g_panel_gap_percent = 0;
+    g_segment_color = kSegmentColorAuto;
     g_experimental_features_enabled = false;
     g_debug_mode = false;
     g_dosimeter_reading = 0;
@@ -71,6 +73,10 @@ void switch_settings_load() {
 
         if (strcmp(line, "background_color") == 0) {
             g_settings.background_color = (uint32_t)value;
+        } else if (strcmp(line, "segment_color") == 0) {
+            const char* v = eq + 1;
+            while (*v == ' ') v++;
+            g_segment_color = (strncmp(v, "auto", 4) == 0) ? kSegmentColorAuto : ((uint32_t)value & 0xFFFFFFu);
         } else if (strcmp(line, "segment_marking_alpha") == 0) {
             g_settings.segment_marking_alpha = (uint8_t)value;
         } else if (strcmp(line, "rotation") == 0) {
@@ -168,8 +174,30 @@ void switch_settings_save() {
     }
     fprintf(file, "experimentalgames=%d\n", g_experimental_games_enabled ? 1 : 0);
     fprintf(file, "panelgap=%u\n", (unsigned)g_panel_gap_percent);
+    if (g_segment_color == kSegmentColorAuto) {
+        fprintf(file, "segment_color=auto\n");
+    } else {
+        fprintf(file, "segment_color=0x%06x\n", (unsigned)(g_segment_color & 0xFFFFFFu));
+    }
     fprintf(file, "experimentalfeatures=%d\n", g_experimental_features_enabled ? 1 : 0);
     fprintf(file, "dosimeterreading=%u\n", (unsigned)g_dosimeter_reading);
     fprintf(file, "timesetmode=%u\n", (unsigned)g_time_set_mode);
     fclose(file);
+}
+
+uint32_t effective_segment_color(uint32_t background_rgb) {
+    if (g_segment_color != kSegmentColorAuto) return g_segment_color & 0xFFFFFFu;
+    const float r = ((background_rgb >> 16) & 0xFF) / 255.0f;
+    const float g = ((background_rgb >> 8) & 0xFF) / 255.0f;
+    const float b = (background_rgb & 0xFF) / 255.0f;
+    const float luma = 0.299f * r + 0.587f * g + 0.114f * b;
+    // Light backgrounds: 12% of the background colour - the look every game
+    // has always had. Dark backgrounds (e.g. the Black preset) would make that
+    // invisible, so lighten toward white instead, keeping the hue.
+    const float k = 0.12f;
+    auto ch = [&](float c) {
+        const float out = (luma >= 0.35f) ? c * k : c + (1.0f - c) * (1.0f - k);
+        return (uint32_t)(out * 255.0f + 0.5f);
+    };
+    return (ch(r) << 16) | (ch(g) << 8) | ch(b);
 }

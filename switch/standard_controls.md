@@ -373,6 +373,30 @@ Console: 4-way d-pad + single action button.
 
 ---
 
+### R-Zone: Batman Forever / Battle Arena Toshinden / Indy 500 (`RZBATFOR`, `RZTOSHDEN`, `RZINDY500`)
+
+Tiger's 1995-96 R-Zone cartridge system (MAME's `rzone.cpp`): the same
+SM510/SM512 LCD games as the handhelds, but the console's 14 buttons are read
+through a 74165 shift register on the cartridge's R/S/K pins instead of a
+button matrix, so they use their own input path
+(`source/virtual_i_o/rzone_io.h`, `switch/source/input/rzone_input_map.cpp`)
+rather than a `Virtual_Input` class. Every R-Zone game has the same controls:
+
+| Switch input | Function |
+|---|---|
+| D-Pad / left stick | Joystick |
+| A / B / X / Y | Buttons 1 / 2 / 3 / 4 (A / B / C / D on the console) |
+| + | Start |
+| − | Pause |
+| L | Select |
+| R | Sound (volume) |
+
+Power On / Power Off aren't mapped - the games run from boot without them.
+No background or console artwork exists for these yet: they render on the
+plain background colour, and the thumbnail is the game's own LCD art (red on
+black, after the HeadGear's red-on-black screen). For that look in-game, set
+Game Background Color to **Black** and Segment Color to **Red**.
+
 ## McDonald's (LCDonald ports)
 
 Twenty games ported from the [LCDonald](https://github.com/Difegue/LCDonald)

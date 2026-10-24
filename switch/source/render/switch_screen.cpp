@@ -425,16 +425,21 @@ void switch_screen_render() {
             }
         }
 
-        const float seg_r = br * 0.12f;
-        const float seg_g = bgc * 0.12f;
-        const float seg_b = bb * 0.12f;
+        // Lit-segment colour - the Segment Color setting, or (Auto) a tint
+        // of the background colour; see effective_segment_color().
+        const uint32_t seg_rgb = effective_segment_color(bg);
+        const float seg_r = ((seg_rgb >> 16) & 0xFF) / 255.0f;
+        const float seg_g = ((seg_rgb >> 8) & 0xFF) / 255.0f;
+        const float seg_b = (seg_rgb & 0xFF) / 255.0f;
         const GLuint seg_tex = (g_gl.tex_segments != 0) ? g_gl.tex_segments : g_gl.tex_white;
 
         if (!is_mask) {
             const float mark_a = (float)g_settings.segment_marking_alpha / 255.0f;
             if (mark_a > 0.0f && !seg_mark_verts.empty()) {
-                const float m = 16.0f / 255.0f;
-                glUniform4f(g_gl.uMul, m, m, m, mark_a);
+                // Unlit-segment "ghost" marks, in the lit colour at low
+                // alpha (it used to be a fixed near-black, which matched the
+                // old always-dark segments but disappears on dark backgrounds).
+                glUniform4f(g_gl.uMul, seg_r, seg_g, seg_b, mark_a);
                 draw_vertices(seg_tex, seg_mark_verts);
             }
             if (!seg_shadow_verts.empty()) {
