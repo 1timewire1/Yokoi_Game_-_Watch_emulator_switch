@@ -81,6 +81,28 @@ extern CloneFilterMode g_clone_filter_mode;
 enum class TimeSetMode : uint8_t { Automatic = 0, Manual = 1 };
 extern TimeSetMode g_time_set_mode;
 
+// "Pet Time" - what happens to an E0C6S46/S48 virtual pet (only the ones
+// whose clock layout is known - core/e0c6200_clock.h) for the time that
+// passed while it wasn't running: the app closed (measured from its save
+// state's timestamp) or the game paused/suspended mid-play (HOME, console
+// sleep, the in-game settings screen). See core/pet_time.h.
+//  - RealTime (default): fast-forward the pet through that time (up to
+//    g_pet_time_cap_hours), so it really aged/got hungry, then set its clock.
+//  - ClockSync: only set its clock to the real time - it doesn't age.
+//  - Paused: neither - it picks up exactly where it left off.
+enum class PetTimeMode : uint8_t { RealTime = 0, ClockSync = 1, Paused = 2 };
+extern PetTimeMode g_pet_time_mode;
+
+// Real Time's catch-up limit in hours (0 = no limit). Any time beyond it is
+// skipped like Clock Sync (the clock jumps, the pet doesn't age through it).
+// Presets 8/24/72/168 or Unlimited, or a custom 1-9999 (switch_menu.cpp).
+extern uint32_t g_pet_time_cap_hours;
+
+// How Real Time's catch-up looks: a progress screen, or the pet's own LCD
+// running at high speed with a small remaining-time readout.
+enum class PetTimeDisplay : uint8_t { Progress = 0, FastForward = 1 };
+extern PetTimeDisplay g_pet_time_display;
+
 // Whether debug_log (debug_log.h) writes to yokoi_log.txt at all. Defaults
 // off. Applied via debug_log::set_enabled() both at load and live whenever
 // this row changes in the settings menu. Only ever shown/changeable from the

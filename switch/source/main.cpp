@@ -44,6 +44,11 @@
 #include "input/auto_confirm_press.h"
 #include "input/lcdonald_input_map.h"
 #include "input/rzone_input_map.h"
+#include "input/e0c6200_input_map.h"
+#include "input/e0c6200_clock_setup.h"
+#include "core/pet_time.h"
+#include "E0C6200/E0C6S46.h"
+#include "std/savestate.h"
 #include "core/high_scores.h"
 #include "virtual_i_o/rzone_io.h"
 #include "audio/lcdonald_sound.h"
@@ -315,6 +320,17 @@ int main(int argc, char* argv[]) {
             continue;
         }
 
+        // Pet Time (core/pet_time.h): while a virtual pet is being caught up
+        // on time spent away, that catch-up owns the whole frame - no input,
+        // no normal stepping, no tone output - and draws its own overlay.
+        if (pet_time_frame(kDown)) {
+            g_sound.play_sample();
+            switch_screen_render();
+            pet_time_render(viewport_w, viewport_h);
+            eglSwapBuffers(s_display, s_surface);
+            continue;
+        }
+
         // VESARIF has a normal Virtual_Input class (g_input isn't null for
         // it) but still needs its boot-time clock-setup sequence to own
         // every button while it plays out - see vesarif_clock_setup.h's
@@ -389,6 +405,20 @@ int main(int argc, char* argv[]) {
         // null for these, same as the special cases above.
         if (g_cpu && g_rzone_io) {
             apply_rzone_input(g_rzone_io.get());
+        }
+
+        // E0C6S46/S48 keychain games (Tamagotchi etc.): every button is
+        // wired straight to a K pin - see e0c6200_input_map.h. g_input is
+        // null for these too. Type id check, not dynamic_cast (-fno-rtti).
+        // While the automatic clock-set sequence is pressing buttons (see
+        // e0c6200_clock_setup.h), it owns the K pins instead.
+        if (g_cpu && g_game && g_cpu->get_cpu_type_id() == CPU_TYPE_E0C6S46) {
+            E0C6S46* e0c = static_cast<E0C6S46*>(g_cpu.get());
+            if (e0c6200_clock_setup_active()) {
+                e0c6200_clock_setup_advance(e0c);
+            } else {
+                apply_e0c6200_input(e0c, g_game->ref);
+            }
         }
 
         // McDonald's (LCDonald-ported) games read a small named-input

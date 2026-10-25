@@ -19,6 +19,7 @@
 
 #include "../third_party/stb_image.h"
 
+#include "pet_time.h"
 #include "switch_game_loader.h"
 #include "switch_layout.h"
 #include "switch_runtime_state.h"
@@ -101,6 +102,8 @@ bool g_seg_custom_selected = false;
 std::string g_seg_custom_text; // raw entered decimal 0-255; empty = not yet entered
 bool g_panelgap_custom_selected = false;
 std::string g_panelgap_custom_text; // raw entered decimal 0-30; empty = not yet entered
+bool g_pettimecap_custom_selected = false;
+std::string g_pettimecap_custom_text; // raw entered decimal 1-9999 (hours); empty = not yet entered
 
 // Every row the settings screen can show, in display order. Which of these
 // actually appear varies: BackgroundCustomEntry/SegmentsCustomEntry/
@@ -124,6 +127,10 @@ enum class SettingsRow : uint8_t {
     LoadStateBehavior,
     CloneFilter,
     TimeSetMode,
+    PetTime,
+    PetTimeCap,
+    PetTimeCapCustomEntry,
+    PetTimeDisplay,
     LogFile,
     ExperimentalGames,
     ExperimentalFeatures,
@@ -158,6 +165,13 @@ std::vector<SettingsRow> build_settings_rows() {
         rows.push_back(SettingsRow::LoadStateBehavior);
         rows.push_back(SettingsRow::CloneFilter);
         rows.push_back(SettingsRow::TimeSetMode);
+        rows.push_back(SettingsRow::PetTime);
+        // The limit and display only mean anything under Real Time.
+        if (g_pet_time_mode == PetTimeMode::RealTime) {
+            rows.push_back(SettingsRow::PetTimeCap);
+            if (g_pettimecap_custom_selected) rows.push_back(SettingsRow::PetTimeCapCustomEntry);
+            rows.push_back(SettingsRow::PetTimeDisplay);
+        }
         rows.push_back(SettingsRow::LogFile);
         rows.push_back(SettingsRow::ExperimentalGames);
         rows.push_back(SettingsRow::ExperimentalFeatures);
@@ -173,7 +187,8 @@ bool settings_row_is_action(SettingsRow row) {
         || row == SettingsRow::BackgroundCustomEntry
         || row == SettingsRow::SegmentColorCustomEntry
         || row == SettingsRow::SegmentsCustomEntry
-        || row == SettingsRow::PanelGapCustomEntry;
+        || row == SettingsRow::PanelGapCustomEntry
+        || row == SettingsRow::PetTimeCapCustomEntry;
 }
 
 // Mirrors Android's SettingsMenu.java 3-preset "Segments" spinner (None/
@@ -188,6 +203,14 @@ constexpr const char* kSegPresetNames[3] = {"None", "Light", "Dark"};
 // switch_settings.h) - a percentage of the top panel's own height.
 constexpr uint8_t kPanelGapPresetPercent[3] = {0, 4, 10};
 constexpr const char* kPanelGapPresetNames[3] = {"None", "Small", "Large"};
+
+// Pet Time's catch-up limit (see g_pet_time_cap_hours in switch_settings.h):
+// presets plus a Custom slot (hours, via keyboard). 0 = no limit.
+constexpr int kNumPetTimeCapPresets = 5;
+constexpr uint32_t kPetTimeCapPresetHours[kNumPetTimeCapPresets] = {8, 24, 72, 168, 0};
+constexpr const char* kPetTimeCapPresetNames[kNumPetTimeCapPresets] = {"8 Hours", "24 Hours", "72 Hours", "1 Week",
+                                                                        "Unlimited"};
+constexpr uint32_t kPetTimeCapDefaultHours = 72;
 
 // Nearest-index fallbacks (never exact for an off-preset value) - only ever
 // used as a *starting point* to cycle Left/Right from, never to rewrite the
@@ -290,6 +313,27 @@ bool seg_matches_any_preset(uint8_t alpha) {
         if (kSegPresetAlpha[i] == alpha) return true;
     }
     return false;
+}
+
+int find_pettimecap_preset_index(uint32_t hours) {
+    for (int i = 0; i < kNumPetTimeCapPresets; i++) {
+        if (kPetTimeCapPresetHours[i] == hours) return i;
+    }
+    return 2;  // 72 Hours
+}
+
+bool pettimecap_matches_any_preset(uint32_t hours) {
+    for (int i = 0; i < kNumPetTimeCapPresets; i++) {
+        if (kPetTimeCapPresetHours[i] == hours) return true;
+    }
+    return false;
+}
+
+std::string pettimecap_display(uint32_t hours) {
+    for (int i = 0; i < kNumPetTimeCapPresets; i++) {
+        if (kPetTimeCapPresetHours[i] == hours) return kPetTimeCapPresetNames[i];
+    }
+    return std::to_string((unsigned)hours) + "h";
 }
 
 bool panelgap_matches_any_preset(uint8_t percent) {
@@ -466,6 +510,33 @@ void open_panelgap_custom_keyboard() {
     }
     switch_settings_save();
     rebuild_layout_from_game(); // apply immediately - see the Left/Right case's comment
+}
+
+// Same again for Pet Time's catch-up limit, in hours (1-9999) - falls back to
+// the 72 Hours preset on invalid input.
+void open_pettimecap_custom_keyboard() {
+    std::string text;
+    if (!show_keyboard(SwkbdType_NumPad, "Custom Catch-Up Limit", "Hours, 1-9999", g_pettimecap_custom_text, 4, text)) {
+        return; // cancelled
+    }
+
+    bool valid = !text.empty() && text.size() <= 4;
+    if (valid) {
+        for (unsigned char c : text) {
+            if (!std::isdigit(c)) { valid = false; break; }
+        }
+    }
+    const long value = valid ? strtol(text.c_str(), nullptr, 10) : -1;
+    valid = valid && value >= 1 && value <= 9999;
+
+    if (valid) {
+        g_pettimecap_custom_text = text;
+        g_pet_time_cap_hours = (uint32_t)value;
+    } else {
+        g_pettimecap_custom_text.clear();
+        g_pet_time_cap_hours = kPetTimeCapDefaultHours;
+    }
+    switch_settings_save();
 }
 
 const char* rotation_label(ScreenRotation r) {
@@ -647,6 +718,10 @@ const char* mfr_name(uint8_t mfr) {
     if (mfr == GW_rom::MANUFACTURER_KONAMI) return "KONAMI";
     if (mfr == GW_rom::MANUFACTURER_NELSONIC) return "NELSONIC";
     if (mfr == GW_rom::MANUFACTURER_VTECH) return "V-TECH";
+    if (mfr == GW_rom::MANUFACTURER_BANDAI) return "BANDAI";
+    if (mfr == GW_rom::MANUFACTURER_EPOCH) return "EPOCH";
+    if (mfr == GW_rom::MANUFACTURER_NIKKO) return "NIKKO";
+    if (mfr == GW_rom::MANUFACTURER_TANDY) return "TANDY";
     if (mfr == GW_rom::MANUFACTURER_DAVID_AND_JOHN) return "DAVID AND JOHN";
     if (mfr == GW_rom::MANUFACTURER_MCDONALDS) return "MCDONALD'S";
     // LCDonald's white-label re-skin, credited as "Burger Bard" on its
@@ -669,9 +744,13 @@ int mfr_rank(uint8_t mfr) {
         case GW_rom::MANUFACTURER_KONAMI:         return 4;
         case GW_rom::MANUFACTURER_NELSONIC:       return 5;
         case GW_rom::MANUFACTURER_VTECH:          return 6;
-        case GW_rom::MANUFACTURER_DAVID_AND_JOHN: return 7;
-        case GW_rom::MANUFACTURER_MCDONALDS:      return 8;
-        case GW_rom::MANUFACTURER_BURGER_BARD:    return 9;
+        case GW_rom::MANUFACTURER_BANDAI:         return 7;
+        case GW_rom::MANUFACTURER_EPOCH:          return 8;
+        case GW_rom::MANUFACTURER_NIKKO:          return 9;
+        case GW_rom::MANUFACTURER_TANDY:          return 10;
+        case GW_rom::MANUFACTURER_DAVID_AND_JOHN: return 11;
+        case GW_rom::MANUFACTURER_MCDONALDS:      return 12;
+        case GW_rom::MANUFACTURER_BURGER_BARD:    return 13;
         default:                                  return 100 + (int)mfr;
     }
 }
@@ -684,6 +763,10 @@ bool is_experimental_games_manufacturer(uint8_t mfr) {
         case GW_rom::MANUFACTURER_KONAMI:
         case GW_rom::MANUFACTURER_NELSONIC:
         case GW_rom::MANUFACTURER_VTECH:
+        case GW_rom::MANUFACTURER_BANDAI:
+        case GW_rom::MANUFACTURER_EPOCH:
+        case GW_rom::MANUFACTURER_NIKKO:
+        case GW_rom::MANUFACTURER_TANDY:
         case GW_rom::MANUFACTURER_DAVID_AND_JOHN:
         case GW_rom::MANUFACTURER_MCDONALDS:
         case GW_rom::MANUFACTURER_BURGER_BARD:
@@ -809,6 +892,25 @@ CloneFilterMode cycle_clone_filter(CloneFilterMode cur, int dir) {
 // See g_time_set_mode's doc comment in switch_settings.h.
 const char* time_set_mode_label(TimeSetMode m) {
     return (m == TimeSetMode::Manual) ? "Manual" : "Automatic";
+}
+
+// See g_pet_time_mode / g_pet_time_display in switch_settings.h.
+const char* pet_time_mode_label(PetTimeMode m) {
+    switch (m) {
+        case PetTimeMode::ClockSync: return "Clock Sync";
+        case PetTimeMode::Paused:    return "Paused";
+        default:                     return "Real Time";
+    }
+}
+
+PetTimeMode cycle_pet_time_mode(PetTimeMode cur, int dir) {
+    int i = ((int)cur + dir) % 3;
+    if (i < 0) i += 3;
+    return (PetTimeMode)i;
+}
+
+const char* pet_time_display_label(PetTimeDisplay d) {
+    return (d == PetTimeDisplay::FastForward) ? "Fast-Forward" : "Progress Bar";
 }
 
 TimeSetMode cycle_time_set_mode(TimeSetMode cur, int dir) {
@@ -1038,6 +1140,10 @@ const char* settings_row_label(SettingsRow row) {
         case SettingsRow::LoadStateBehavior:        return "Load State Behavior";
         case SettingsRow::CloneFilter:               return "Duplicate & Clone Games";
         case SettingsRow::TimeSetMode:                return "Time Set Mode";
+        case SettingsRow::PetTime:                    return "Pet Time";
+        case SettingsRow::PetTimeCap:                 return "Catch-Up Limit";
+        case SettingsRow::PetTimeCapCustomEntry:      return "Enter Custom Hours";
+        case SettingsRow::PetTimeDisplay:             return "Catch-Up Display";
         case SettingsRow::LogFile:                   return "Log File";
         case SettingsRow::ExperimentalGames:                  return "Experimental Games";
         case SettingsRow::ExperimentalFeatures:                return "Experimental Features";
@@ -1077,6 +1183,14 @@ std::string settings_row_value(SettingsRow row) {
             return clone_filter_label(g_clone_filter_mode);
         case SettingsRow::TimeSetMode:
             return time_set_mode_label(g_time_set_mode);
+        case SettingsRow::PetTime:
+            return pet_time_mode_label(g_pet_time_mode);
+        case SettingsRow::PetTimeCap:
+            return g_pettimecap_custom_selected
+                ? (g_pettimecap_custom_text.empty() ? std::string("Custom") : ("Custom: " + g_pettimecap_custom_text + "h"))
+                : pettimecap_display(g_pet_time_cap_hours);
+        case SettingsRow::PetTimeDisplay:
+            return pet_time_display_label(g_pet_time_display);
         case SettingsRow::LogFile:
             return g_log_file_enabled ? "On" : "Off";
         case SettingsRow::ExperimentalGames:
@@ -1171,7 +1285,8 @@ void render_settings_rows(int logical_w, int logical_h) {
         // indent the label only, keep the selection highlight full-width.
         const bool nested = (row == SettingsRow::BackgroundCustomEntry) || (row == SettingsRow::SegmentColorCustomEntry)
             || (row == SettingsRow::SegmentsCustomEntry)
-            || (row == SettingsRow::PanelGapCustomEntry);
+            || (row == SettingsRow::PanelGapCustomEntry)
+            || (row == SettingsRow::PetTimeCapCustomEntry);
         const float indent = nested ? 24.0f : 0.0f;
 
         if (sel) {
@@ -1343,6 +1458,10 @@ void switch_menu_init() {
         snprintf(buf, sizeof(buf), "%u", (unsigned)g_panel_gap_percent);
         g_panelgap_custom_text = buf;
     }
+    g_pettimecap_custom_selected = !pettimecap_matches_any_preset(g_pet_time_cap_hours);
+    if (g_pettimecap_custom_selected) {
+        g_pettimecap_custom_text = std::to_string((unsigned)g_pet_time_cap_hours);
+    }
 
     g_menu_active = true;
 }
@@ -1363,7 +1482,9 @@ static void update_load_prompt(uint64_t kDown) {
     if (kDown & HidNpadButton_A) {
         YOKOI_LOG("switch_menu: load-save-state prompt confirmed for index %u", (unsigned)g_selected_index);
         switch_load_game_by_index_and_init(g_selected_index);
-        load_game_state(g_cpu.get(), g_selected_index);
+        if (load_game_state(g_cpu.get(), g_selected_index)) {
+            pet_time_on_state_loaded();  // time away since that save - see pet_time.h
+        }
         g_load_prompt_active = false;
         g_menu_active = false;
     } else if (kDown & HidNpadButton_B) {
@@ -1546,6 +1667,30 @@ static void update_settings_menu(uint64_t kDown) {
             case SettingsRow::TimeSetMode:
                 g_time_set_mode = cycle_time_set_mode(g_time_set_mode, dir);
                 break;
+            case SettingsRow::PetTime:
+                g_pet_time_mode = cycle_pet_time_mode(g_pet_time_mode, dir);
+                break;
+            case SettingsRow::PetTimeCap: {
+                int slot = g_pettimecap_custom_selected ? kNumPetTimeCapPresets
+                                                        : find_pettimecap_preset_index(g_pet_time_cap_hours);
+                slot = (slot + dir + kNumPetTimeCapPresets + 1) % (kNumPetTimeCapPresets + 1);
+                if (slot == kNumPetTimeCapPresets) {
+                    g_pettimecap_custom_selected = true;
+                    // The 72 Hours default until a value is typed, like the
+                    // other Custom slots.
+                    g_pet_time_cap_hours = g_pettimecap_custom_text.empty()
+                        ? kPetTimeCapDefaultHours
+                        : (uint32_t)std::clamp((int)strtol(g_pettimecap_custom_text.c_str(), nullptr, 10), 1, 9999);
+                } else {
+                    g_pettimecap_custom_selected = false;
+                    g_pet_time_cap_hours = kPetTimeCapPresetHours[slot];
+                }
+                break;
+            }
+            case SettingsRow::PetTimeDisplay:
+                g_pet_time_display = (g_pet_time_display == PetTimeDisplay::Progress) ? PetTimeDisplay::FastForward
+                                                                                     : PetTimeDisplay::Progress;
+                break;
             case SettingsRow::LogFile:
                 g_log_file_enabled = !g_log_file_enabled;
                 debug_log::set_enabled(g_log_file_enabled);
@@ -1624,6 +1769,8 @@ static void update_settings_menu(uint64_t kDown) {
                 open_segments_custom_keyboard();
             } else if (row == SettingsRow::PanelGapCustomEntry) {
                 open_panelgap_custom_keyboard();
+            } else if (row == SettingsRow::PetTimeCapCustomEntry) {
+                open_pettimecap_custom_keyboard();
             }
         }
     }
@@ -1704,7 +1851,9 @@ void switch_menu_update(uint64_t kDown, uint64_t kHeld) {
         } else if (has_save && g_load_state_behavior == LoadStateBehavior::AutoLoad) {
             YOKOI_LOG("switch_menu: A pressed on index %u, save exists (Auto-Load) - loading directly", (unsigned)g_selected_index);
             switch_load_game_by_index_and_init(g_selected_index);
-            load_game_state(g_cpu.get(), g_selected_index);
+            if (load_game_state(g_cpu.get(), g_selected_index)) {
+                pet_time_on_state_loaded();  // time away since that save - see pet_time.h
+            }
             g_menu_active = false;
         } else {
             // No save, Never Load, or debug mode - always fresh. Never
@@ -1824,7 +1973,8 @@ void switch_menu_render(int viewport_w, int viewport_h) {
         // either Custom-entry row) - shown whenever one of those can
         // currently be reached, not just in the from-gameplay case that used
         // to be the only source of one.
-        if (g_settings_from_gameplay || g_bg_custom_selected || g_segcolor_custom_selected || g_seg_custom_selected || g_panelgap_custom_selected) {
+        if (g_settings_from_gameplay || g_bg_custom_selected || g_segcolor_custom_selected || g_seg_custom_selected || g_panelgap_custom_selected
+            || g_pettimecap_custom_selected) {
             put_icon(SwitchButtonIcon::A);
             put_text("Confirm");
         }

@@ -397,6 +397,89 @@ plain background colour, and the thumbnail is the game's own LCD art (red on
 black, after the HeadGear's red-on-black screen). For that look in-game, set
 Game Background Color to **Black** and Segment Color to **Red**.
 
+## Seiko Epson E0C6S46/S48 keychain games (Experimental Games)
+
+MAME's `hh_e0c6200.cpp` set, on its own core (`source/E0C6200/` - a port of
+MAME's E0C6200 CPU and E0C6S46 peripherals): Bandai's Tamagotchi (Gen. 1/2,
+Tenshitchi, Mothra) and Digital Monster (Ver. 1-3), Epoch's Chibi Pachi:
+Alien Fever, Nikko's Venus Diet Monogatari and Tandy's Stack Challenge. Each
+button is wired straight to an MCU input pin, so these use their own input
+path (`switch/source/input/e0c6200_input_map.cpp`) rather than a
+`Virtual_Input` class.
+
+These were built to run 24/7. For the Tamagotchis and Digital Monsters whose
+clock is mapped (all but Yasashii), the **Pet Time** setting decides what
+happens to the time they weren't running - the app closed, or the game
+paused/suspended mid-play. **Real Time** (default) fast-forwards the pet
+through it on load (up to the Catch-Up Limit; **B** skips the rest), so it
+really aged - and can get hungry, sick or worse, just like a real one left
+alone. **Clock Sync** only sets its clock to now; **Paused** leaves it
+exactly where it was. Venus Diet, Alien Fever, Stack Challenge and Yasashii
+always pick up where they left off.
+
+With Time Set Mode on **Automatic**, a fresh start sets the clock for you:
+about 3 seconds in, the game's own clock-set screen opens, the current
+time is entered and confirmed (the egg then starts hatching as usual) -
+`switch/source/input/e0c6200_clock_setup.cpp`. Your buttons are ignored for
+those ~5 seconds. It never runs on a pet restored from a save state (it
+checks the clock is still unset first). Supported: every Tamagotchi except
+Yasashii, every Digital Monster. Yasashii Tamagotchi and Venus Diet still
+need setting by hand; Alien Fever and Stack Challenge have no clock.
+
+**Tamagotchi / Digital Monster / Venus Diet Monogatari** (`TAMA`, `TAMAG2`,
+`TAMAJ`, `TAMAANG`, `TAMAMOT`, `TAMAUMI`, `TAMAMORI`, `TAMAGENJIN`, `DIGIMON*`,
+`VENUSDM`) - three buttons, left to right:
+
+| Switch input | Function |
+|---|---|
+| Y / D-Pad Left | Left button (A - select / cycle) |
+| A / D-Pad Up / D-Pad Down | Middle button (B - confirm) |
+| B / D-Pad Right | Right button (C - cancel) |
+| X | Sensor on K03 (`TAMAANG`, `TAMAUMI`, `TAMAMORI`, `TAMAGENJIN` - BrickEmuPy wires it to tapping the screen) |
+| L + R (held) | Reset (`DIGIMON*` only - the recessed reset button) |
+
+**Yasashii Tamagotchi** (`TAMAYASA`) - six icon buttons around the screen
+plus Select / Cancel, mapped by position:
+
+| Switch input | Function |
+|---|---|
+| D-Pad Left / Up / Right | Food / Smile / Heart (top row) |
+| L / D-Pad Down / R | Clean / Bulb / Weight (bottom row) |
+| A | Select (えらぶ) |
+| B | Cancel (とりけし) |
+| + and − (held) | Reset |
+
+**Stack Challenge** (`STACKCH`) - starts powered off, press + to turn it on:
+
+| Switch input | Function |
+|---|---|
+| D-Pad Left / Right | Left / Level, Right / Height |
+| D-Pad Down | Down / Start |
+| A / D-Pad Up | Rotate / Contrast |
+| + | On / Off |
+| − | Pause |
+| R | Sound |
+
+**Chibi Pachi: Alien Fever** (`ALIENFEV`):
+
+| Switch input | Function |
+|---|---|
+| A | Handle (the slot lever) |
+| X | Mode |
+| Y | Select |
+| R | Sound |
+
+LCD art, the printed inlays behind it and the thumbnails come from
+[BrickEmuPy](https://github.com/azya52/BrickEmuPy)'s whole-device face SVGs
+(CC0), split by `CONVERT_ROM/split_brick_svg.py` (run through
+`prepare_e0c6200.py --brick`). Alien Fever, Venus Diet and Stack Challenge
+have a plain single-colour LCD on the real unit, so they get no background
+art and follow the Background Color setting instead. Seven of these games (`TAMAJ`, `TAMAUMI`,
+`TAMAMORI`, `TAMAGENJIN`, `TAMAYASA`, `DIGIMONES`, `DIGIMONV4`) exist only in
+BrickEmuPy, not MAME. Each board's fast-oscillator (OSC3) speed is also
+BrickEmuPy's measured value rather than MAME's 1 MHz placeholder - Alien
+Fever, which runs on it full time, plays ~40% faster than in MAME.
+
 ## McDonald's (LCDonald ports)
 
 Twenty games ported from the [LCDonald](https://github.com/Difegue/LCDonald)

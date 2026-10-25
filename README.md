@@ -29,7 +29,7 @@ Supported games are all of the Game & Watch titles, some Tronica, some Elektroni
 - Adjustable background color and LCD segment shadow
 - Optional console art display for single-screen games
 - Left/right analog stick support (left stick mirrors the D-Pad everywhere, right stick mirrors A/B/X/Y in-game)
-- Optional experimental support for Tiger, Konami, Nelsonic, V-Tech, David & John, McDonald's and Burger Bard games
+- Optional experimental support for Tiger, Konami, Nelsonic, V-Tech, David & John, McDonald's and Burger Bard games, plus the Seiko Epson E0C6S46 keychain games (Tamagotchi, Digital Monster, Alien Fever, Venus Diet Monogatari, Stack Challenge) on the Switch
 
 Full controls, settings, and technical details: [switch/README.md](switch/README.md)
 

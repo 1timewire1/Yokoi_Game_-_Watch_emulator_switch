@@ -110,6 +110,12 @@ after `hh_hmcs40.cpp` on cleanliness alone.
 
 ### `hh_e0c6200.cpp` — Tamagotchi/Digimon, different form factor
 
+**Done (Switch):** all 10 sets run on `source/E0C6200/` (MAME's E0C6200 core +
+E0C6S46/S48 peripherals, ported) - see `CONVERT_ROM/prepare_e0c6200.py` for
+the asset prep and `switch/standard_controls.md` for controls. The note below
+is the original assessment; the round form factor turned out not to matter,
+since the LCD itself is rectangular and the thumbnails are screen captures.
+
 All 10 games are `MACHINE_REQUIRES_ARTWORK` (no built-in background,
 matching the "keychain toy" reality - these are round/oval devices, not
 rectangular G&W-style units) but otherwise clean. Strong brand recognition
@@ -221,7 +227,7 @@ first pass above, with one addition:
   exists. One game, no sound, a comms port for multiplayer that we'd skip.
 
 Updated priority: **`rzone.cpp`** (existing cores) -> **`hh_hmcs40.cpp`**
-(+ `dbridgec`) -> **`hh_ucom4.cpp`** -> **`hh_e0c6200.cpp`** -> the rest as
+(+ `dbridgec`) -> **`hh_ucom4.cpp`** -> ~~`hh_e0c6200.cpp`~~ (done) -> the rest as
 listed above.
 
 ### Uses the SVG device, but a poor fit for this project

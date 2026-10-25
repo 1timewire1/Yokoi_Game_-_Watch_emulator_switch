@@ -339,10 +339,44 @@ extern const GW_rom r_zone_batman_forever;
 extern const GW_rom r_zone_battle_arena_toshinden;
 #include "GW_ROM_RGDS/r_zone_indy_500.h"
 extern const GW_rom r_zone_indy_500;
+#include "GW_ROM_RGDS/tamagotchi_gen_1.h"
+extern const GW_rom tamagotchi_gen_1;
+#include "GW_ROM_RGDS/tamagotchi_gen_2.h"
+extern const GW_rom tamagotchi_gen_2;
+#include "GW_ROM_RGDS/tenshitchi_no_tamagotchi.h"
+extern const GW_rom tenshitchi_no_tamagotchi;
+#include "GW_ROM_RGDS/mothra_no_tamagotchi.h"
+extern const GW_rom mothra_no_tamagotchi;
+#include "GW_ROM_RGDS/digital_monster.h"
+extern const GW_rom digital_monster;
+#include "GW_ROM_RGDS/digital_monster_ver_2.h"
+extern const GW_rom digital_monster_ver_2;
+#include "GW_ROM_RGDS/digital_monster_ver_3.h"
+extern const GW_rom digital_monster_ver_3;
+#include "GW_ROM_RGDS/chibi_pachi_alien_fever.h"
+extern const GW_rom chibi_pachi_alien_fever;
+#include "GW_ROM_RGDS/beans_collection_venus_diet_monogatari.h"
+extern const GW_rom beans_collection_venus_diet_monogatari;
+#include "GW_ROM_RGDS/stack_challenge.h"
+extern const GW_rom stack_challenge;
+#include "GW_ROM_RGDS/tamagotchi_gen_1_japan.h"
+extern const GW_rom tamagotchi_gen_1_japan;
+#include "GW_ROM_RGDS/umi_de_hakken_tamagotchi.h"
+extern const GW_rom umi_de_hakken_tamagotchi;
+#include "GW_ROM_RGDS/mori_de_hakken_tamagotchi.h"
+extern const GW_rom mori_de_hakken_tamagotchi;
+#include "GW_ROM_RGDS/genjintchi.h"
+extern const GW_rom genjintchi;
+#include "GW_ROM_RGDS/yasashii_tamagotchi.h"
+extern const GW_rom yasashii_tamagotchi;
+#include "GW_ROM_RGDS/digital_monster_spanish.h"
+extern const GW_rom digital_monster_spanish;
+#include "GW_ROM_RGDS/digital_monster_ver_4.h"
+extern const GW_rom digital_monster_ver_4;
 
 
 
 
-const GW_rom* GW_list[] = {&_25th_anniversary_konami, &aliens, &altair_nauchpribor, &altered_beast, &apollo_13, &ataka_asteroidov, &autoslalom, &back_to_the_future, &ball, &balloon_fight_crystal_screen, &balloon_fight_new_wide_screen, &basketball_konami, &bassmate_computer_telko_nintendo, &batman, &battletoads, &biathlon, &bill_elliott_s_nascar_racing_konami, &black_jack, &blades_of_steel_konami, &bomb_sweeper, &bottom_of_the_ninth_konami, &boxing, &bucky_o_hare_konami, &castlevania_ii_simon_s_quest, &chef, &chequered_flag_konami, &circus_elektronika, &clever_chicken, &climber_crystal_screen, &climber_new_wide_screen, &contra_konami, &crab_grab, &dennis_the_menace, &diver_s_adventure, &donkey_kong, &donkey_kong_3, &donkey_kong_circus, &donkey_kong_hockey, &donkey_kong_ii, &donkey_kong_jr_new_wide_screen, &donkey_kong_jr_panorama_screen, &double_dose_of_doom, &double_dragon, &double_dragon_iii_the_rosetta_stone, &double_dribble_konami, &egg, &electronic_number_muncher_vtech, &fire_attack, &fire_silver, &fire_wide_screen, &flagman, &garfield_konami, &gauntlet, &generation_2, &gold_cliff, &golden_axe, &goldeneye, &gradius_konami, &green_house, &helmet_version_cn_07, &helmet_version_cn_17, &hockey_elektronika, &home_alone, &hook, &independence_day, &judge_dredd, &judge_green_version, &judge_purple_version, &jurassic_park, &karnov, &kazaam, &kosmicheskiy_polyot, &kot_rybolov_elektronika, &kvaka_zadavaka, &life_boat, &lion, &lost_in_new_york, &manhole_gold, &manhole_new_wide_screen, &mario_bros, &mario_s_bombs_away, &mario_s_cement_factory_new_wide_screen, &mario_s_cement_factory_table_top_cm_72, &mario_s_cement_factory_table_top_cm_72a, &mario_the_juggler, &mc_hammer_u_can_t_touch_this, &mega_man_3, &mickey_donald, &mickey_mouse_panorama_screen, &mickey_mouse_wide_screen, &mighty_max, &morskaja_ataka, &mortal_kombat, &nfl_football_konami, &night_flight, &nightmare_before_christmas, &ninja_gaiden, &ninja_gaiden_iii, &nochnye_vorishki, &octopus, &oil_panic, &okhota, &parachute, &pinball, &pit_fighter, &popeye_panorama_screen, &popeye_wide_screen, &project_x, &rain_shower, &robin_hood, &robocop_2, &robocop_3, &safe_buster, &second_mission_konami, &shredder_s_last_stand_konami, &skate_or_die_konami, &snoopy_panorama_screen, &snoopy_tennis, &sonic_the_hedgehog, &sonic_the_hedgehog_2, &space_adventure, &space_harrier_ii, &space_jam, &space_mission_tronica, &spider_man, &spider_tronica, &spitball_sparky, &splinter_speaks_konami, &squish, &star_fox_nelsonic, &street_fighter_ii, &strider, &super_double_dragon, &super_goal_keeper, &super_mario_bros_3_nelsonic, &super_mario_bros_crystal_screen, &super_mario_bros_new_wide_screen, &super_mario_world_nelsonic, &superman, &swamp_thing, &tayny_okeana, &teenage_mutant_ninja_turtles_konami, &the_addams_family, &the_adventures_of_bayou_billy_konami, &the_animated_series, &the_dark_crusade, &the_final_fight, &the_flash, &the_incredible_crash_dummies, &the_lone_ranger_konami, &the_rocketeer, &the_shadow, &thunder_ball_tronica, &top_gun_konami, &treasure_island_tronica, &tropical_fish, &turtle_bridge, &uchitel_arifmetiki_elektronika, &vermin, &vesolaya_arifmetika_elektronika, &vesyolye_futbolisty, &vindicators, &vinni_pukh_panorama_screen, &wayne_s_world, &x_men, &zelda, &r_zone_batman_forever, &r_zone_battle_arena_toshinden, &r_zone_indy_500};
-const size_t nb_games = 169;
+const GW_rom* GW_list[] = {&_25th_anniversary_konami, &aliens, &altair_nauchpribor, &altered_beast, &apollo_13, &ataka_asteroidov, &autoslalom, &back_to_the_future, &ball, &balloon_fight_crystal_screen, &balloon_fight_new_wide_screen, &basketball_konami, &bassmate_computer_telko_nintendo, &batman, &battletoads, &biathlon, &bill_elliott_s_nascar_racing_konami, &black_jack, &blades_of_steel_konami, &bomb_sweeper, &bottom_of_the_ninth_konami, &boxing, &bucky_o_hare_konami, &castlevania_ii_simon_s_quest, &chef, &chequered_flag_konami, &circus_elektronika, &clever_chicken, &climber_crystal_screen, &climber_new_wide_screen, &contra_konami, &crab_grab, &dennis_the_menace, &diver_s_adventure, &donkey_kong, &donkey_kong_3, &donkey_kong_circus, &donkey_kong_hockey, &donkey_kong_ii, &donkey_kong_jr_new_wide_screen, &donkey_kong_jr_panorama_screen, &double_dose_of_doom, &double_dragon, &double_dragon_iii_the_rosetta_stone, &double_dribble_konami, &egg, &electronic_number_muncher_vtech, &fire_attack, &fire_silver, &fire_wide_screen, &flagman, &garfield_konami, &gauntlet, &generation_2, &gold_cliff, &golden_axe, &goldeneye, &gradius_konami, &green_house, &helmet_version_cn_07, &helmet_version_cn_17, &hockey_elektronika, &home_alone, &hook, &independence_day, &judge_dredd, &judge_green_version, &judge_purple_version, &jurassic_park, &karnov, &kazaam, &kosmicheskiy_polyot, &kot_rybolov_elektronika, &kvaka_zadavaka, &life_boat, &lion, &lost_in_new_york, &manhole_gold, &manhole_new_wide_screen, &mario_bros, &mario_s_bombs_away, &mario_s_cement_factory_new_wide_screen, &mario_s_cement_factory_table_top_cm_72, &mario_s_cement_factory_table_top_cm_72a, &mario_the_juggler, &mc_hammer_u_can_t_touch_this, &mega_man_3, &mickey_donald, &mickey_mouse_panorama_screen, &mickey_mouse_wide_screen, &mighty_max, &morskaja_ataka, &mortal_kombat, &nfl_football_konami, &night_flight, &nightmare_before_christmas, &ninja_gaiden, &ninja_gaiden_iii, &nochnye_vorishki, &octopus, &oil_panic, &okhota, &parachute, &pinball, &pit_fighter, &popeye_panorama_screen, &popeye_wide_screen, &project_x, &rain_shower, &robin_hood, &robocop_2, &robocop_3, &safe_buster, &second_mission_konami, &shredder_s_last_stand_konami, &skate_or_die_konami, &snoopy_panorama_screen, &snoopy_tennis, &sonic_the_hedgehog, &sonic_the_hedgehog_2, &space_adventure, &space_harrier_ii, &space_jam, &space_mission_tronica, &spider_man, &spider_tronica, &spitball_sparky, &splinter_speaks_konami, &squish, &star_fox_nelsonic, &street_fighter_ii, &strider, &super_double_dragon, &super_goal_keeper, &super_mario_bros_3_nelsonic, &super_mario_bros_crystal_screen, &super_mario_bros_new_wide_screen, &super_mario_world_nelsonic, &superman, &swamp_thing, &tayny_okeana, &teenage_mutant_ninja_turtles_konami, &the_addams_family, &the_adventures_of_bayou_billy_konami, &the_animated_series, &the_dark_crusade, &the_final_fight, &the_flash, &the_incredible_crash_dummies, &the_lone_ranger_konami, &the_rocketeer, &the_shadow, &thunder_ball_tronica, &top_gun_konami, &treasure_island_tronica, &tropical_fish, &turtle_bridge, &uchitel_arifmetiki_elektronika, &vermin, &vesolaya_arifmetika_elektronika, &vesyolye_futbolisty, &vindicators, &vinni_pukh_panorama_screen, &wayne_s_world, &x_men, &zelda, &r_zone_batman_forever, &r_zone_battle_arena_toshinden, &r_zone_indy_500, &tamagotchi_gen_1, &tamagotchi_gen_2, &tenshitchi_no_tamagotchi, &mothra_no_tamagotchi, &digital_monster, &digital_monster_ver_2, &digital_monster_ver_3, &chibi_pachi_alien_fever, &beans_collection_venus_diet_monogatari, &stack_challenge, &tamagotchi_gen_1_japan, &umi_de_hakken_tamagotchi, &mori_de_hakken_tamagotchi, &genjintchi, &yasashii_tamagotchi, &digital_monster_spanish, &digital_monster_ver_4};
+const size_t nb_games = 186;
 

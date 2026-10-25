@@ -241,6 +241,60 @@ Special editions are not supported in the emulator, refer to the Notes column fo
 |-----|---------|---------------------|--------------------------------------------------------------|--------------|-----|-------|
 | 01  | nummunch| nummunch.zip        | Electronic Number Muncher                                    | 1989.01.01   | SM511 |  |
 
+## Bandai
+
+<!-- Seiko Epson E0C6S46 / E0C6S48 virtual pets (MAME hh_e0c6200.cpp, run on
+     source/E0C6200/). Like the other non-Nintendo/Tronica/Elektronika
+     groups, gated behind the Switch app's "Experimental Games" setting.
+     Meant to run 24/7 on the real thing - the app's save state on exit is
+     what keeps a pet alive between sessions (time doesn't pass while the
+     app is closed). LCD art, inlays and thumbnails come from BrickEmuPy's
+     face SVGs (prepare_e0c6200.py --brick, split_brick_svg.py); rows 08-14
+     exist only in BrickEmuPy (github.com/azya52/BrickEmuPy), ROM included. -->
+
+| No. | Model   | Filename            | Game Title                                                   | Release Date | CPU | Clone Of |
+|-----|---------|---------------------|--------------------------------------------------------------|--------------|-----|-------|
+| 01  | tama    | tama.zip            | Tamagotchi (Gen. 1)                                          | 1997.01.01   | E0C6S46 |  |
+| 02  | tamag2  | tamag2.zip          | Tamagotchi (Gen. 2)                                          | 1997.01.01   | E0C6S46 |  |
+| 03  | tamaang | tamaang.zip         | Tenshitchi no Tamagotchi                                     | 1997.01.01   | E0C6S48 |  |
+| 04  | tamamot | tamamot.zip         | Mothra no Tamagotchi                                         | 1997.01.01   | E0C6S48 |  |
+| 05  | digimon | digimon.zip         | Digital Monster                                              | 1997.01.01   | E0C6S48 |  |
+| 06  | digimonv2 | digimonv2.zip     | Digital Monster Ver. 2                                       | 1998.01.01   | E0C6S48 |  |
+| 07  | digimonv3 | digimonv3.zip     | Digital Monster Ver. 3                                       | 1998.01.01   | E0C6S48 |  |
+| 08  | tamaj   | (BrickEmuPy)        | Tamagotchi (Gen. 1, Japan)                                   | 1996.01.01   | E0C6S46 |  |
+| 09  | tamaumi | (BrickEmuPy)        | Umi de Hakken!! Tamagotchi                                   | 1998.01.01   | E0C6S48 |  |
+| 10  | tamamori | (BrickEmuPy)       | Mori de Hakken! Tamagotchi                                   | 1998.02.01   | E0C6S48 |  |
+| 11  | tamagenjin | (BrickEmuPy)     | Genjintchi                                                   | 1997.11.01   | E0C6S48 |  |
+| 12  | tamayasa | (BrickEmuPy)       | Yasashii Tamagotchi                                          | 1998.01.01   | E0C6S48 |  |
+| 13  | digimones | (BrickEmuPy)      | Digital Monster (Spanish)                                    | 1997.01.01   | E0C6S48 |  |
+| 14  | digimonv4 | (BrickEmuPy)      | Digital Monster Ver. 4                                       | 1998.05.01   | E0C6S48 |  |
+
+## Epoch
+
+<!-- E0C6S46 (MAME hh_e0c6200.cpp). Plain 39x16 dot-matrix LCD with no MAME
+     SVG - prepare_e0c6200.py generates one. -->
+
+| No. | Model   | Filename            | Game Title                                                   | Release Date | CPU | Clone Of |
+|-----|---------|---------------------|--------------------------------------------------------------|--------------|-----|-------|
+| 01  | alienfev | alienfev.zip       | Chibi Pachi: Alien Fever                                     | 1997.01.01   | E0C6S46 |  |
+
+## Nikko
+
+<!-- E0C6S46 (MAME hh_e0c6200.cpp). 32x20 dot-matrix LCD with no MAME SVG -
+     prepare_e0c6200.py generates one. -->
+
+| No. | Model   | Filename            | Game Title                                                   | Release Date | CPU | Clone Of |
+|-----|---------|---------------------|--------------------------------------------------------------|--------------|-----|-------|
+| 01  | venusdm | venusdm.zip         | Beans Collection: Venus Diet Monogatari                      | 1997.01.01   | E0C6S46 |  |
+
+## Tandy
+
+<!-- E0C6S46 (MAME hh_e0c6200.cpp). Radio Shack's brick game. -->
+
+| No. | Model   | Filename            | Game Title                                                   | Release Date | CPU | Clone Of |
+|-----|---------|---------------------|--------------------------------------------------------------|--------------|-----|-------|
+| 01  | stackch | stackch.zip         | Stack Challenge                                              | 1991.01.01   | E0C6S46 |  |
+
 ## McDonald's (LCDonald)
 
 <!-- Manufacturer id assigned by generate_games_path.py's heading parser

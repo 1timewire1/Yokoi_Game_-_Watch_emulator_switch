@@ -44,7 +44,7 @@ TARGET		:=	yokoi_switch
 BUILD		:=	build
 SOURCES		:=	source source/core source/input source/render source/audio source/third_party \
 			../source/std ../source/SM5XX ../source/SM5XX/SM5A ../source/SM5XX/SM510 ../source/SM5XX/SM511_SM512 \
-			../source/SM5XX/SM530 \
+			../source/SM5XX/SM530 ../source/E0C6200 \
 			../source/std/David_And_John_ROM_rgds \
 			../source/std/LCDonald_ROM_rgds \
 			../source/David_and_John ../source/David_and_John/common \

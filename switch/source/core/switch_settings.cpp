@@ -22,6 +22,9 @@ bool g_experimental_features_enabled = false;
 bool g_debug_mode = false;
 uint8_t g_dosimeter_reading = 0;
 TimeSetMode g_time_set_mode = TimeSetMode::Automatic;
+PetTimeMode g_pet_time_mode = PetTimeMode::RealTime;
+uint32_t g_pet_time_cap_hours = 72;
+PetTimeDisplay g_pet_time_display = PetTimeDisplay::Progress;
 
 namespace {
 
@@ -46,6 +49,9 @@ void switch_settings_load() {
     g_debug_mode = false;
     g_dosimeter_reading = 0;
     g_time_set_mode = TimeSetMode::Automatic;
+    g_pet_time_mode = PetTimeMode::RealTime;
+    g_pet_time_cap_hours = 72;
+    g_pet_time_display = PetTimeDisplay::Progress;
 
     // Applied before anything below gets a chance to log, so even the
     // "no settings file" case respects logging being off by default -
@@ -132,6 +138,14 @@ void switch_settings_load() {
             g_dosimeter_reading = (uint8_t)v;
         } else if (strcmp(line, "timesetmode") == 0) {
             g_time_set_mode = (value == 1) ? TimeSetMode::Manual : TimeSetMode::Automatic;
+        } else if (strcmp(line, "pettime") == 0) {
+            if (value == 1) g_pet_time_mode = PetTimeMode::ClockSync;
+            else if (value == 2) g_pet_time_mode = PetTimeMode::Paused;
+            else g_pet_time_mode = PetTimeMode::RealTime;
+        } else if (strcmp(line, "pettimecap") == 0) {
+            g_pet_time_cap_hours = (value < 0) ? 72u : (uint32_t)(value > 9999 ? 9999 : value);
+        } else if (strcmp(line, "pettimedisplay") == 0) {
+            g_pet_time_display = (value == 1) ? PetTimeDisplay::FastForward : PetTimeDisplay::Progress;
         }
     }
     fclose(file);
@@ -182,6 +196,9 @@ void switch_settings_save() {
     fprintf(file, "experimentalfeatures=%d\n", g_experimental_features_enabled ? 1 : 0);
     fprintf(file, "dosimeterreading=%u\n", (unsigned)g_dosimeter_reading);
     fprintf(file, "timesetmode=%u\n", (unsigned)g_time_set_mode);
+    fprintf(file, "pettime=%u\n", (unsigned)g_pet_time_mode);
+    fprintf(file, "pettimecap=%u\n", (unsigned)g_pet_time_cap_hours);
+    fprintf(file, "pettimedisplay=%u\n", (unsigned)g_pet_time_display);
     fclose(file);
 }
 

@@ -12,7 +12,9 @@ constexpr uint8_t SAVESTATE_VERSION = 1;
 enum CPUType : uint8_t {
     CPU_TYPE_SM5A = 0,
     CPU_TYPE_SM510 = 1,
-    CPU_TYPE_SM511_2 = 2
+    CPU_TYPE_SM511_2 = 2,
+    // 3 = SM5XX convention gap (see yokoi_cpu_utils.cpp), 4 = SM530
+    CPU_TYPE_E0C6S46 = 5,  // E0C6S46 and E0C6S48 (the state header records which)
 };
 
 // Common header for all save states

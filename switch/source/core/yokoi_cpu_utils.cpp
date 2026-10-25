@@ -7,6 +7,7 @@
 #include "SM5XX/SM510/SM510.h"
 #include "SM5XX/SM511_SM512/SM511_2.h"
 #include "SM5XX/SM530/SM530.h"
+#include "E0C6200/E0C6S46.h"
 #include "David_and_John/David_And_John_fake_cpu.h"
 #include "LCDonald/LCDonald_fake_cpu.h"
 
@@ -50,6 +51,16 @@ bool yokoi_cpu_create_instance(std::unique_ptr<SM5XX>& out, const uint8_t* rom, 
     }
     if (size_rom == 2048) { // 32 pages x 64 words - only SM530 dumps come in this size
         out = std::make_unique<SM530>();
+        return true;
+    }
+    // Seiko Epson E0C6S46 / E0C6S48 (hh_e0c6200 keychain games): 6144 / 8192
+    // 12-bit words, stored as 16-bit big-endian - see source/E0C6200/.
+    if (size_rom == 0x3000) {
+        out = std::make_unique<E0C6S46>(E0C6S46::Model::S46);
+        return true;
+    }
+    if (size_rom == 0x4000) {
+        out = std::make_unique<E0C6S46>(E0C6S46::Model::S48);
         return true;
     }
     if (size_rom == 4096) {

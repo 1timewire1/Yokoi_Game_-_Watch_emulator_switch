@@ -15,6 +15,7 @@
 #include "virtual_i_o/virtual_input.h"
 #include "virtual_i_o/rzone_io.h"
 #undef get_input_config
+#include "E0C6200/E0C6S46.h"
 
 #include "audio/switch_sound.h"
 #include "audio/lcdonald_sound.h"
@@ -27,6 +28,8 @@
 #include "input/uchitari_clock_setup.h"
 #include "input/vesarif_clock_setup.h"
 #include "input/auto_confirm_press.h"
+#include "input/e0c6200_clock_setup.h"
+#include "pet_time.h"
 
 namespace {
 
@@ -168,6 +171,11 @@ void switch_load_game_by_index_and_init(uint8_t idx) {
         g_cpu->port_device = g_rzone_io.get();
         YOKOI_LOG("switch_load_game_by_index_and_init: R-Zone I/O attached (type %d)", rzone_type == RZoneIO::Type::Type1 ? 1 : 2);
     }
+    // E0C6S46/S48 boards differ in OSC3 / P-port wiring - see configure_for_ref().
+    // (Type id check rather than dynamic_cast - this build is -fno-rtti.)
+    if (g_cpu->get_cpu_type_id() == CPU_TYPE_E0C6S46) {
+        static_cast<E0C6S46*>(g_cpu.get())->configure_for_ref(g_game->ref);
+    }
     g_cpu->load_rom(g_game->rom, g_game->size_rom);
     YOKOI_LOG("switch_load_game_by_index_and_init: cpu->load_rom() done");
     if (GW_rom::is_lcdonald_family(g_game->manufacturer)) {
@@ -228,6 +236,14 @@ void switch_load_game_by_index_and_init(uint8_t idx) {
     // their default 00:00 boot clock and every confirm-press game stays on
     // its time-display screen until the player presses the button
     // themselves, exactly as un-automated hardware behaves.
+    // E0C6S46/S48 games (Tamagotchi, Digital Monster): set the clock through
+    // the game's own set screen a few seconds in - unless a save state
+    // (loaded right after this function returns) already has it set. See
+    // e0c6200_clock_setup.h. begin() also cancels any sequence left running
+    // from the previous game, so it's called for every game.
+    e0c6200_clock_setup_begin(g_game->ref, g_time_set_mode == TimeSetMode::Automatic);
+    pet_time_on_game_loaded();
+
     if (g_time_set_mode == TimeSetMode::Automatic) {
         // UCHITARI/VESARIF don't get a time_addresses.h entry (see that
         // file's comments on these two) - their clocks only respond to real

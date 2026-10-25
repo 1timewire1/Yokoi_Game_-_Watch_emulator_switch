@@ -37,7 +37,14 @@ struct GW_rom {
     // VTech currently has a single supported device (Electronic Number
     // Muncher); more are expected.
     static constexpr uint8_t MANUFACTURER_VTECH = 10;
-    static constexpr uint8_t MANUFACTURER_COUNT = 11;
+    // Seiko Epson E0C6S46/E0C6S48 keychain games (MAME's hh_e0c6200 driver,
+    // source/E0C6200/): Tamagotchi / Digital Monster, Alien Fever, Venus
+    // Diet Monogatari and Stack Challenge respectively.
+    static constexpr uint8_t MANUFACTURER_BANDAI = 11;
+    static constexpr uint8_t MANUFACTURER_EPOCH = 12;
+    static constexpr uint8_t MANUFACTURER_NIKKO = 13;
+    static constexpr uint8_t MANUFACTURER_TANDY = 14;
+    static constexpr uint8_t MANUFACTURER_COUNT = 15;
 
     // Both LCDonald-derived buckets run on LCDonald_fake_cpu (see
     // source/LCDonald/), so the Switch layer's LCDonald-specific handling

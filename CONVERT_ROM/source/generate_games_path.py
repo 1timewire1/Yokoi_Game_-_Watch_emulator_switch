@@ -16,12 +16,12 @@ from PIL import Image
 try:
     # When imported as part of the 'source' package
     from source.games_path_utils import GameEntry, write_games_path
-    from source.manufacturer_ids import MANUFACTURER_NINTENDO, MANUFACTURER_TRONICA, MANUFACTURER_ELEKTRONIKA, MANUFACTURER_TIGER, MANUFACTURER_DAVID_AND_JOHN, MANUFACTURER_MCDONALDS, MANUFACTURER_BURGER_BARD, MANUFACTURER_KONAMI, MANUFACTURER_NELSONIC, MANUFACTURER_VTECH
+    from source.manufacturer_ids import MANUFACTURER_NINTENDO, MANUFACTURER_TRONICA, MANUFACTURER_ELEKTRONIKA, MANUFACTURER_TIGER, MANUFACTURER_DAVID_AND_JOHN, MANUFACTURER_MCDONALDS, MANUFACTURER_BURGER_BARD, MANUFACTURER_KONAMI, MANUFACTURER_NELSONIC, MANUFACTURER_VTECH, MANUFACTURER_BANDAI, MANUFACTURER_EPOCH, MANUFACTURER_NIKKO, MANUFACTURER_TANDY
     from source.target_profiles import get_target
 except ImportError:
     # When run directly from the 'source' directory
     from games_path_utils import GameEntry, write_games_path
-    from manufacturer_ids import MANUFACTURER_NINTENDO, MANUFACTURER_TRONICA, MANUFACTURER_ELEKTRONIKA, MANUFACTURER_TIGER, MANUFACTURER_DAVID_AND_JOHN, MANUFACTURER_MCDONALDS, MANUFACTURER_BURGER_BARD, MANUFACTURER_KONAMI, MANUFACTURER_NELSONIC, MANUFACTURER_VTECH
+    from manufacturer_ids import MANUFACTURER_NINTENDO, MANUFACTURER_TRONICA, MANUFACTURER_ELEKTRONIKA, MANUFACTURER_TIGER, MANUFACTURER_DAVID_AND_JOHN, MANUFACTURER_MCDONALDS, MANUFACTURER_BURGER_BARD, MANUFACTURER_KONAMI, MANUFACTURER_NELSONIC, MANUFACTURER_VTECH, MANUFACTURER_BANDAI, MANUFACTURER_EPOCH, MANUFACTURER_NIKKO, MANUFACTURER_TANDY
     from target_profiles import get_target
 
 # Preferred background views ordered by desirability. Boolean marks multi-screen views.
@@ -177,6 +177,14 @@ def _load_game_metadata(script_dir: Path) -> Dict[str, GameMetadata]:
                 current_manufacturer = MANUFACTURER_NELSONIC
             elif "v-tech" in heading or "vtech" in heading:
                 current_manufacturer = MANUFACTURER_VTECH
+            elif "bandai" in heading:
+                current_manufacturer = MANUFACTURER_BANDAI
+            elif "epoch" in heading:
+                current_manufacturer = MANUFACTURER_EPOCH
+            elif "nikko" in heading:
+                current_manufacturer = MANUFACTURER_NIKKO
+            elif "tandy" in heading:
+                current_manufacturer = MANUFACTURER_TANDY
             elif "mcdonald" in heading:
                 current_manufacturer = MANUFACTURER_MCDONALDS
             elif "burger bard" in heading:
