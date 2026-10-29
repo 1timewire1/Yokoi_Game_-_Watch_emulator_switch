@@ -33,13 +33,13 @@
 
 namespace {
 
-uint8_t find_game_index_by_ref(const std::string& ref) {
+uint16_t find_game_index_by_ref(const std::string& ref) {
     size_t n = get_nb_name();
-    if (n > 255) n = 255;
+    if (n > 0xFFFF) n = 0xFFFF;
     for (size_t i = 0; i < n; i++) {
-        const GW_rom* g = load_game((uint8_t)i);
+        const GW_rom* g = load_game((uint16_t)i);
         if (g && g->ref == ref) {
-            return (uint8_t)i;
+            return (uint16_t)i;
         }
     }
     return 0;
@@ -140,7 +140,7 @@ constexpr ConfirmButton kAutoConfirmButtons[] = {
 
 } // namespace
 
-void switch_load_game_by_index_and_init(uint8_t idx) {
+void switch_load_game_by_index_and_init(uint16_t idx) {
     YOKOI_LOG("switch_load_game_by_index_and_init: idx=%u begin", (unsigned)idx);
 
     g_game_index = idx;
@@ -320,7 +320,7 @@ void switch_unload_current_game() {
     g_seg_raw_prev.clear();
 }
 
-uint8_t switch_get_default_game_index() {
+uint16_t switch_get_default_game_index() {
     size_t n = get_nb_name();
     if (n == 0) {
         return 0;
@@ -333,7 +333,7 @@ uint8_t switch_get_default_game_index() {
     // 0 for both "found at index 0" and "not found", so the match is
     // confirmed by re-checking the resolved game's own ref.
     if (!g_last_game_played_ref.empty()) {
-        const uint8_t idx = find_game_index_by_ref(g_last_game_played_ref);
+        const uint16_t idx = find_game_index_by_ref(g_last_game_played_ref);
         const GW_rom* g = load_game(idx);
         if (g && g->ref == g_last_game_played_ref) {
             return idx;
@@ -341,15 +341,15 @@ uint8_t switch_get_default_game_index() {
     }
 
     const uint8_t mfr = load_last_selected_manufacturer(GW_rom::MANUFACTURER_NINTENDO);
-    uint8_t idx = 0;
+    uint16_t idx = 0;
     if (try_load_last_game_index_for_manufacturer(mfr, &idx)) {
-        if (idx < (uint8_t)n) {
+        if (idx < n) {
             return idx;
         }
     }
 
     idx = find_game_index_by_ref("AC_01");
-    if (idx >= (uint8_t)n) {
+    if (idx >= n) {
         idx = 0;
     }
     return idx;

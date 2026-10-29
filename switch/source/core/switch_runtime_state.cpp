@@ -8,7 +8,7 @@ std::unique_ptr<SM5XX> g_cpu;
 std::unique_ptr<RZoneIO> g_rzone_io;
 const GW_rom* g_game = nullptr;
 std::unique_ptr<Virtual_Input> g_input;
-uint8_t g_game_index = 0;
+uint16_t g_game_index = 0;
 
 std::vector<Segment> g_segments;
 std::vector<uint8_t> g_seg_on;

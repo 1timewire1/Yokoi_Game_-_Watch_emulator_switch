@@ -5,12 +5,12 @@
 #include "segment.h"
 #include "GW_ROM.h"
 
-const GW_rom* load_game(uint8_t i_game);
+const GW_rom* load_game(uint16_t i_game);
 
-std::string get_name(uint8_t i_game);
-std::string get_ref(uint8_t i_game);
+std::string get_name(uint16_t i_game);
+std::string get_ref(uint16_t i_game);
 size_t get_nb_name();
-std::string get_path_console_img(uint8_t i_game);
-const uint16_t* get_info_console_img(uint8_t i_game);
-std::string get_date(uint8_t i_game);
+std::string get_path_console_img(uint16_t i_game);
+const uint16_t* get_info_console_img(uint16_t i_game);
+std::string get_date(uint16_t i_game);
 

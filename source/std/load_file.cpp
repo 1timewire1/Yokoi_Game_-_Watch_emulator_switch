@@ -20,7 +20,7 @@
 #endif
 
 
-const GW_rom* load_game(uint8_t i_game){
+const GW_rom* load_game(uint16_t i_game){
     if (gw_pack::is_loaded()) {
         if(i_game < gw_pack::game_count()){ return gw_pack::game_at(i_game); }
         else { return OPEN_SOURCE_list[i_game - gw_pack::game_count()]; }
@@ -36,12 +36,12 @@ const GW_rom* load_game(uint8_t i_game){
     return nullptr;
 }
 
-std::string get_name(uint8_t i_game){
+std::string get_name(uint16_t i_game){
     const GW_rom* g = load_game(i_game);
     return g ? g->name : std::string();
 }
 
-std::string get_ref(uint8_t i_game){
+std::string get_ref(uint16_t i_game){
     const GW_rom* g = load_game(i_game);
     return g ? g->ref : std::string();
 }
@@ -57,17 +57,17 @@ size_t get_nb_name(){
 #endif
 }
 
-std::string get_path_console_img(uint8_t i_game){
+std::string get_path_console_img(uint16_t i_game){
     const GW_rom* g = load_game(i_game);
     return g ? g->path_console : std::string();
 }
 
-const uint16_t* get_info_console_img(uint8_t i_game){
+const uint16_t* get_info_console_img(uint16_t i_game){
     const GW_rom* g = load_game(i_game);
     return g ? g->console_info : nullptr;
 }
 
-std::string get_date(uint8_t i_game){
+std::string get_date(uint16_t i_game){
     const GW_rom* g = load_game(i_game);
     return g ? g->date : std::string();
 }

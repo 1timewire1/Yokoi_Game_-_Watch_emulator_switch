@@ -25,7 +25,7 @@ extern std::unique_ptr<SM5XX> g_cpu;
 extern std::unique_ptr<RZoneIO> g_rzone_io;
 extern const GW_rom* g_game;
 extern std::unique_ptr<Virtual_Input> g_input;
-extern uint8_t g_game_index;
+extern uint16_t g_game_index;
 
 extern std::vector<Segment> g_segments;
 // Debounced/displayed lit-state per segment (what the renderer reads), and the

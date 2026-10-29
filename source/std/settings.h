@@ -52,3 +52,5 @@ uint8_t load_last_selected_manufacturer(uint8_t default_manufacturer = 0);
 // Persists the last selected game *ref* for the given manufacturer.
 void save_last_selected_game(uint8_t manufacturer_id, const std::string& game_ref);
 bool try_load_last_game_index_for_manufacturer(uint8_t manufacturer_id, uint8_t* out_index);
+// 16-bit variant for frontends whose game list can exceed 256 entries (Switch).
+bool try_load_last_game_index_for_manufacturer(uint8_t manufacturer_id, uint16_t* out_index);

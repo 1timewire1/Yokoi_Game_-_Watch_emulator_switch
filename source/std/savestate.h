@@ -29,10 +29,10 @@ struct SaveStateHeader {
 };
 
 // Save state management functions
-bool save_game_state(SM5XX* cpu, uint8_t game_index);
-bool load_game_state(SM5XX* cpu, uint8_t game_index);
-bool save_state_exists(uint8_t game_index);
-void delete_game_state(uint8_t game_index);
+bool save_game_state(SM5XX* cpu, uint16_t game_index);
+bool load_game_state(SM5XX* cpu, uint16_t game_index);
+bool save_state_exists(uint16_t game_index);
+void delete_game_state(uint16_t game_index);
 
 // Get save file path for a game
-const char* get_save_path(uint8_t game_index);
+const char* get_save_path(uint16_t game_index);

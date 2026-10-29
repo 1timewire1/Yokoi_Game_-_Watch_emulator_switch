@@ -47,7 +47,7 @@ constexpr int kBottomBarH = 56;
 constexpr int kThumbMax = 460;
 
 bool g_menu_active = true;
-uint8_t g_selected_index = 0;
+uint16_t g_selected_index = 0;
 
 // Load-save-state prompt, shown instead of loading immediately when A is
 // pressed on a game that already has a save file (source/std/savestate.h's
@@ -580,14 +580,14 @@ LoadStateBehavior cycle_load_state_behavior(LoadStateBehavior cur, int dir) {
 // otherwise look identical to a failed search) - used to check whether
 // g_last_game_played_ref points at an experimental game when that setting gets turned
 // off (see update_settings_menu()'s row 6 handler).
-uint8_t find_game_index_by_ref(const std::string& ref, bool* out_found) {
+uint16_t find_game_index_by_ref(const std::string& ref, bool* out_found) {
     *out_found = false;
     const size_t n = get_nb_name();
     for (size_t i = 0; i < n; i++) {
-        const GW_rom* g = load_game((uint8_t)i);
+        const GW_rom* g = load_game((uint16_t)i);
         if (g && g->ref == ref) {
             *out_found = true;
-            return (uint8_t)i;
+            return (uint16_t)i;
         }
     }
     return 0;
@@ -606,11 +606,11 @@ SortMode g_sort_mode = SortMode::MakerName;
 // Right and the Up/Down group-jump both walk this instead of raw indices,
 // so "next"/"first of the next group" have one implementation shared by
 // all three modes (see select_next() and select_next_other_group() below).
-std::vector<uint8_t> g_sorted_order;
+std::vector<uint16_t> g_sorted_order;
 
 GLuint g_thumb_tex = 0;
 int g_thumb_w = 0, g_thumb_h = 0;
-uint8_t g_loaded_thumb_index = 0xFF;
+uint16_t g_loaded_thumb_index = 0xFFFF;
 
 // Small header-bar icon shown just left of the "YOKOI"/"PAUSED" title (see
 // switch_menu_render()) - decoded once from the compiled-in PNG bytes in
@@ -710,7 +710,7 @@ void reload_thumbnail_if_needed() {
     g_loaded_thumb_index = g_selected_index;
 }
 
-uint8_t get_mfr(uint8_t idx) {
+uint8_t get_mfr(uint16_t idx) {
     const GW_rom* g = load_game(idx);
     return g ? g->manufacturer : GW_rom::MANUFACTURER_NINTENDO;
 }
@@ -995,17 +995,17 @@ const char* sort_mode_group_label(SortMode m) {
     }
 }
 
-std::string name_of(uint8_t idx) {
+std::string name_of(uint16_t idx) {
     const GW_rom* g = load_game(idx);
     return g ? g->name : std::string();
 }
 
-std::string date_of(uint8_t idx) {
+std::string date_of(uint16_t idx) {
     const GW_rom* g = load_game(idx);
     return g ? g->date : std::string();
 }
 
-std::string ref_of(uint8_t idx) {
+std::string ref_of(uint16_t idx) {
     const GW_rom* g = load_game(idx);
     return g ? g->ref : std::string();
 }
@@ -1036,7 +1036,7 @@ int parse_year(const std::string& date) {
 // first letter (uppercased), or year. Same-key entries must be contiguous in
 // g_sorted_order for select_next_other_group() below to work, which holds by
 // construction since rebuild_sorted_order() sorts by exactly this key first.
-int group_key(uint8_t idx) {
+int group_key(uint16_t idx) {
     switch (g_sort_mode) {
         case SortMode::Name: {
             const std::string n = name_of(idx);
@@ -1052,7 +1052,7 @@ int group_key(uint8_t idx) {
 // A game is experimental if its manufacturer is, or if it runs on one of the
 // BrickEmuPy-derived cores (a BRK1 container ROM, source/BrickCores/) - those
 // can sit in an otherwise-ungated group (e.g. Pocket Pikachu under Nintendo).
-bool is_experimental_game(uint8_t idx) {
+bool is_experimental_game(uint16_t idx) {
     const GW_rom* g = load_game(idx);
     if (!g) return false;
     return is_experimental_games_manufacturer(g->manufacturer) || BrickRom::is_container(g->rom, g->size_rom);
@@ -1072,19 +1072,19 @@ void rebuild_sorted_order() {
     g_sorted_order.clear();
     g_sorted_order.reserve(n);
     for (size_t i = 0; i < n; i++) {
-        if (!show_experimental_games && is_experimental_game((uint8_t)i)) {
+        if (!show_experimental_games && is_experimental_game((uint16_t)i)) {
             continue;
         }
-        if (clone_hidden_under(ref_of((uint8_t)i), g_clone_filter_mode)) {
+        if (clone_hidden_under(ref_of((uint16_t)i), g_clone_filter_mode)) {
             continue;
         }
-        g_sorted_order.push_back((uint8_t)i);
+        g_sorted_order.push_back((uint16_t)i);
     }
 
     // Date order everywhere: ISO date strings sort chronologically as text,
     // ties broken by name so equal-date games always land in a stable,
     // predictable order.
-    auto date_then_name = [](uint8_t a, uint8_t b) {
+    auto date_then_name = [](uint16_t a, uint16_t b) {
         const std::string da = date_of(a), db = date_of(b);
         if (da != db) return da < db;
         return name_less_ci(name_of(a), name_of(b));
@@ -1092,7 +1092,7 @@ void rebuild_sorted_order() {
 
     switch (g_sort_mode) {
         case SortMode::Name:
-            std::stable_sort(g_sorted_order.begin(), g_sorted_order.end(), [](uint8_t a, uint8_t b) {
+            std::stable_sort(g_sorted_order.begin(), g_sorted_order.end(), [](uint16_t a, uint16_t b) {
                 return name_less_ci(name_of(a), name_of(b));
             });
             break;
@@ -1100,14 +1100,14 @@ void rebuild_sorted_order() {
             std::stable_sort(g_sorted_order.begin(), g_sorted_order.end(), date_then_name);
             break;
         case SortMode::MakerDate:
-            std::stable_sort(g_sorted_order.begin(), g_sorted_order.end(), [&](uint8_t a, uint8_t b) {
+            std::stable_sort(g_sorted_order.begin(), g_sorted_order.end(), [&](uint16_t a, uint16_t b) {
                 const int ra = mfr_rank(get_mfr(a)), rb = mfr_rank(get_mfr(b));
                 if (ra != rb) return ra < rb;
                 return date_then_name(a, b);
             });
             break;
         default: // MakerName
-            std::stable_sort(g_sorted_order.begin(), g_sorted_order.end(), [](uint8_t a, uint8_t b) {
+            std::stable_sort(g_sorted_order.begin(), g_sorted_order.end(), [](uint16_t a, uint16_t b) {
                 const int ra = mfr_rank(get_mfr(a)), rb = mfr_rank(get_mfr(b));
                 if (ra != rb) return ra < rb;
                 return name_less_ci(name_of(a), name_of(b));
@@ -1119,7 +1119,7 @@ void rebuild_sorted_order() {
     // games toggled off while one was selected) - land on whatever's first
     // in the new order instead of leaving it dangling on something hidden.
     bool selected_visible = false;
-    for (uint8_t idx : g_sorted_order) {
+    for (uint16_t idx : g_sorted_order) {
         if (idx == g_selected_index) {
             selected_visible = true;
             break;
@@ -1130,14 +1130,14 @@ void rebuild_sorted_order() {
     }
 }
 
-void set_selected(uint8_t idx) {
+void set_selected(uint16_t idx) {
     g_selected_index = idx;
 }
 
-uint8_t wrap_index(int i, int n) {
+uint16_t wrap_index(int i, int n) {
     while (i < 0) i += n;
     i = i % n;
-    return (uint8_t)i;
+    return (uint16_t)i;
 }
 
 int position_of_selected() {
@@ -1727,7 +1727,7 @@ static void update_settings_menu(uint64_t kDown) {
                 g_clone_filter_mode = cycle_clone_filter(g_clone_filter_mode, dir);
                 if (!g_last_game_played_ref.empty()) {
                     bool found = false;
-                    const uint8_t idx = find_game_index_by_ref(g_last_game_played_ref, &found);
+                    const uint16_t idx = find_game_index_by_ref(g_last_game_played_ref, &found);
                     if (found && clone_hidden_under(ref_of(idx), g_clone_filter_mode)) {
                         // Same idea as ExperimentalGames below - the
                         // saved last-played game just became hidden under
@@ -1785,7 +1785,7 @@ static void update_settings_menu(uint64_t kDown) {
                     g_experimental_games_enabled = false;
                     if (!g_last_game_played_ref.empty()) {
                         bool found = false;
-                        const uint8_t idx = find_game_index_by_ref(g_last_game_played_ref, &found);
+                        const uint16_t idx = find_game_index_by_ref(g_last_game_played_ref, &found);
                         if (found && is_experimental_game(idx)) {
                             // The saved last-played game just became hidden -
                             // point lastgameplayed at a known-safe game

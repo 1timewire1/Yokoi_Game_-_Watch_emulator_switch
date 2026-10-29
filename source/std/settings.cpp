@@ -178,7 +178,7 @@ void save_last_selected_game(uint8_t manufacturer_id, const std::string& game_re
     save_last_games_by_mfr(data);
 }
 
-bool try_load_last_game_index_for_manufacturer(uint8_t manufacturer_id, uint8_t* out_index) {
+bool try_load_last_game_index_for_manufacturer(uint8_t manufacturer_id, uint16_t* out_index) {
     if (!out_index) {
         return false;
     }
@@ -195,12 +195,26 @@ bool try_load_last_game_index_for_manufacturer(uint8_t manufacturer_id, uint8_t*
 
     // Search for the game with matching name.
     const size_t num_games = get_nb_name();
-    for (uint8_t i = 0; i < num_games; i++) {
-        if (get_ref(i) == saved_ref) {
-            *out_index = i;
+    // size_t counter: a uint8_t one never reaches num_games once a pack has
+    // more than 255 games and the loop would spin forever.
+    for (size_t i = 0; i < num_games && i <= 0xFFFF; i++) {
+        if (get_ref((uint16_t)i) == saved_ref) {
+            *out_index = (uint16_t)i;
             return true;
         }
     }
 
     return false;
+}
+
+bool try_load_last_game_index_for_manufacturer(uint8_t manufacturer_id, uint8_t* out_index) {
+    if (!out_index) {
+        return false;
+    }
+    uint16_t idx = 0;
+    if (!try_load_last_game_index_for_manufacturer(manufacturer_id, &idx) || idx > 0xFF) {
+        return false;
+    }
+    *out_index = (uint8_t)idx;
+    return true;
 }

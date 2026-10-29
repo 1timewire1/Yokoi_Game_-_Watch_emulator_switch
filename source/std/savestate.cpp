@@ -19,7 +19,7 @@ static CPUType get_cpu_type(SM5XX* cpu) {
 }
 
 // Get save file path for a game
-const char* get_save_path(uint8_t game_index) {
+const char* get_save_path(uint16_t game_index) {
     static char path[256];
     // Use game ref for the savestate filename (stable across pack reorder).
     const GW_rom* game = load_game(game_index);
@@ -40,7 +40,7 @@ static void ensure_save_directory() {
 }
 
 // Check if a save state file exists for a game
-bool save_state_exists(uint8_t game_index) {
+bool save_state_exists(uint16_t game_index) {
     const char* path = get_save_path(game_index);
     if(path[0] == '\0') return false;
     FILE* file = fopen(path, "rb");
@@ -50,7 +50,7 @@ bool save_state_exists(uint8_t game_index) {
 }
 
 // Save game state to file
-bool save_game_state(SM5XX* cpu, uint8_t game_index) {
+bool save_game_state(SM5XX* cpu, uint16_t game_index) {
     if(!cpu) return false;
     
     ensure_save_directory();
@@ -64,7 +64,7 @@ bool save_game_state(SM5XX* cpu, uint8_t game_index) {
     SaveStateHeader header;
     header.magic = SAVESTATE_MAGIC;
     header.version = SAVESTATE_VERSION;
-    header.game_index = game_index;
+    header.game_index = (uint8_t)game_index; // informational only
     header.cpu_type = get_cpu_type(cpu);
     header.reserved = 0;
     header.data_size = 0;
@@ -89,7 +89,7 @@ bool save_game_state(SM5XX* cpu, uint8_t game_index) {
 }
 
 // Load game state from file
-bool load_game_state(SM5XX* cpu, uint8_t game_index) {
+bool load_game_state(SM5XX* cpu, uint16_t game_index) {
     if(!cpu) return false;
     
     const char* path = get_save_path(game_index);
@@ -133,7 +133,7 @@ bool load_game_state(SM5XX* cpu, uint8_t game_index) {
 }
 
 // Delete game state file
-void delete_game_state(uint8_t game_index) {
+void delete_game_state(uint16_t game_index) {
     const char* path = get_save_path(game_index);
     if(path[0] == '\0') return;
     remove(path);
