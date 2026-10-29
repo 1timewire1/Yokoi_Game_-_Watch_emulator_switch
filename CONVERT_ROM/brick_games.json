@@ -654,7 +654,9 @@
       "readme": "D-Power Digivice EU 1.01, 2001 (SPL61X)",
       "manufacturer": "Bandai",
       "date": "2001-01-01",
-      "keys": {},
+      "keys": {
+        "btnStep": "A|*ZR"
+      },
       "model": null,
       "clone_of": null,
       "notes": "EU/Asia/Oceania Version 1 line (Wikimon firmware 'DP-EU V1.00'; dump is v1.01). Face LCD is 32x16, matching Version 1. Exact EU release unknown (Wikimon: 2001-2002); 2001 is the toy's copyright year, so the European street date may be 2002. Step/Card are virtual inputs for the pedometer and card slot. Distributed without ROM. | Second pass: Gap-fill: no change; no EU launch month found (Wikimon '?? 2001-2002', Baidu 'US/HK/EU 2001').",
@@ -669,7 +671,8 @@
         "date": "Low",
         "model": "Unknown",
         "clone_of": "High"
-      }
+      },
+      "screen_pad": 1.0
     },
     {
       "brick": "TetrisNugget",

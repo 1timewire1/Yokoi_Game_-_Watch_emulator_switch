@@ -24,10 +24,20 @@ uint64_t key_mask(const std::string& name) {
 }
 
 // One binding: pressed while any alternative ("|") has all its keys ("+") held.
+// An alternative written with a leading '*' ("A|*ZR") is a turbo: while it's
+// held the button is pressed and released over and over (kTurboFrames each)
+// instead of staying down - e.g. the D-Power Digivice's Step button, whose
+// pedometer counts one step per press.
 struct Resolved {
     std::string name;
     std::vector<uint64_t> alternatives;
+    std::vector<bool> turbo;  // per alternative
+    int turbo_frame = 0;      // frames since the turbo started, for the press/release cadence
 };
+
+// 3 frames down + 3 up at 60 fps = 10 presses a second - as fast as the
+// D-Power Digivice still counts every one (it drops half of them at 12/s).
+constexpr int kTurboFrames = 3;
 
 bool is_chord(uint64_t mask) { return (mask & (mask - 1)) != 0; }  // more than one key
 
@@ -44,12 +54,17 @@ void resolve(const BrickCore* core) {
     g_resolved.clear();
     g_last.clear();
     for (const BrickCore::Binding& b : core->bindings()) {
-        Resolved r{b.name, {}};
+        Resolved r{b.name, {}, {}};
         uint64_t mask = 0;
         bool bad = false;
+        bool turbo = false;
         std::string key;
         for (size_t i = 0; i <= b.switch_keys.size(); i++) {
             const char c = i < b.switch_keys.size() ? b.switch_keys[i] : '|';
+            if (c == '*' && key.empty() && mask == 0) {
+                turbo = true;
+                continue;
+            }
             if (c != '+' && c != '|') {
                 key += c;
                 continue;
@@ -59,9 +74,13 @@ void resolve(const BrickCore* core) {
             mask |= m;
             key.clear();
             if (c == '|') {
-                if (mask && !bad) r.alternatives.push_back(mask);
+                if (mask && !bad) {
+                    r.alternatives.push_back(mask);
+                    r.turbo.push_back(turbo);
+                }
                 mask = 0;
                 bad = false;
+                turbo = false;
             }
         }
         if (!r.alternatives.empty()) g_resolved.push_back(r);
@@ -86,10 +105,19 @@ void apply_brick_input(BrickCore* core) {
             if (is_chord(m) && (held & m) == m) chorded |= m;
         }
     }
-    for (const Resolved& r : g_resolved) {
-        bool pressed = false;
-        for (uint64_t m : r.alternatives) {
-            if ((held & m) == m && (is_chord(m) || !(m & chorded))) pressed = true;
+    for (Resolved& r : g_resolved) {
+        bool pressed = false, turbo_held = false;
+        for (size_t i = 0; i < r.alternatives.size(); i++) {
+            const uint64_t m = r.alternatives[i];
+            if ((held & m) != m || (!is_chord(m) && (m & chorded))) continue;
+            if (r.turbo[i]) turbo_held = true;
+            else pressed = true;
+        }
+        if (turbo_held && !pressed) {
+            pressed = (r.turbo_frame / kTurboFrames) % 2 == 0;
+            r.turbo_frame++;
+        } else {
+            r.turbo_frame = 0;
         }
         auto last = g_last.find(r.name);
         if (last != g_last.end() && last->second == pressed) continue;

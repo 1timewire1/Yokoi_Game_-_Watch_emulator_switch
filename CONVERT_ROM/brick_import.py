@@ -48,7 +48,7 @@ GAMES_PATH = HERE / "games_path_rgds.py"
 
 # BrickEmuPy core names with a C++ port (source/BrickCores/BrickCore.cpp's
 # kCores). Kept in sync by hand.
-PORTED_CORES = {"HT943", "SPL81408"}
+PORTED_CORES = {"GPL191X", "HT943", "MSM50XX", "SPL61X", "SPL81408"}
 
 
 def load_brick(path: Path) -> dict:
@@ -70,7 +70,10 @@ def flatten_options(mask: dict, brick_dir: Path):
             for k, sub in v.items():
                 walk(f"{prefix}.{k}" if prefix else k, sub)
         elif isinstance(v, (list, tuple)):
-            lines.append(f"{prefix}=" + ",".join(str(int(x)) for x in v))
+            # Whole numbers as ints (as before); fractions kept as written -
+            # MSM50XX's sound_freq_div_tbl has dividers like 5.5.
+            lines.append(f"{prefix}=" + ",".join(
+                str(int(x)) if float(x).is_integer() else repr(float(x)) for x in v))
         elif isinstance(v, bool):
             lines.append(f"{prefix}={int(v)}")
         elif isinstance(v, (int, float)):
@@ -305,7 +308,12 @@ def import_game(brick_dir: Path, game: dict) -> bool:
     inputs, _ = input_lines(cfg, game.get("keys"))
     write_container(d / f"{game['set']}.brk", cfg["core"], cfg["clock"], options + inputs, blobs)
     face = brick_dir / cfg["face_path"]
-    info = sb.split(face, d, game["set"])
+    # "screen_pad" (brick_games.json, optional): margin around the segments as
+    # a fraction, clipped to the LCD glass - a large value (1.0) crops to the
+    # whole glass, for faces whose dot matrix sits in a bigger window (D-Power
+    # Digivice: 2:1 matrix in a ~1.25:1 glass), so it isn't blown up to fill
+    # the screen.
+    info = sb.split(face, d, game["set"], pad=float(game.get("screen_pad", 0.03)))
     sb.face_thumbnail(face, CONSOLE / f"{game['set']}.png")
     key = re.sub(r"[^A-Za-z0-9]+", "_", game["name"]).strip("_")
     upsert_games_path(key, games_path_block(key, game, info))
