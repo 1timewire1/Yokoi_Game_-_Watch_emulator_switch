@@ -16,12 +16,12 @@ from PIL import Image
 try:
     # When imported as part of the 'source' package
     from source.games_path_utils import GameEntry, write_games_path
-    from source.manufacturer_ids import MANUFACTURER_NINTENDO, MANUFACTURER_TRONICA, MANUFACTURER_ELEKTRONIKA, MANUFACTURER_TIGER, MANUFACTURER_DAVID_AND_JOHN, MANUFACTURER_MCDONALDS, MANUFACTURER_BURGER_BARD, MANUFACTURER_KONAMI, MANUFACTURER_NELSONIC, MANUFACTURER_VTECH, MANUFACTURER_BANDAI, MANUFACTURER_EPOCH, MANUFACTURER_NIKKO, MANUFACTURER_TANDY
+    from source.manufacturer_ids import MANUFACTURER_NINTENDO, MANUFACTURER_TRONICA, MANUFACTURER_ELEKTRONIKA, MANUFACTURER_TIGER, MANUFACTURER_DAVID_AND_JOHN, MANUFACTURER_MCDONALDS, MANUFACTURER_BURGER_BARD, MANUFACTURER_KONAMI, MANUFACTURER_NELSONIC, MANUFACTURER_VTECH, MANUFACTURER_BANDAI, MANUFACTURER_EPOCH, MANUFACTURER_NIKKO, MANUFACTURER_TANDY, MANUFACTURER_BY_NAME
     from source.target_profiles import get_target
 except ImportError:
     # When run directly from the 'source' directory
     from games_path_utils import GameEntry, write_games_path
-    from manufacturer_ids import MANUFACTURER_NINTENDO, MANUFACTURER_TRONICA, MANUFACTURER_ELEKTRONIKA, MANUFACTURER_TIGER, MANUFACTURER_DAVID_AND_JOHN, MANUFACTURER_MCDONALDS, MANUFACTURER_BURGER_BARD, MANUFACTURER_KONAMI, MANUFACTURER_NELSONIC, MANUFACTURER_VTECH, MANUFACTURER_BANDAI, MANUFACTURER_EPOCH, MANUFACTURER_NIKKO, MANUFACTURER_TANDY
+    from manufacturer_ids import MANUFACTURER_NINTENDO, MANUFACTURER_TRONICA, MANUFACTURER_ELEKTRONIKA, MANUFACTURER_TIGER, MANUFACTURER_DAVID_AND_JOHN, MANUFACTURER_MCDONALDS, MANUFACTURER_BURGER_BARD, MANUFACTURER_KONAMI, MANUFACTURER_NELSONIC, MANUFACTURER_VTECH, MANUFACTURER_BANDAI, MANUFACTURER_EPOCH, MANUFACTURER_NIKKO, MANUFACTURER_TANDY, MANUFACTURER_BY_NAME
     from target_profiles import get_target
 
 # Preferred background views ordered by desirability. Boolean marks multi-screen views.
@@ -163,7 +163,13 @@ def _load_game_metadata(script_dir: Path) -> Dict[str, GameMetadata]:
             # in it now sits under its real manufacturer's heading instead.)
             # Keep the current value for unrelated headings like "Special Editions".
             in_table = False
-            if "tronica" in heading:
+            # BrickEmuPy-era makers (manufacturer_ids.MANUFACTURER_BY_NAME,
+            # id 15 up) - matched first so e.g. "Popy (Bandai)" lands in Popy.
+            brick_era = [mid for name, mid in MANUFACTURER_BY_NAME.items()
+                         if mid >= 15 and name.lower() in heading]
+            if brick_era:
+                current_manufacturer = brick_era[0]
+            elif "tronica" in heading:
                 current_manufacturer = MANUFACTURER_TRONICA
             elif "elektronika" in heading:
                 current_manufacturer = MANUFACTURER_ELEKTRONIKA

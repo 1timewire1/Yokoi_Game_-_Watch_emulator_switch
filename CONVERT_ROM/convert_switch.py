@@ -665,6 +665,7 @@ def generate_game_file(destination_game_file, name, display_name, ref, date
                 , background_white_keep_threshold: int = 245
                 , multiply_segments: bool = False
                 , overlay_path = []
+                , overlay_alpha = None
                 ):
     
     c_file = f"""
@@ -723,6 +724,12 @@ def generate_game_file(destination_game_file, name, display_name, ref, date
     # that set an 'Overlay' path (currently just Bassmate).
     if overlay_info_ints:
         background_info_ints = list(background_info_ints) + overlay_info_ints
+        # Optional trailing value: the overlay's draw alpha in percent. Left
+        # off (so the renderer keeps its 0.7 default - MAME's own TEXT layer
+        # alpha) unless 'overlay_alpha' is set - e.g. 100 for BrickEmuPy
+        # faces, whose overlay art already carries its own transparency.
+        if overlay_alpha is not None:
+            background_info_ints.append(int(overlay_alpha))
 
     c_file += "\n\n"
     
@@ -939,6 +946,7 @@ def process_single_game(args):
         background_white_keep_threshold,
         multiply_segments,
         overlay_path,
+        game_data.get('overlay_alpha'),
     )
 
     wrote_cache = game_cache.write_game_cache(key, game_data, pack_meta)

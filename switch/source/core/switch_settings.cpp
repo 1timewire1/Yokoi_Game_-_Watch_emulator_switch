@@ -11,6 +11,7 @@
 
 ScreenRotation g_screen_rotation = ScreenRotation::Deg0;
 bool g_hide_console_art = true;
+bool g_hide_background_art = false;
 LoadStateBehavior g_load_state_behavior = LoadStateBehavior::Ask;
 CloneFilterMode g_clone_filter_mode = CloneFilterMode::ShowAll;
 bool g_log_file_enabled = false;
@@ -38,6 +39,7 @@ void switch_settings_load() {
     reset_settings_to_default();
     g_screen_rotation = ScreenRotation::Deg0;
     g_hide_console_art = true;
+    g_hide_background_art = false;
     g_load_state_behavior = LoadStateBehavior::Ask;
     g_clone_filter_mode = CloneFilterMode::ShowAll;
     g_log_file_enabled = false;
@@ -91,6 +93,8 @@ void switch_settings_load() {
             else g_screen_rotation = ScreenRotation::Deg0;
         } else if (strcmp(line, "hide_console_art") == 0) {
             g_hide_console_art = (value != 0);
+        } else if (strcmp(line, "hide_background_art") == 0) {
+            g_hide_background_art = (value != 0);
         } else if (strcmp(line, "loadstate") == 0) {
             if (value == 1) g_load_state_behavior = LoadStateBehavior::AutoLoad;
             else if (value == 2) g_load_state_behavior = LoadStateBehavior::NeverLoad;
@@ -180,6 +184,7 @@ void switch_settings_save() {
     fprintf(file, "segment_marking_alpha=%u\n", (unsigned)g_settings.segment_marking_alpha);
     fprintf(file, "rotation=%u\n", (unsigned)g_screen_rotation);
     fprintf(file, "hide_console_art=%d\n", g_hide_console_art ? 1 : 0);
+    fprintf(file, "hide_background_art=%d\n", g_hide_background_art ? 1 : 0);
     fprintf(file, "loadstate=%u\n", (unsigned)g_load_state_behavior);
     fprintf(file, "clonefilter=%u\n", (unsigned)g_clone_filter_mode);
     fprintf(file, "enable_log=%d\n", g_log_file_enabled ? 1 : 0);

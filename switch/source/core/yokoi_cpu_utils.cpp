@@ -8,6 +8,7 @@
 #include "SM5XX/SM511_SM512/SM511_2.h"
 #include "SM5XX/SM530/SM530.h"
 #include "E0C6200/E0C6S46.h"
+#include "BrickCores/BrickCore.h"
 #include "David_and_John/David_And_John_fake_cpu.h"
 #include "LCDonald/LCDonald_fake_cpu.h"
 
@@ -26,11 +27,18 @@ void yokoi_cpu_set_time_if_needed(SM5XX* cpu) {
     cpu->time_set(true);
 }
 
-bool yokoi_cpu_create_instance(std::unique_ptr<SM5XX>& out, const uint8_t* rom, uint16_t size_rom, bool has_melody_rom) {
+bool yokoi_cpu_create_instance(std::unique_ptr<SM5XX>& out, const uint8_t* rom, size_t size_rom, bool has_melody_rom) {
     if (!rom || size_rom == 0) {
         return false;
     }
 
+    // Cores ported from BrickEmuPy: the ROM is a self-describing ".brk"
+    // container naming its core (source/BrickCores/BrickRom.h) - checked
+    // first, since those games' real ROM sizes overlap everything below.
+    if (BrickRom::is_container(rom, size_rom)) {
+        out = brick_core_create(rom, size_rom);
+        return out != nullptr;
+    }
     if (size_rom == 4) { // No real CPU - "David and John" original/open-source games
         if (rom[0] == 0xFF && rom[1] == 0xFF && rom[2] == 0xFF) {
             out = std::make_unique<David_And_John_fake_cpu>();

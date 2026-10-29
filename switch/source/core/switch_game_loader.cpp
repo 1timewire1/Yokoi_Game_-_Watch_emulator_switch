@@ -152,7 +152,7 @@ void switch_load_game_by_index_and_init(uint8_t idx) {
     YOKOI_LOG("switch_load_game_by_index_and_init: got GW_rom '%s' ref=%s size_rom=%u mfr=%u",
               g_game->name.c_str(), g_game->ref.c_str(), (unsigned)g_game->size_rom, (unsigned)g_game->manufacturer);
 
-    if (!yokoi_cpu_create_instance(g_cpu, g_game->rom, (uint16_t)g_game->size_rom, g_game->size_melody > 0)) {
+    if (!yokoi_cpu_create_instance(g_cpu, g_game->rom, g_game->size_rom, g_game->size_melody > 0)) {
         YOKOI_LOG("switch_load_game_by_index_and_init: unsupported ROM size / CPU type for %s", g_game->name.c_str());
         return;
     }
@@ -178,7 +178,7 @@ void switch_load_game_by_index_and_init(uint8_t idx) {
     }
     g_cpu->load_rom(g_game->rom, g_game->size_rom);
     YOKOI_LOG("switch_load_game_by_index_and_init: cpu->load_rom() done");
-    if (GW_rom::is_lcdonald_family(g_game->manufacturer)) {
+    if (g_game->is_lcdonald_game()) {
         // Drop any decoded .ogg samples cached for whichever McDonald's
         // game was previously loaded (see lcdonald_sound_reset()'s doc
         // comment) - harmless no-op the first time or for every other
@@ -240,8 +240,10 @@ void switch_load_game_by_index_and_init(uint8_t idx) {
     // the game's own set screen a few seconds in - unless a save state
     // (loaded right after this function returns) already has it set. See
     // e0c6200_clock_setup.h. begin() also cancels any sequence left running
-    // from the previous game, so it's called for every game.
-    e0c6200_clock_setup_begin(g_game->ref, g_time_set_mode == TimeSetMode::Automatic);
+    // from the previous game, so it's called for every game. Like Pet Time,
+    // this is an Experimental Feature.
+    e0c6200_clock_setup_begin(g_game->ref,
+                              g_time_set_mode == TimeSetMode::Automatic && g_experimental_features_enabled);
     pet_time_on_game_loaded();
 
     if (g_time_set_mode == TimeSetMode::Automatic) {

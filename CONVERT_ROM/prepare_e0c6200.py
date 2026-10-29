@@ -79,7 +79,17 @@ BRICK_FACES = {
     "tamayasa": "TamagotchiYasashii.svg",
     "digimones": "DigimonV1ES.svg",
     "digimonv4": "DigimonV4J.svg",
+    "digimonja": "DigimonV1J.svg",  # (same file as DigimonV1.svg)
+    # Unidentified: TamagotchiTamaotch.bin has no .brick/face upstream. Its
+    # LCD fits the standard Tamagotchi segment layout (every segment it
+    # lights is in P1/Angel/Morino's identical 520-segment set), so it gets
+    # P1's segments and nothing else - see SEGMENTS_ONLY.
+    "tamaotch": "TamagotchiP1.svg",
 }
+
+# Sets that take only the LCD segments from their face - no inlay
+# Background, overlay or device-body thumbnail, since the face isn't theirs.
+SEGMENTS_ONLY = {"tamaotch"}
 
 # set -> BrickEmuPy ROM, for the sets MAME doesn't have (need --brick)
 BRICK_ROMS = {
@@ -90,6 +100,11 @@ BRICK_ROMS = {
     "tamayasa": "TamagotchiYasashii.bin",
     "digimones": "DigimonV1ES.bin",
     "digimonv4": "DigimonV4J.bin",
+    # From the BrickEmuPy maintainer's own dumps (reference/repo maintainer
+    # romset/) - BrickEmuPy's repo ships these without ROM, and an older
+    # DigimonV1JA.bin in circulation is really a copy of V1JB.
+    "digimonja": "DigimonV1JA.bin",
+    "tamaotch": "TamagotchiTamaotch.bin",
 }
 
 
@@ -206,7 +221,11 @@ def prepare(name: str, brick: Path = None) -> None:
             (out_dir / f"{name}.bin").write_bytes(_rom_bytes(zf, name))
     if brick is not None and name in BRICK_FACES:
         import split_brick_svg
-        split_brick_svg.split(brick / BRICK_FACES[name], out_dir, name, face_png=True)
+        split_brick_svg.split(brick / BRICK_FACES[name], out_dir, name, scheme="e0c6200",
+                              face_png=name not in SEGMENTS_ONLY)
+        if name in SEGMENTS_ONLY:
+            for extra in list(out_dir.glob("Background*.png")) + list(out_dir.glob("Overlay*.png")):
+                extra.unlink()
         return
     with zipfile.ZipFile(ROMS / f"{name}.zip") as zf:
         svg_name = SETS[name]

@@ -13,8 +13,9 @@ constexpr int kSettleFrames = 180;       // boot animation before the first pres
 constexpr int kPressFrames = 12;         // button held
 constexpr int kOpenWaitFrames = 90;      // open release -> set screen showing
 constexpr int kConfirmWaitFrames = 30;   // confirm release -> done
+constexpr int kNudgeWaitFrames = 30;     // nudge release -> time written
 
-enum class Step { Settle, OpenPress, OpenWait, ConfirmPress, ConfirmWait, Done };
+enum class Step { Settle, OpenPress, OpenWait, NudgePress, NudgeWait, ConfirmPress, ConfirmWait, Done };
 
 const E0C6200ClockLayout* g_layout = nullptr;
 Step g_step = Step::Done;
@@ -56,9 +57,20 @@ void e0c6200_clock_setup_advance(E0C6S46* cpu) {
             go(Step::OpenWait, kOpenWaitFrames);
             break;
         case Step::OpenWait:
+            if (l.nudge_line >= 0) {
+                cpu->set_k_line(l.nudge_line, false);
+                go(Step::NudgePress, kPressFrames);
+                break;
+            }
+            [[fallthrough]];
+        case Step::NudgeWait:
             e0c6200_clock_write(cpu, l, time(nullptr));
             cpu->set_k_line(l.confirm_line, false);
             go(Step::ConfirmPress, kPressFrames);
+            break;
+        case Step::NudgePress:
+            cpu->set_k_line(l.nudge_line, true);
+            go(Step::NudgeWait, kNudgeWaitFrames);
             break;
         case Step::ConfirmPress:
             cpu->set_k_line(l.confirm_line, true);

@@ -1,5 +1,6 @@
 #include "switch_screen.h"
 
+#include <algorithm>
 #include <cstdio>
 #include <string>
 #include <utility>
@@ -332,8 +333,12 @@ void switch_screen_render() {
         draw_vertices(g_gl.tex_white, fill_verts);
     }
 
+    // Printed art (Background + Overlay) unless Background Art is Hidden -
+    // masked games always keep it (see g_hide_background_art).
+    const bool draw_art = !g_hide_background_art || is_mask_game;
+
     // Background layer (per-screen rect from GW_rom::background_info).
-    if (g_gl.tex_background != 0 && g_game && g_game->background_info && g_gl.tex_background_w > 0 && g_gl.tex_background_h > 0) {
+    if (draw_art && g_gl.tex_background != 0 && g_game && g_game->background_info && g_gl.tex_background_w > 0 && g_gl.tex_background_h > 0) {
         const uint16_t* bi = g_game->background_info;
         glUniform4f(g_gl.uMul, 1.0f, 1.0f, 1.0f, 1.0f);
         std::vector<RenderVertex> bg_verts;
@@ -523,7 +528,7 @@ void switch_screen_render() {
     // than the normal number of elements for a game with an overlay
     // (nothing else validates its length), so every other game's
     // rendering is untouched.
-    if (g_gl.tex_overlay != 0 && g_game && g_game->background_info &&
+    if (draw_art && g_gl.tex_overlay != 0 && g_game && g_game->background_info &&
         g_gl.tex_overlay_w > 0 && g_gl.tex_overlay_h > 0) {
         const uint16_t* bi = g_game->background_info;
         const size_t base_len = (size_t)2 + (size_t)4 * g_nb_screen + 3;
@@ -556,9 +561,16 @@ void switch_screen_render() {
 
             if (g_gl.uAlphaOnly >= 0) glUniform1f(g_gl.uAlphaOnly, 0.0f);
             if (g_gl.uMultiplyDarken >= 0) glUniform1f(g_gl.uMultiplyDarken, 0.0f);
-            // MAME's own default.lay: <element ref="TEXT-Top"><color alpha="0.7" />.
-            constexpr float kOverlayAlpha = 0.7f;
-            glUniform4f(g_gl.uMul, 1.0f, 1.0f, 1.0f, kOverlayAlpha);
+            // MAME's own default.lay: <element ref="TEXT-Top"><color alpha="0.7" />,
+            // unless the pack carries an explicit alpha (percent) right after the
+            // overlay rects - BrickEmuPy faces set 100, their overlay art having
+            // its own transparency (convert_switch.py's 'overlay_alpha').
+            float overlay_alpha = 0.7f;
+            const size_t alpha_at = base_len + (size_t)2 + (size_t)4 * g_nb_screen;
+            if (g_game->background_info_count > alpha_at) {
+                overlay_alpha = std::min(bi[alpha_at], (uint16_t)100) / 100.0f;
+            }
+            glUniform4f(g_gl.uMul, 1.0f, 1.0f, 1.0f, overlay_alpha);
             draw_vertices(g_gl.tex_overlay, ov_verts);
         }
     }

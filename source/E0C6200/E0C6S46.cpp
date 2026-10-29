@@ -64,7 +64,10 @@ void E0C6S46::configure_for_ref(const std::string& ref) {
         // BrickEmuPy-only sets (not in MAME)
         {"TAMAJ", 1'600'000},     {"TAMAUMI", 1'060'000},   {"TAMAMORI", 1'060'000},
         {"TAMAGENJIN", 1'060'000}, {"TAMAYASA", 1'060'000}, {"DIGIMONES", 1'060'000},
-        {"DIGIMONV4", 1'060'000},
+        {"DIGIMONV4", 1'060'000}, {"DIGIMONJA", 1'060'000},
+        // Unidentified S48 Tamagotchi (BrickEmuPy maintainer's dump, no
+        // .brick upstream) - assumed the same board as the other S48 ones.
+        {"TAMAOTCH", 1'060'000},
     };
     s_.osc3 = kOsc1;
     for (const Osc3& b : kOsc3Boards) {

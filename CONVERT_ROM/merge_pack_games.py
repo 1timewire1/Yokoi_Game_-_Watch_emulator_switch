@@ -2,14 +2,15 @@
 rebuilding the base from artwork - e.g. new games built on their own with
 `convert_switch.py --target rgds --game <key> --pack-name <tmp>`.
 
-For each donor game whose ref isn't already in the base, its full record
+For each donor game whose ref isn't already in the base (or every donor game,
+with --replace - same slot, its texture files overwritten), its full record
 (name/ref/date, ROM, melody, segment array, info arrays) and the texture files
 its segment/background/console paths point at are appended. Everything already
 in the base is carried over byte for byte. The output keeps the base's header
 (format/platform/content_version) and is validated before it's written.
 
 Usage:
-  python merge_pack_games.py <base.ykp> <donor.ykp> [<donor.ykp> ...] --out <merged.ykp>
+  python merge_pack_games.py <base.ykp> <donor.ykp> [<donor.ykp> ...] --out <merged.ykp> [--replace]
 """
 import argparse
 import struct
@@ -131,6 +132,7 @@ def main() -> int:
     ap.add_argument("base", type=Path)
     ap.add_argument("donors", type=Path, nargs="+")
     ap.add_argument("--out", type=Path, required=True)
+    ap.add_argument("--replace", action="store_true", help="donor games replace base games with the same ref")
     args = ap.parse_args()
 
     base_buf, base_header, base_files, base_games = load_pack(args.base)
@@ -141,20 +143,24 @@ def main() -> int:
     for donor in args.donors:
         d_buf, _d_header, d_files, d_games = load_pack(donor)
         for g in d_games:
-            if g["ref"] in have:
+            replacing = g["ref"] in have
+            if replacing and not args.replace:
                 print(f"  skip {g['ref']} (already in base)")
                 continue
             rec = game_record(d_buf, d_files, g)
-            games.append(rec)
+            if replacing:
+                games[next(i for i, b in enumerate(games) if b["ref"] == g["ref"])] = rec
+            else:
+                games.append(rec)
             have.add(g["ref"])
             for tex in (rec["path_segment"], rec["path_background"], rec["path_console"]):
                 if tex is None:
                     continue
                 _path, fname, content = tex
-                if fname in shared and shared[fname] != content:
+                if fname in shared and shared[fname] != content and not replacing:
                     raise RuntimeError(f"{g['ref']}: file {fname!r} already in base with different bytes")
                 shared[fname] = content
-            print(f"  added {g['ref']} ({g['display_name']}) from {donor.name}")
+            print(f"  {'replaced' if replacing else 'added'} {g['ref']} ({g['display_name']}) from {donor.name}")
 
     out = write_pack(games, shared, base_header)
     ip.validate_pack_bytes(out)

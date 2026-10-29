@@ -250,24 +250,34 @@ Special editions are not supported in the emulator, refer to the Notes column fo
      what keeps a pet alive between sessions (time doesn't pass while the
      app is closed). LCD art, inlays and thumbnails come from BrickEmuPy's
      face SVGs (prepare_e0c6200.py --brick, split_brick_svg.py); rows 08-14
-     exist only in BrickEmuPy (github.com/azya52/BrickEmuPy), ROM included. -->
+     exist only in BrickEmuPy (github.com/azya52/BrickEmuPy), ROM included.
+     17-18 are the BrickEmuPy maintainer's own dumps (reference/repo
+     maintainer romset/): 17 is Ver.1's other Japanese ROM revision (252
+     bytes differ from 05's Rev. B), hidden under "Hide Duplicates"; 18 is a
+     working S48 Tamagotchi with no .brick or device art upstream, name
+     unknown - it gets the standard Tamagotchi LCD segments only (every
+     segment it lights is in that layout) and a guessed 1997 date. -->
 
 | No. | Model   | Filename            | Game Title                                                   | Release Date | CPU | Clone Of |
 |-----|---------|---------------------|--------------------------------------------------------------|--------------|-----|-------|
-| 01  | tama    | tama.zip            | Tamagotchi (Gen. 1)                                          | 1997.01.01   | E0C6S46 |  |
-| 02  | tamag2  | tamag2.zip          | Tamagotchi (Gen. 2)                                          | 1997.01.01   | E0C6S46 |  |
-| 03  | tamaang | tamaang.zip         | Tenshitchi no Tamagotchi                                     | 1997.01.01   | E0C6S48 |  |
-| 04  | tamamot | tamamot.zip         | Mothra no Tamagotchi                                         | 1997.01.01   | E0C6S48 |  |
-| 05  | digimon | digimon.zip         | Digital Monster                                              | 1997.01.01   | E0C6S48 |  |
-| 06  | digimonv2 | digimonv2.zip     | Digital Monster Ver. 2                                       | 1998.01.01   | E0C6S48 |  |
-| 07  | digimonv3 | digimonv3.zip     | Digital Monster Ver. 3                                       | 1998.01.01   | E0C6S48 |  |
-| 08  | tamaj   | (BrickEmuPy)        | Tamagotchi (Gen. 1, Japan)                                   | 1996.01.01   | E0C6S46 |  |
-| 09  | tamaumi | (BrickEmuPy)        | Umi de Hakken!! Tamagotchi                                   | 1998.01.01   | E0C6S48 |  |
-| 10  | tamamori | (BrickEmuPy)       | Mori de Hakken! Tamagotchi                                   | 1998.02.01   | E0C6S48 |  |
-| 11  | tamagenjin | (BrickEmuPy)     | Genjintchi                                                   | 1997.11.01   | E0C6S48 |  |
-| 12  | tamayasa | (BrickEmuPy)       | Yasashii Tamagotchi                                          | 1998.01.01   | E0C6S48 |  |
-| 13  | digimones | (BrickEmuPy)      | Digital Monster (Spanish)                                    | 1997.01.01   | E0C6S48 |  |
-| 14  | digimonv4 | (BrickEmuPy)      | Digital Monster Ver. 4                                       | 1998.05.01   | E0C6S48 |  |
+| 01  | tama    | tama.zip            | Tamagotchi (Gen. 1, International)                           | 1997.05.01   | E0C6S46 |  |
+| 02  | tamag2  | tamag2.zip          | Tamagotchi (Gen. 2, Japan)                                   | 1997.02.01   | E0C6S46 |  |
+| 03  | tamaang | tamaang.zip         | Tenshitchi no Tamagotchi                                     | 1997.08.01   | E0C6S48 |  |
+| 04  | tamamot | tamamot.zip         | Mothra no Tamagotchi                                         | 1997.12.01   | E0C6S48 |  |
+| 05  | digimon | digimon.zip         | Digital Monster Ver.1 (Japan, Rev. B)                        | 1997.06.26   | E0C6S48 |  |
+| 06  | digimonv2 | digimonv2.zip       | Digital Monster Ver.2                                        | 1997.12.01   | E0C6S48 |  |
+| 07  | digimonv3 | digimonv3.zip       | Digital Monster Ver.3                                        | 1998.03.01   | E0C6S48 |  |
+| 08  | tamaj   | (BrickEmuPy)        | Tamagotchi (Gen. 1, Japan)                                   | 1996.11.23   | E0C6S46 |  |
+| 09  | tamaumi | (BrickEmuPy)        | Umi de Hakken!! Tamagotchi                                   | 1998.03.01   | E0C6S48 |  |
+| 10  | tamamori | (BrickEmuPy)        | Mori de Hakken!! Tamagotchi                                  | 1998.02.01   | E0C6S48 |  |
+| 11  | tamagenjin | (BrickEmuPy)        | Genjintchi no Tamagotchi                                     | 1997.11.01   | E0C6S48 |  |
+| 12  | tamayasa | (BrickEmuPy)        | Yasashii Tamagotchi                                          | 1998.10.01   | E0C6S48 |  |
+| 13  | digimones | (BrickEmuPy)        | Digital Monster Ver.1 (Europe)                               | 1998.01.01   | E0C6S48 |  |
+| 14  | digimonv4 | (BrickEmuPy)        | Digital Monster Ver.4                                        | 1998.05.01   | E0C6S48 |  |
+| 15  | mamegalaxian | (BrickEmuPy)        | Galaxian                                                     | 1997.01.01   | HT943 |  |
+| 16  | mametamagotch | (BrickEmuPy)        | Mame Game de Hakken!! Tamagotchi                             | 1997.01.01   | HT943 |  |
+| 17  | digimonja | (BrickEmuPy)        | Digital Monster Ver.1 (Japan, Rev. A)                        | 1997.06.26   | E0C6S48 | digimon |
+| 18  | tamaotch | (BrickEmuPy)        | Unknown Tamagotchi (Tamaotch)                                | 1997.01.01   | E0C6S48 |  |
 
 ## Epoch
 
@@ -276,7 +286,7 @@ Special editions are not supported in the emulator, refer to the Notes column fo
 
 | No. | Model   | Filename            | Game Title                                                   | Release Date | CPU | Clone Of |
 |-----|---------|---------------------|--------------------------------------------------------------|--------------|-----|-------|
-| 01  | alienfev | alienfev.zip       | Chibi Pachi: Alien Fever                                     | 1997.01.01   | E0C6S46 |  |
+| 01  | alienfev | alienfev.zip        | Chibi Pachi: Alien Fever                                     | 1997.01.01   | E0C6S46 |  |
 
 ## Nikko
 
@@ -285,7 +295,7 @@ Special editions are not supported in the emulator, refer to the Notes column fo
 
 | No. | Model   | Filename            | Game Title                                                   | Release Date | CPU | Clone Of |
 |-----|---------|---------------------|--------------------------------------------------------------|--------------|-----|-------|
-| 01  | venusdm | venusdm.zip         | Beans Collection: Venus Diet Monogatari                      | 1997.01.01   | E0C6S46 |  |
+| 01  | venusdm | venusdm.zip         | Venus Diet Monogatari                                        | 1997.01.01   | E0C6S46 |  |
 
 ## Tandy
 
@@ -294,6 +304,33 @@ Special editions are not supported in the emulator, refer to the Notes column fo
 | No. | Model   | Filename            | Game Title                                                   | Release Date | CPU | Clone Of |
 |-----|---------|---------------------|--------------------------------------------------------------|--------------|-----|-------|
 | 01  | stackch | stackch.zip         | Stack Challenge                                              | 1991.01.01   | E0C6S46 |  |
+
+## Brick Game
+
+<!-- Unbranded/OEM Chinese and Taiwanese brick games and keychains. Ported
+     from BrickEmuPy (github.com/azya52/BrickEmuPy): source/BrickCores/,
+     imported by brick_import.py from brick_games.json - these rows are
+     documentation only (Filename isn't a .zip). -->
+
+| No. | Model   | Filename            | Game Title                                                   | Release Date | CPU | Clone Of |
+|-----|---------|---------------------|--------------------------------------------------------------|--------------|-----|-------|
+| 01  | e23plusmarkii96in1 | (BrickEmuPy)        | Brick Game 96 in 1 (E-23 Plus Mark II)                       | 1993.01.01   | HT943 |  |
+| 02  | e888in1 | (BrickEmuPy)        | Brick Game 8 in 1 (E-88)                                     | 1994.01.01   | HT943 |  |
+| 03  | ga888   | (BrickEmuPy)        | Block Game & Echo Key                                        | 1996.01.01   | HT943 |  |
+| 04  | keychainpinball | (BrickEmuPy)        | Keychain Pin Ball                                            | 1996.01.01   | HT943 |  |
+| 05  | spaceintrudertk150i | (BrickEmuPy)        | Space Intruder                                               | 1998.01.01   | HT943 |  |
+
+## Gametech
+
+| No. | Model   | Filename            | Game Title                                                   | Release Date | CPU | Clone Of |
+|-----|---------|---------------------|--------------------------------------------------------------|--------------|-----|-------|
+| 01  | keychain55in1 | (BrickEmuPy)        | Pikorin 55                                                   | 1996.01.01   | HT943 |  |
+
+## Compile
+
+| No. | Model   | Filename            | Game Title                                                   | Release Date | CPU | Clone Of |
+|-----|---------|---------------------|--------------------------------------------------------------|--------------|-----|-------|
+| 01  | puyolin | (BrickEmuPy)        | Puyolin                                                      | 1997.07.25   | HT943 |  |
 
 ## McDonald's (LCDonald)
 
@@ -448,6 +485,15 @@ Special editions are not supported in the emulator, refer to the Notes column fo
 | 29  | artennis_espn|               | ESPN25: Venus and Serena Williams - Tennis                    | 2004.04.30   |  | arvolleyball |
 | 30  | cflower2|                     | Cream Flower Catch                                           | 2004.12.03   |  | abanana |
 | 31  | bgiantegg|                    | Billy's Giant Egg                                            | 2004.12.03   |  |  |
+
+## McDonald's (BrickEmuPy)
+
+<!-- Real-ROM McDonald's units, emulated (source/BrickCores/) rather than
+     LCDonald re-implementations - same McDonald's group in the app. -->
+
+| No. | Model   | Filename            | Game Title                                                   | Release Date | CPU | Clone Of |
+|-----|---------|---------------------|--------------------------------------------------------------|--------------|-----|-------|
+| 01  | tetrisnugget | (BrickEmuPy)        | Chicken McNugget Tetris                                      | 2023.05.24   | SPL81408 |  |
 
 ## Burger Bard (LCDonald white label)
 

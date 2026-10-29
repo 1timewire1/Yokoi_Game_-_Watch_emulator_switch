@@ -44,13 +44,38 @@ struct GW_rom {
     static constexpr uint8_t MANUFACTURER_EPOCH = 12;
     static constexpr uint8_t MANUFACTURER_NIKKO = 13;
     static constexpr uint8_t MANUFACTURER_TANDY = 14;
-    static constexpr uint8_t MANUFACTURER_COUNT = 15;
+    // Makers of the games ported from BrickEmuPy (source/BrickCores/,
+    // CONVERT_ROM/brick_games.json). Popy is Bandai's toy brand (merged into
+    // Bandai in 1983) - kept apart because its 1982-83 units only carry the
+    // Popy mark. Brick Game = the unbranded/OEM Chinese and Taiwanese brick
+    // games and keychains; Unbranded = everything else with no traceable
+    // maker. One-title makers each have a group for now.
+    static constexpr uint8_t MANUFACTURER_POPY = 15;
+    static constexpr uint8_t MANUFACTURER_GAKKEN = 16;
+    static constexpr uint8_t MANUFACTURER_SPICA = 17;
+    static constexpr uint8_t MANUFACTURER_APOLLO = 18;
+    static constexpr uint8_t MANUFACTURER_BRICK_GAME = 19;
+    static constexpr uint8_t MANUFACTURER_HIRO = 20;
+    static constexpr uint8_t MANUFACTURER_NATURE_LAND = 21;
+    static constexpr uint8_t MANUFACTURER_SPARKLE_CRYSTAL = 22;
+    static constexpr uint8_t MANUFACTURER_GAMETECH = 23;
+    static constexpr uint8_t MANUFACTURER_COMPILE = 24;
+    static constexpr uint8_t MANUFACTURER_VGS = 25;
+    static constexpr uint8_t MANUFACTURER_COOL_TEC = 26;
+    static constexpr uint8_t MANUFACTURER_HARTUNG = 27;
+    static constexpr uint8_t MANUFACTURER_EDLA = 28;
+    static constexpr uint8_t MANUFACTURER_STADLBAUER = 29;
+    static constexpr uint8_t MANUFACTURER_UNBRANDED = 30;
+    static constexpr uint8_t MANUFACTURER_COUNT = 31;
 
-    // Both LCDonald-derived buckets run on LCDonald_fake_cpu (see
-    // source/LCDonald/), so the Switch layer's LCDonald-specific handling
-    // (named-input model, .ogg playback, Endless-mode HUD) keys off this.
-    static constexpr bool is_lcdonald_family(uint8_t mfr) {
-        return mfr == MANUFACTURER_MCDONALDS || mfr == MANUFACTURER_BURGER_BARD;
+    // Whether this game runs on LCDonald_fake_cpu (source/LCDonald/): its
+    // ROM is the 4-byte dummy FF FF FE <game id> (see GW_ROM_RGDS/lcd_*.cpp).
+    // The Switch layer's LCDonald-specific handling (named-input model, .ogg
+    // playback, Endless-mode HUD) keys off this. Keyed on the ROM, not the
+    // manufacturer, since McDonald's also has real-ROM games (Chicken
+    // McNugget Tetris, a BrickEmuPy core).
+    bool is_lcdonald_game() const {
+        return rom && size_rom == 4 && rom[0] == 0xFF && rom[1] == 0xFF && rom[2] == 0xFE;
     }
 
     const std::string name;

@@ -57,7 +57,8 @@ void finish(E0C6S46* cpu, const E0C6200ClockLayout& layout) {
 
 // `away` seconds passed without the pet running.
 void apply_time_away(int64_t away, const char* why) {
-    if (away <= 0 || g_pet_time_mode == PetTimeMode::Paused) return;
+    // Experimental Features off = as if Paused (the stored mode is kept).
+    if (away <= 0 || !g_experimental_features_enabled || g_pet_time_mode == PetTimeMode::Paused) return;
     const E0C6200ClockLayout* layout = nullptr;
     E0C6S46* cpu = pet(&layout);
     if (!cpu || !e0c6200_clock_is_set(cpu, *layout)) return;  // pet never started - nothing to age

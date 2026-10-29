@@ -10,6 +10,7 @@
 
 #include <switch.h>
 
+#include "BrickCores/BrickRom.h"
 #include "std/GW_ROM.h"
 #include "std/debug_log.h"
 #include "std/gw_pack.h"
@@ -117,6 +118,7 @@ enum class SettingsRow : uint8_t {
     Rotation,
     Background,
     BackgroundCustomEntry,
+    BackgroundArt,
     SegmentColor,
     SegmentColorCustomEntry,
     Segments,
@@ -147,6 +149,7 @@ std::vector<SettingsRow> build_settings_rows() {
     rows.push_back(SettingsRow::Rotation);
     rows.push_back(SettingsRow::Background);
     if (g_bg_custom_selected) rows.push_back(SettingsRow::BackgroundCustomEntry);
+    rows.push_back(SettingsRow::BackgroundArt);
     rows.push_back(SettingsRow::SegmentColor);
     if (g_segcolor_custom_selected) rows.push_back(SettingsRow::SegmentColorCustomEntry);
     rows.push_back(SettingsRow::Segments);
@@ -165,9 +168,10 @@ std::vector<SettingsRow> build_settings_rows() {
         rows.push_back(SettingsRow::LoadStateBehavior);
         rows.push_back(SettingsRow::CloneFilter);
         rows.push_back(SettingsRow::TimeSetMode);
-        rows.push_back(SettingsRow::PetTime);
-        // The limit and display only mean anything under Real Time.
-        if (g_pet_time_mode == PetTimeMode::RealTime) {
+        // Pet Time is an Experimental Feature (pet_time_enabled()); the
+        // limit and display only mean anything under Real Time.
+        if (g_experimental_features_enabled) rows.push_back(SettingsRow::PetTime);
+        if (g_experimental_features_enabled && g_pet_time_mode == PetTimeMode::RealTime) {
             rows.push_back(SettingsRow::PetTimeCap);
             if (g_pettimecap_custom_selected) rows.push_back(SettingsRow::PetTimeCapCustomEntry);
             rows.push_back(SettingsRow::PetTimeDisplay);
@@ -722,6 +726,22 @@ const char* mfr_name(uint8_t mfr) {
     if (mfr == GW_rom::MANUFACTURER_EPOCH) return "EPOCH";
     if (mfr == GW_rom::MANUFACTURER_NIKKO) return "NIKKO";
     if (mfr == GW_rom::MANUFACTURER_TANDY) return "TANDY";
+    if (mfr == GW_rom::MANUFACTURER_POPY) return "POPY";
+    if (mfr == GW_rom::MANUFACTURER_GAKKEN) return "GAKKEN";
+    if (mfr == GW_rom::MANUFACTURER_SPICA) return "SPICA";
+    if (mfr == GW_rom::MANUFACTURER_APOLLO) return "APOLLO";
+    if (mfr == GW_rom::MANUFACTURER_BRICK_GAME) return "BRICK GAME";
+    if (mfr == GW_rom::MANUFACTURER_HIRO) return "HIRO";
+    if (mfr == GW_rom::MANUFACTURER_NATURE_LAND) return "NATURE LAND";
+    if (mfr == GW_rom::MANUFACTURER_SPARKLE_CRYSTAL) return "SPARKLE CRYSTAL";
+    if (mfr == GW_rom::MANUFACTURER_GAMETECH) return "GAMETECH";
+    if (mfr == GW_rom::MANUFACTURER_COMPILE) return "COMPILE";
+    if (mfr == GW_rom::MANUFACTURER_VGS) return "VGS";
+    if (mfr == GW_rom::MANUFACTURER_COOL_TEC) return "COOL TEC";
+    if (mfr == GW_rom::MANUFACTURER_HARTUNG) return "HARTUNG";
+    if (mfr == GW_rom::MANUFACTURER_EDLA) return "EDLA";
+    if (mfr == GW_rom::MANUFACTURER_STADLBAUER) return "STADLBAUER";
+    if (mfr == GW_rom::MANUFACTURER_UNBRANDED) return "UNBRANDED";
     if (mfr == GW_rom::MANUFACTURER_DAVID_AND_JOHN) return "DAVID AND JOHN";
     if (mfr == GW_rom::MANUFACTURER_MCDONALDS) return "MCDONALD'S";
     // LCDonald's white-label re-skin, credited as "Burger Bard" on its
@@ -734,23 +754,42 @@ const char* mfr_name(uint8_t mfr) {
 // Up/Down group jump). The ids stored in the pack aren't in this order and
 // must never change, so the order lives here: the three always-visible
 // manufacturers first, then everything the "Experimental Games" setting
-// hides.
+// hides. The multi-title makers come first, then the rest alphabetically
+// (McDonald's among them - it has a real-ROM game too), then Unbranded.
+// David & John and Burger Bard go last: they're original LCD-inspired
+// simulations rather than emulated hardware.
 int mfr_rank(uint8_t mfr) {
     switch (mfr) {
-        case GW_rom::MANUFACTURER_NINTENDO:       return 0;
-        case GW_rom::MANUFACTURER_TRONICA:        return 1;
-        case GW_rom::MANUFACTURER_ELEKTRONIKA:    return 2;
-        case GW_rom::MANUFACTURER_TIGER:          return 3;
-        case GW_rom::MANUFACTURER_KONAMI:         return 4;
-        case GW_rom::MANUFACTURER_NELSONIC:       return 5;
-        case GW_rom::MANUFACTURER_VTECH:          return 6;
-        case GW_rom::MANUFACTURER_BANDAI:         return 7;
-        case GW_rom::MANUFACTURER_EPOCH:          return 8;
-        case GW_rom::MANUFACTURER_NIKKO:          return 9;
-        case GW_rom::MANUFACTURER_TANDY:          return 10;
-        case GW_rom::MANUFACTURER_DAVID_AND_JOHN: return 11;
-        case GW_rom::MANUFACTURER_MCDONALDS:      return 12;
-        case GW_rom::MANUFACTURER_BURGER_BARD:    return 13;
+        case GW_rom::MANUFACTURER_NINTENDO:              return 0;
+        case GW_rom::MANUFACTURER_TRONICA:               return 1;
+        case GW_rom::MANUFACTURER_ELEKTRONIKA:           return 2;
+        case GW_rom::MANUFACTURER_TIGER:                 return 3;
+        case GW_rom::MANUFACTURER_KONAMI:                return 4;
+        case GW_rom::MANUFACTURER_NELSONIC:              return 5;
+        case GW_rom::MANUFACTURER_VTECH:                 return 6;
+        case GW_rom::MANUFACTURER_BANDAI:                return 7;
+        case GW_rom::MANUFACTURER_POPY:                  return 8;
+        case GW_rom::MANUFACTURER_EPOCH:                 return 9;
+        case GW_rom::MANUFACTURER_GAKKEN:                return 10;
+        case GW_rom::MANUFACTURER_NIKKO:                 return 11;
+        case GW_rom::MANUFACTURER_TANDY:                 return 12;
+        case GW_rom::MANUFACTURER_HIRO:                  return 13;
+        case GW_rom::MANUFACTURER_SPICA:                 return 14;
+        case GW_rom::MANUFACTURER_APOLLO:                return 15;
+        case GW_rom::MANUFACTURER_BRICK_GAME:            return 16;
+        case GW_rom::MANUFACTURER_COMPILE:               return 17;
+        case GW_rom::MANUFACTURER_COOL_TEC:              return 18;
+        case GW_rom::MANUFACTURER_EDLA:                  return 19;
+        case GW_rom::MANUFACTURER_GAMETECH:              return 20;
+        case GW_rom::MANUFACTURER_HARTUNG:               return 21;
+        case GW_rom::MANUFACTURER_MCDONALDS:             return 22;
+        case GW_rom::MANUFACTURER_NATURE_LAND:           return 23;
+        case GW_rom::MANUFACTURER_SPARKLE_CRYSTAL:       return 24;
+        case GW_rom::MANUFACTURER_STADLBAUER:            return 25;
+        case GW_rom::MANUFACTURER_VGS:                   return 26;
+        case GW_rom::MANUFACTURER_UNBRANDED:             return 27;
+        case GW_rom::MANUFACTURER_DAVID_AND_JOHN:        return 28;
+        case GW_rom::MANUFACTURER_BURGER_BARD:           return 29;
         default:                                  return 100 + (int)mfr;
     }
 }
@@ -767,6 +806,22 @@ bool is_experimental_games_manufacturer(uint8_t mfr) {
         case GW_rom::MANUFACTURER_EPOCH:
         case GW_rom::MANUFACTURER_NIKKO:
         case GW_rom::MANUFACTURER_TANDY:
+        case GW_rom::MANUFACTURER_POPY:
+        case GW_rom::MANUFACTURER_GAKKEN:
+        case GW_rom::MANUFACTURER_SPICA:
+        case GW_rom::MANUFACTURER_APOLLO:
+        case GW_rom::MANUFACTURER_BRICK_GAME:
+        case GW_rom::MANUFACTURER_HIRO:
+        case GW_rom::MANUFACTURER_NATURE_LAND:
+        case GW_rom::MANUFACTURER_SPARKLE_CRYSTAL:
+        case GW_rom::MANUFACTURER_GAMETECH:
+        case GW_rom::MANUFACTURER_COMPILE:
+        case GW_rom::MANUFACTURER_VGS:
+        case GW_rom::MANUFACTURER_COOL_TEC:
+        case GW_rom::MANUFACTURER_HARTUNG:
+        case GW_rom::MANUFACTURER_EDLA:
+        case GW_rom::MANUFACTURER_STADLBAUER:
+        case GW_rom::MANUFACTURER_UNBRANDED:
         case GW_rom::MANUFACTURER_DAVID_AND_JOHN:
         case GW_rom::MANUFACTURER_MCDONALDS:
         case GW_rom::MANUFACTURER_BURGER_BARD:
@@ -790,7 +845,7 @@ bool experimental_games_visible() {
 // concept in CONVERT_ROM's Python pipeline, used only to fall back to a
 // parent game's ROM/artwork files when a clone doesn't have its own).
 //
-// kKnownDuplicateRefs - the 3 entries GNW_LIST.md's own comments call out as
+// kKnownDuplicateRefs - the entries GNW_LIST.md's own comments call out as
 // genuinely the *same* release cataloged twice, kept as separate pack
 // entries only because of a documented minor hardware/behavior difference:
 //   CN-07 vs CN-17 Helmet, IP-05 vs IP-15 Judge, CM-72A vs CM-72 Mario's
@@ -805,6 +860,8 @@ constexpr const char* kKnownDuplicateRefs[] = {
     // (shockey.lay's "Front (Rare)"/"Back (Rare)" views), same tier as the
     // International entries above.
     "SHOCKEY_RARE",
+    // Digital Monster Ver.1 Japan's other ROM revision - same release.
+    "DIGIMONJA",
 };
 
 // kKnownCloneRefs - every entry GNW_LIST.md's "Clone Of" column marks as a
@@ -834,7 +891,7 @@ constexpr const char* kKnownCloneRefs[] = {
     //   ARTENNIS clones ARVOLLEYBALL.
     "KSOCCER_INTL", "SGRINDER_INTL", "SSPEEDWAY_INTL", "SXTREMEBOARD_INTL", "SHOCKEY_RARE",
     "SSPEEDWAY_ESPN", "TSOCCER_ESPN", "SSKATEBOARD_ESPN",
-    "SBASKETBALL_ESPN", "ARTENNIS_ESPN",
+    "SBASKETBALL_ESPN", "ARTENNIS_ESPN", "DIGIMONJA",
     "TSOCCER", "CFLOWER", "CFLOWER2", "SSKATEBOARD", "SBASKETBALL", "ARTENNIS",
     // KBASEBALL_ESPN ("ESPN25: Michael Vick - Football", 2004-04-30) is the
     // real origin here - Knuckles Baseball itself didn't release until
@@ -992,6 +1049,15 @@ int group_key(uint8_t idx) {
     }
 }
 
+// A game is experimental if its manufacturer is, or if it runs on one of the
+// BrickEmuPy-derived cores (a BRK1 container ROM, source/BrickCores/) - those
+// can sit in an otherwise-ungated group (e.g. Pocket Pikachu under Nintendo).
+bool is_experimental_game(uint8_t idx) {
+    const GW_rom* g = load_game(idx);
+    if (!g) return false;
+    return is_experimental_games_manufacturer(g->manufacturer) || BrickRom::is_container(g->rom, g->size_rom);
+}
+
 // Rebuilds g_sorted_order - the single list every bit of navigation, the
 // bottom counter, and Up/Down group-jumping all walk (see select_next(),
 // select_next_other_group(), position_of_selected() below). Filtering
@@ -1006,8 +1072,7 @@ void rebuild_sorted_order() {
     g_sorted_order.clear();
     g_sorted_order.reserve(n);
     for (size_t i = 0; i < n; i++) {
-        const uint8_t mfr = get_mfr((uint8_t)i);
-        if (!show_experimental_games && is_experimental_games_manufacturer(mfr)) {
+        if (!show_experimental_games && is_experimental_game((uint8_t)i)) {
             continue;
         }
         if (clone_hidden_under(ref_of((uint8_t)i), g_clone_filter_mode)) {
@@ -1134,6 +1199,7 @@ const char* settings_row_label(SettingsRow row) {
         case SettingsRow::SegmentColorCustomEntry: return "Enter Custom Color";
         case SettingsRow::Segments:                return "Segment Marking";
         case SettingsRow::SegmentsCustomEntry:     return "Enter Custom Value";
+        case SettingsRow::BackgroundArt:            return "Background Art";
         case SettingsRow::ConsoleArt:               return "Display Single Screen Console Art";
         case SettingsRow::PanelGap:                 return "Panel Gap";
         case SettingsRow::PanelGapCustomEntry:      return "Enter Custom Value";
@@ -1171,6 +1237,8 @@ std::string settings_row_value(SettingsRow row) {
             return g_seg_custom_selected
                 ? (g_seg_custom_text.empty() ? std::string("Custom") : ("Custom: " + g_seg_custom_text))
                 : seg_display(g_settings.segment_marking_alpha);
+        case SettingsRow::BackgroundArt:
+            return g_hide_background_art ? "Hidden" : "Shown";
         case SettingsRow::ConsoleArt:
             return g_hide_console_art ? "Hidden" : "Shown";
         case SettingsRow::PanelGap:
@@ -1520,6 +1588,11 @@ static void update_experimental_features_confirm(uint64_t kDown) {
     if (kDown & HidNpadButton_A) {
         YOKOI_LOG("switch_menu: experimental features enable confirmed");
         g_experimental_features_enabled = true;
+        // Turning it on reveals the Pet Time rows above this one - keep the
+        // cursor on this row rather than on whatever slid into its index.
+        const std::vector<SettingsRow> rows = build_settings_rows();
+        for (size_t i = 0; i < rows.size(); i++)
+            if (rows[i] == SettingsRow::ExperimentalFeatures) g_settings_selected_row = (int)i;
         switch_settings_save();
         g_experimental_features_confirm_active = false;
     } else if (kDown & HidNpadButton_B) {
@@ -1616,6 +1689,9 @@ static void update_settings_menu(uint64_t kDown) {
                 }
                 break;
             }
+            case SettingsRow::BackgroundArt:
+                g_hide_background_art = !g_hide_background_art;
+                break;
             case SettingsRow::ConsoleArt:
                 g_hide_console_art = !g_hide_console_art;
                 break;
@@ -1710,7 +1786,7 @@ static void update_settings_menu(uint64_t kDown) {
                     if (!g_last_game_played_ref.empty()) {
                         bool found = false;
                         const uint8_t idx = find_game_index_by_ref(g_last_game_played_ref, &found);
-                        if (found && is_experimental_games_manufacturer(get_mfr(idx))) {
+                        if (found && is_experimental_game(idx)) {
                             // The saved last-played game just became hidden -
                             // point lastgameplayed at a known-safe game
                             // instead of leaving a technically-invalid

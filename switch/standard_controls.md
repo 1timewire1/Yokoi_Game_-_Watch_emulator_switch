@@ -400,14 +400,17 @@ Game Background Color to **Black** and Segment Color to **Red**.
 ## Seiko Epson E0C6S46/S48 keychain games (Experimental Games)
 
 MAME's `hh_e0c6200.cpp` set, on its own core (`source/E0C6200/` - a port of
-MAME's E0C6200 CPU and E0C6S46 peripherals): Bandai's Tamagotchi (Gen. 1/2,
-Tenshitchi, Mothra) and Digital Monster (Ver. 1-3), Epoch's Chibi Pachi:
-Alien Fever, Nikko's Venus Diet Monogatari and Tandy's Stack Challenge. Each
+MAME's E0C6200 CPU and E0C6S46 peripherals): Bandai's Tamagotchi (Gen. 1
+International/Japan, Gen. 2, Tenshitchi, Mothra, Umi de Hakken!!, Mori de
+Hakken!!, Genjintchi, Yasashii, and an unidentified one listed as "Unknown
+Tamagotchi (Tamaotch)") and Digital Monster (Ver. 1 Japan Rev. A/Rev. B and
+Europe, Ver. 2-4), Epoch's Chibi Pachi: Alien Fever, Nikko's Venus Diet
+Monogatari and Tandy's Stack Challenge. Each
 button is wired straight to an MCU input pin, so these use their own input
 path (`switch/source/input/e0c6200_input_map.cpp`) rather than a
 `Virtual_Input` class.
 
-These were built to run 24/7. For the Tamagotchis and Digital Monsters whose
+These were built to run 24/7. With Experimental Features on, for the Tamagotchis and Digital Monsters whose
 clock is mapped (all but Yasashii), the **Pet Time** setting decides what
 happens to the time they weren't running - the app closed, or the game
 paused/suspended mid-play. **Real Time** (default) fast-forwards the pet
@@ -417,13 +420,14 @@ alone. **Clock Sync** only sets its clock to now; **Paused** leaves it
 exactly where it was. Venus Diet, Alien Fever, Stack Challenge and Yasashii
 always pick up where they left off.
 
-With Time Set Mode on **Automatic**, a fresh start sets the clock for you:
+With Experimental Features on and Time Set Mode on **Automatic**, a fresh start sets the clock for you:
 about 3 seconds in, the game's own clock-set screen opens, the current
 time is entered and confirmed (the egg then starts hatching as usual) -
 `switch/source/input/e0c6200_clock_setup.cpp`. Your buttons are ignored for
 those ~5 seconds. It never runs on a pet restored from a save state (it
 checks the clock is still unset first). Supported: every Tamagotchi except
-Yasashii, every Digital Monster. Yasashii Tamagotchi and Venus Diet still
+Yasashii, every Digital Monster. (Tamaotch's set screen only accepts the
+confirm after an hour change, so its sequence adds an A press.) Yasashii Tamagotchi and Venus Diet still
 need setting by hand; Alien Fever and Stack Challenge have no clock.
 
 **Tamagotchi / Digital Monster / Venus Diet Monogatari** (`TAMA`, `TAMAG2`,
@@ -435,7 +439,7 @@ need setting by hand; Alien Fever and Stack Challenge have no clock.
 | Y / D-Pad Left | Left button (A - select / cycle) |
 | A / D-Pad Up / D-Pad Down | Middle button (B - confirm) |
 | B / D-Pad Right | Right button (C - cancel) |
-| X | Sensor on K03 (`TAMAANG`, `TAMAUMI`, `TAMAMORI`, `TAMAGENJIN` - BrickEmuPy wires it to tapping the screen) |
+| X | Sensor on K03 (`TAMAANG`, `TAMAUMI`, `TAMAMORI`, `TAMAGENJIN` - BrickEmuPy wires it to tapping the screen; also on `TAMAOTCH`, untested) |
 | L + R (held) | Reset (`DIGIMON*` only - the recessed reset button) |
 
 **Yasashii Tamagotchi** (`TAMAYASA`) - six icon buttons around the screen
@@ -479,6 +483,35 @@ art and follow the Background Color setting instead. Seven of these games (`TAMA
 BrickEmuPy, not MAME. Each board's fast-oscillator (OSC3) speed is also
 BrickEmuPy's measured value rather than MAME's 1 MHz placeholder - Alien
 Fever, which runs on it full time, plays ~40% faster than in MAME.
+
+## BrickEmuPy ports: Holtek HT943, Sunplus SPL81408 (Experimental Games)
+
+Games run on cores ported from [BrickEmuPy](https://github.com/azya52/BrickEmuPy)
+(CC0) - `source/BrickCores/`, one C++ class per BrickEmuPy core, each game's
+ROM a `.brk` container carrying its `.brick` config (`CONVERT_ROM/brick_import.py`).
+All of them are Experimental Games, whatever their group. Each core is
+checked instruction-for-instruction against BrickEmuPy's own Python core
+(`CONVERT_ROM/tmp/ht943/run_compare.py`, `CONVERT_ROM/tmp/spl/run_compare.py`).
+
+Buttons map straight to the device's: **D-pad** = its arrows, **A** = the
+main action (rotate / fire / start), **+** / **-** = start or on and
+pause or off, **R** = sound / mute. **+ and - together** is the reset or
+ACL button, where the device has one (holding it holds the chip in reset).
+
+| Game | A | + | - | R | Other |
+|---|---|---|---|---|---|
+| Brick Game 96 in 1 (E-23 Plus Mark II), Brick Game 8 in 1 (E-88) | Rotate | Start/Pause | On/Off | Mute | |
+| Block Game & Echo Key (GA888) | Rotate | | Pause | | +/- Reset |
+| Pikorin 55 | Start/Rotate | On/Pause | | Sound | +/- Reset |
+| Keychain Pin Ball | | Start/On | Pause | Mute | X Off, +/- Reset; Left/Right = flippers |
+| Galaxian (Bandai) | Start/Shoot | | Pause | Sound | B Life, X Continue, +/- On/Reset |
+| Mame Game de Hakken!! Tamagotchi | Start/Rotate | | Pause | Sound | +/- On/Reset |
+| Puyolin | Start/Rotate | Start/Rotate | On/Off | Mute | X Pause, +/- ACL |
+| Space Intruder (TK-150I) | Fire/Start | On/Off | Pause | Sound | |
+| Chicken McNugget Tetris (McDonald's, SPL81408) | Rotate (also B) | Pause | On/Off | Mute | Up = hard drop |
+
+Several of these power off by halting the chip; the screen is blank until
+the power/on button wakes them, as on the real thing.
 
 ## McDonald's (LCDonald ports)
 

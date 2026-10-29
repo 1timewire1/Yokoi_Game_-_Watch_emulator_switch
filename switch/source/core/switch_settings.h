@@ -32,6 +32,15 @@ extern ScreenRotation g_screen_rotation;
 // naturally unaffected too. Defaults to hidden, per explicit request.
 extern bool g_hide_console_art;
 
+// Background Art: Shown (default) / Hidden. Hidden drops each game's printed
+// artwork - its Background image and its label Overlay - leaving only the
+// segments over the plain, Background Color-tinted fill. Masked games
+// (Panorama/Table Top: their art IS the lit layer behind dark segments)
+// always keep theirs. Purely a rendering switch (render/switch_screen.cpp),
+// shown in both settings screens since it applies live. Stored as
+// hide_background_art.
+extern bool g_hide_background_art;
+
 // Governs what happens when A is pressed on a game that already has a save
 // file - see the load prompt in switch_menu.cpp. Only concerns *loading*;
 // saving on leaving a game is always unconditional regardless of this

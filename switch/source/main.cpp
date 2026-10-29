@@ -45,6 +45,8 @@
 #include "input/lcdonald_input_map.h"
 #include "input/rzone_input_map.h"
 #include "input/e0c6200_input_map.h"
+#include "input/brick_input_map.h"
+#include "BrickCores/BrickCore.h"
 #include "input/e0c6200_clock_setup.h"
 #include "core/pet_time.h"
 #include "E0C6200/E0C6S46.h"
@@ -412,6 +414,12 @@ int main(int argc, char* argv[]) {
         // null for these too. Type id check, not dynamic_cast (-fno-rtti).
         // While the automatic clock-set sequence is pressing buttons (see
         // e0c6200_clock_setup.h), it owns the K pins instead.
+        // BrickEmuPy-ported cores: each game's ROM container carries its own
+        // button bindings - see brick_input_map.h. g_input is null for these.
+        if (g_cpu && g_game && g_cpu->get_cpu_type_id() == CPU_TYPE_BRICK) {
+            apply_brick_input(static_cast<BrickCore*>(g_cpu.get()));
+        }
+
         if (g_cpu && g_game && g_cpu->get_cpu_type_id() == CPU_TYPE_E0C6S46) {
             E0C6S46* e0c = static_cast<E0C6S46*>(g_cpu.get());
             if (e0c6200_clock_setup_active()) {
@@ -429,7 +437,7 @@ int main(int argc, char* argv[]) {
         // their own dedicated call here instead. static_cast is safe (not
         // dynamic_cast - this build is -fno-rtti): manufacturer already
         // tells us g_cpu is genuinely a LCDonald_fake_cpu.
-        if (g_cpu && g_game && GW_rom::is_lcdonald_family(g_game->manufacturer)) {
+        if (g_cpu && g_game && g_game->is_lcdonald_game()) {
             LCDonald_fake_cpu* lcd_cpu = static_cast<LCDonald_fake_cpu*>(g_cpu.get());
             apply_lcdonald_input(lcd_cpu);
 
@@ -506,13 +514,13 @@ int main(int argc, char* argv[]) {
             // each as a real decoded .ogg sample - see lcdonald_sound.h's
             // doc comment for why this needs to run every frame rather than
             // less often (take_queued_sounds() drains, it doesn't accumulate).
-            if (g_game && GW_rom::is_lcdonald_family(g_game->manufacturer)) {
+            if (g_game && g_game->is_lcdonald_game()) {
                 lcdonald_sound_play_queued(static_cast<LCDonald_fake_cpu*>(g_cpu.get()));
             }
         }
 
         switch_screen_render();
-        if (g_cpu && g_game && GW_rom::is_lcdonald_family(g_game->manufacturer)) {
+        if (g_cpu && g_game && g_game->is_lcdonald_game()) {
             lcdonald_hud_render(viewport_w, viewport_h, static_cast<LCDonald_fake_cpu*>(g_cpu.get()),
                                 high_score_get(g_game->ref, "endless"));
         }

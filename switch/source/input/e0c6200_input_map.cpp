@@ -87,7 +87,7 @@ void apply_e0c6200_input(E0C6S46* cpu, const std::string& ref) {
         cpu->set_reset_line((held & HidNpadButton_Plus) && (held & HidNpadButton_Minus));
     } else {
         apply(cpu, kTama, held);
-        if (ref == "TAMAANG" || ref == "TAMAUMI" || ref == "TAMAMORI" || ref == "TAMAGENJIN") {
+        if (ref == "TAMAANG" || ref == "TAMAUMI" || ref == "TAMAMORI" || ref == "TAMAGENJIN" || ref == "TAMAOTCH") {
             apply(cpu, kTamaSensor, held);
         }
         // Digital Monster's reset button is wired to the RESET pin; a

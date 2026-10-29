@@ -1,0 +1,1846 @@
+{
+  "games": [
+    {
+      "brick": "EpochMonsterPanic",
+      "set": "epochmonsterpanic",
+      "core": "D750X",
+      "name": "Monster Panic",
+      "readme": "Epoch Monster Panic",
+      "manufacturer": "Epoch",
+      "date": "1981-01-01",
+      "keys": {},
+      "model": "36520",
+      "clone_of": null,
+      "notes": "Japanese モンスターパニック; series EPOCH POCKET DIGIT-COM is printed on the face. 1981 per handheldmuseum, Electronic Plastic and Handheld Empire; one JP blog says 1982. A Super Wide version (1983) and an ITMC French release also exist. Same game as Gamatronic Krazy Kong / Grandstand Crazy Kong. The model number comes from handheldmuseum only.",
+      "sources": [
+        "https://www.handheldmuseum.com/Epoch/MonsterPanic.htm",
+        "http://www.electronicplastic.com/game/?company=epoch&id=247",
+        "http://www.electronicplastic.com/game/?company=epoch&id=255",
+        "https://handheldempire.com/game.jsp?game=740",
+        "http://www5e.biglobe.ne.jp/kiden/shu.monpani.htm",
+        "https://note.com/shinonomesousaku/n/n974bf4e3b807"
+      ],
+      "confidence": {
+        "name": "High",
+        "manufacturer": "High",
+        "date": "Medium",
+        "model": "Low",
+        "clone_of": "Medium"
+      }
+    },
+    {
+      "brick": "E33_2in1",
+      "set": "e332in1",
+      "core": "EM73000",
+      "name": "Brick Game E-33 2 in 1",
+      "readme": "Brick Game E-33 2 in 1 (SC6383)",
+      "manufacturer": "Brick Game",
+      "date": "1994-01-01",
+      "keys": {},
+      "model": "E-33",
+      "clone_of": null,
+      "notes": "Face: 'BRICK GAME 2 IN 1', 'E-33', logo with characters 机之宝 (unidentified Chinese brand). Date is a placeholder guess; no source found (search budget exhausted). EMC SC6383. | Second pass: Maker E-Star (Medium): Hard Drop wiki lists the E-33 (2 games) among E-Star's early models with the E-23/E-88; eBay titles 'Brick Game 2 in 1 E-33 E-Star'; same 机之宝 smiley logo as the E-Star E-23. The E-33 number was also reused by others (e.g. a Micro Genius 4-in-1). Date 1994 is an era estimate (sibling dies 1993/1994), not a sourced date.",
+      "sources": [
+        "https://harddrop.com/wiki/Brick_Game",
+        "https://www.ebay.com/itm/388054316961",
+        "https://ynk.ucoz.ru/index/0-57"
+      ],
+      "confidence": {
+        "name": "High",
+        "manufacturer": "Medium",
+        "date": "Low",
+        "model": "High",
+        "clone_of": "Medium"
+      }
+    },
+    {
+      "brick": "TamagotchiMini2017",
+      "set": "tamagotchimini2017",
+      "core": "GPL191X",
+      "name": "Tamagotchi Mini (20th Anniversary)",
+      "readme": "Tamagotchi Mini 2017 (GPL191X)",
+      "manufacturer": "Bandai",
+      "date": "2017-04-08",
+      "keys": {},
+      "model": null,
+      "clone_of": null,
+      "notes": "2017 20th-anniversary re-release of the 2005 Tamagotchi Mini (Japan: Chibi Tamagotchi). Released JP 2017-04-08 and US 2017-11-05; functionally identical in all regions. BrickEmuPy flags 'high probability of errors in the dump'. Distributed without ROM. Real buttons are A/B/C (left/middle/right).",
+      "sources": [
+        "https://tamagotchi.fandom.com/wiki/Tamagotchi_Mini",
+        "https://money.cnn.com/2017/10/10/technology/tamagotchi-mini/index.html"
+      ],
+      "confidence": {
+        "name": "High",
+        "manufacturer": "High",
+        "date": "High",
+        "model": "Unknown",
+        "clone_of": "High"
+      }
+    },
+    {
+      "brick": "E23PlusMarkII96in1",
+      "set": "e23plusmarkii96in1",
+      "core": "HT943",
+      "name": "Brick Game 96 in 1 (E-23 Plus Mark II)",
+      "readme": "Brick Game E-23 PLUS MARK II 96 in 1 (HT-943D0) (An [article](https://habr.com/ru/articles/773040/) describing the reverse engineering.)",
+      "manufacturer": "Brick Game",
+      "date": "1993-01-01",
+      "keys": {},
+      "model": "E-23 Plus Mark II",
+      "clone_of": null,
+      "notes": "Maker E-Star (Taiwan) per habr and MAME (brke23p2, SHA1 match). Face: 'super', 'BRICK GAME 96 IN 1', 'E-23 PLUS MARK II', smiley-hands logo with '机之宝'. Date is MAME's die year (other dies show 1996). | Second pass: Gap-fill: no retail date found; 1993 remains the die year (habr die caption 1993; MAME). Hard Drop wiki: E-Star's earliest units possibly 1992 or earlier; the E-23 first shipped as a 2-game unit without 'Plus Mark II', so the 96-in-1 is a later revision; copies c.1993-94; E-Star's 98/118/154/999-game models c.1995-97.",
+      "sources": [
+        "https://habr.com/ru/articles/773040/",
+        "https://github.com/mamedev/mame/blob/master/src/mame/handheld/hh_ht11xx.cpp",
+        "https://harddrop.com/wiki/Brick_Game"
+      ],
+      "confidence": {
+        "name": "High",
+        "manufacturer": "High",
+        "date": "Low",
+        "model": "High",
+        "clone_of": "High"
+      }
+    },
+    {
+      "brick": "E88_8in1",
+      "set": "e888in1",
+      "core": "HT943",
+      "name": "Brick Game 8 in 1 (E-88)",
+      "readme": "Brick Game E-88 8 in 1 (HT-943E5)",
+      "manufacturer": "Brick Game",
+      "date": "1994-01-01",
+      "keys": {},
+      "model": "E-88",
+      "clone_of": null,
+      "notes": "Face: 'BRICK GAME 8-IN-1', 'E-88', same smiley-hands logo as E-23; likely E-Star (one eBay listing). Date = HT-943E5 mask year 1994 (habr). Config reuses E-23 sound ROM. Optional key: btnRotate A|UP. | Second pass: Maker E-Star now Medium: Hard Drop wiki lists the E-88 among E-Star's early models; multiple eBay titles say E-Star; same logo as the E-Star E-23. Variants seen: E-88C, E-S88, E88A 'Russian talking'. Date still only the 1994 mask year.",
+      "sources": [
+        "https://habr.com/ru/articles/767520/",
+        "https://www.ebay.com/itm/397025125785",
+        "https://x.com/OneBitOnePixel/status/1803063959936733252",
+        "https://harddrop.com/wiki/Brick_Game",
+        "https://violity.com/en/111429800-igra-brick-game-8-in-1-e-88-c",
+        "https://ynk.ucoz.ru/index/0-57"
+      ],
+      "confidence": {
+        "name": "High",
+        "manufacturer": "Medium",
+        "date": "Low",
+        "model": "High",
+        "clone_of": "High"
+      }
+    },
+    {
+      "brick": "GA888",
+      "set": "ga888",
+      "core": "HT943",
+      "name": "Block Game & Echo Key",
+      "readme": "Brick Game E-88 8 in 1 (HT-943E5)",
+      "manufacturer": "Brick Game",
+      "date": "1996-01-01",
+      "keys": {},
+      "model": "GA888",
+      "clone_of": null,
+      "notes": "Handoff README line is wrong (real: 'Block Game & Echo Key GA888 (Tetris Jr. clone)'). Unknown maker (MAME ga888, SHA1 match, year 199?). Tetris Jr. clone; same LCD layout as Keychain55in1 (Pikorin 55) but different ROM. Date is a placeholder. | Second pass: Gap-fill: no maker/date found (EN/RU searches). A Russian listing 'Тетрис брелок BLOCK GAME ECHO KEY GA888' confirms the name and Russian circulation. MAME year still 199?.",
+      "sources": [
+        "https://github.com/mamedev/mame/blob/master/src/mame/handheld/hh_ht11xx.cpp",
+        "https://github.com/azya52/BrickEmuPy"
+      ],
+      "confidence": {
+        "name": "High",
+        "manufacturer": "High",
+        "date": "Low",
+        "model": "High",
+        "clone_of": "Medium"
+      }
+    },
+    {
+      "brick": "Keychain55in1",
+      "set": "keychain55in1",
+      "core": "HT943",
+      "name": "Pikorin 55",
+      "readme": "Keychain 55 in 1 (HT-943I0)",
+      "manufacturer": "Gametech",
+      "date": "1996-01-01",
+      "keys": {},
+      "model": null,
+      "clone_of": null,
+      "notes": "Face logo ピコリン55; MAME piko55 (Gametech) SHA1 match. Retitled Tetrin 55 (Gametech 1996); 55 games = 4 types. List price 1,430 yen. Exact Pikorin release year unconfirmed (1996-97). | Second pass: Gap-fill: the Tetrin 55 -> Pikorin 55 rename followed a trademark dispute with the Tetris rights holder (ja.wikipedia 'テトリス'); Gametech kept making and selling it under the new name. Tetrin 55 = 1996 (no month). Retitle date late 1996 or 1997, unconfirmed; MAME year is 199?.",
+      "sources": [
+        "https://github.com/mamedev/mame/blob/master/src/mame/handheld/hh_ht11xx.cpp",
+        "https://www.weblio.jp/content/%E3%83%94%E3%82%B3%E3%83%AA%E3%83%B355",
+        "https://middle-edge-neo.jp/articles/8012/",
+        "https://en.wikipedia.org/wiki/List_of_Japanese_handheld_electronic_games",
+        "https://ja.wikipedia.org/wiki/%E3%83%86%E3%83%88%E3%83%AA%E3%83%B355",
+        "https://ja.wikipedia.org/wiki/%E3%83%86%E3%83%88%E3%83%AA%E3%82%B9"
+      ],
+      "confidence": {
+        "name": "High",
+        "manufacturer": "High",
+        "date": "Low",
+        "model": "Unknown",
+        "clone_of": "Medium"
+      }
+    },
+    {
+      "brick": "KeychainPinBall",
+      "set": "keychainpinball",
+      "core": "HT943",
+      "name": "Keychain Pin Ball",
+      "readme": "Keychain Pin Ball (HT-943I0)",
+      "manufacturer": "Brick Game",
+      "date": "1996-01-01",
+      "keys": {},
+      "model": null,
+      "clone_of": null,
+      "notes": "Name from face; unbranded, maker unknown. Possibly Holtek HT1134A 'Pin Ball LCD Game' mask product (unconfirmed). Date is a placeholder. | Second pass: Gap-fill: no maker found. Holtek's mask product 'HT1134A Pin Ball LCD Game' datasheet is dated 24 Dec 1998 (alldatasheet listing, snippet only). If this unit uses that stock program, c.1998 would fit better than 1996, but the link is unconfirmed (BrickEmuPy reports die HT-943I0).",
+      "sources": [
+        "https://github.com/mamedev/mame/blob/master/src/mame/handheld/hh_ht11xx.cpp"
+      ],
+      "confidence": {
+        "name": "High",
+        "manufacturer": "Unknown",
+        "date": "Low",
+        "model": "Unknown",
+        "clone_of": "Medium"
+      }
+    },
+    {
+      "brick": "MameGalaxian",
+      "set": "mamegalaxian",
+      "core": "HT943",
+      "name": "Galaxian",
+      "readme": "Mame Galaxian (HTB943R0)",
+      "manufacturer": "Bandai",
+      "date": "1997-01-01",
+      "keys": {},
+      "model": null,
+      "clone_of": null,
+      "notes": "Bandai 'Mame Game' (マメゲーム) keychain series, licensed from Namco; series prefix decision for maintainer (cf. MameTamagotch). JAN 4902425572338. btnLife/btnContinue share PP mask 2; optional keys Continue UP|X, Life DOWN|B.",
+      "sources": [
+        "https://ameblo.jp/showagamer/entry-12498261735.html",
+        "https://en.wikipedia.org/wiki/List_of_Japanese_handheld_electronic_games",
+        "https://www.ebay.com/itm/144108526875"
+      ],
+      "confidence": {
+        "name": "High",
+        "manufacturer": "High",
+        "date": "Medium",
+        "model": "Unknown",
+        "clone_of": "High"
+      }
+    },
+    {
+      "brick": "MameTamagotch",
+      "set": "mametamagotch",
+      "core": "HT943",
+      "name": "Mame Game de Hakken!! Tamagotchi",
+      "readme": "Mame Game Tamagotch (HTGL43Q0)",
+      "manufacturer": "Bandai",
+      "date": "1997-01-01",
+      "keys": {},
+      "model": null,
+      "clone_of": null,
+      "notes": "マメゲームで発見!!たまごっち, Bandai 'Mame Game' keychain series, Japan only. Version 1 (falling-block Tamagotchi puzzle); 'Mame Game 2' is a different unit. Box: ©BANDAI 1997 (BrickEmuPy commit says 1996 = character copyright). Month unknown. Distributed without ROM. Same series as MameGalaxian.",
+      "sources": [
+        "https://tamagotchi.fandom.com/wiki/Tamagotchi_Mame_Game_De_Hakken",
+        "https://static.wikia.nocookie.net/tamagotchi/images/9/95/TamagotchiMameGame.png",
+        "https://en.wikipedia.org/wiki/List_of_Japanese_handheld_electronic_games"
+      ],
+      "confidence": {
+        "name": "High",
+        "manufacturer": "High",
+        "date": "High",
+        "model": "Unknown",
+        "clone_of": "High"
+      }
+    },
+    {
+      "brick": "Puyolin",
+      "set": "puyolin",
+      "core": "HT943",
+      "name": "Puyolin",
+      "readme": "Puyolin (ぷよりん), 1997 (HT-943Q0)",
+      "manufacturer": "Compile",
+      "date": "1997-07-25",
+      "keys": {
+        "btnStart": "A|PLUS"
+      },
+      "model": null,
+      "clone_of": null,
+      "notes": "ぷよりん, Compile keychain Puyo Puyo (endless mode) LCD game; romanization also 'Puyorin'. Date from ja.wikipedia (uncited). Monochrome original; later 'Color Puyolin' successor. Modeled on the Tetrin keychain.",
+      "sources": [
+        "https://ja.wikipedia.org/wiki/ぷよぷよシリーズ",
+        "https://en.wikipedia.org/wiki/List_of_Japanese_handheld_electronic_games",
+        "https://loopdept.hatenablog.com/entry/2023/05/16/171900",
+        "https://kimimithegameeatingshemonster.com/2025/12/24/puyorin-lcd-puyo-rfectly-formed/"
+      ],
+      "confidence": {
+        "name": "High",
+        "manufacturer": "High",
+        "date": "Medium",
+        "model": "Unknown",
+        "clone_of": "High"
+      }
+    },
+    {
+      "brick": "SpaceIntruderTK150I",
+      "set": "spaceintrudertk150i",
+      "core": "HT943",
+      "name": "Space Intruder",
+      "readme": "Space Intruder TK-150I (HTB943R0)",
+      "manufacturer": "Brick Game",
+      "date": "1998-01-01",
+      "keys": {},
+      "model": "TK-150I",
+      "clone_of": null,
+      "notes": "Title printed on face; no maker on face. Unbranded Holtek HTB943R0 Space Invaders-style handheld. Date is a GUESS (web search budget exhausted before research). | Second pass: Gap-fill: 'TK-150I' found nowhere outside BrickEmuPy. Do NOT confuse with Techno Source 'Space Intruder' (2004-2006), a different LCD game (screen with planet backdrop art, not this 10-column brick matrix). Maker/date still unknown.",
+      "sources": [],
+      "confidence": {
+        "name": "High",
+        "manufacturer": "Low",
+        "date": "Low",
+        "model": "Medium",
+        "clone_of": "Low"
+      }
+    },
+    {
+      "brick": "MickeyVGS",
+      "set": "mickeyvgs",
+      "core": "HTG12N0",
+      "name": "Mickey Deluxe Virtual Game",
+      "readme": "Mickey Deluxe Virtual Game virtual pet (HTGT43N0)",
+      "manufacturer": "VGS",
+      "date": "1997-01-01",
+      "keys": {
+        "btnEarLeft": "LEFT|L",
+        "btnEarRight": "RIGHT|R",
+        "btnLeft": "A",
+        "btnRight": "B"
+      },
+      "model": null,
+      "clone_of": null,
+      "notes": "Disney-licensed Mickey-head virtual pet with ear buttons (Japan-market variant). Maker likely VGS (Virtual Game System) / Playworks International ('Mickey for Kids'; related 'Virtual Mickey'/'Cyber Mickey', JP 'Mickey Life Game'). Date is a GUESS. Title from BrickEmuPy and retail listing only. | Second pass: Gap-fill: no change. Tried EN/JA searches (Deluxe Virtual Game, Virtual/Cyber Mickey Playworks, ミッキー バーチャルゲーム), MAME code search (none). A red 'Mickey's romance/Minnie' sibling is sold under the same 'Disney Deluxe virtual game' listing name.",
+      "sources": [
+        "https://buy-tamagotchis.com/product/disney-deluxe-virtual-game-mickey-kids-mouse-virtual-pet-blue-japan/",
+        "https://jennystroom.nl/powerup/2020/10/04/virtual-mickey-virtual-pet/",
+        "https://www.tamatalk.com/threads/anyone-have-any-information-on-the-virtual-mickey-mouse.196779/",
+        "https://x.com/OneBitOnePixel/status/1868701474781642990",
+        "https://boutique-tamagotchis.fr/produit/disney-deluxe-virtual-game-mickey-kids-mouse-mickeys-romance-minnie-red-japan/"
+      ],
+      "confidence": {
+        "name": "Low",
+        "manufacturer": "Low",
+        "date": "Low",
+        "model": "Unknown",
+        "clone_of": "Medium"
+      }
+    },
+    {
+      "brick": "GA878",
+      "set": "ga878",
+      "core": "KS56CX2X",
+      "name": "GA-878",
+      "readme": "Keychain GA-878 (BJ6220A)",
+      "manufacturer": "Brick Game",
+      "date": "2000-01-01",
+      "keys": {},
+      "model": "GA-878",
+      "clone_of": null,
+      "notes": "Unbranded keychain brick game with clock/alarm; only 'GA-878' printed on face. Same MCU (BJ6220A) and layout as MiconKC32 but different ROM. Date is a GUESS (no research possible; search budget exhausted). | Second pass: Gap-fill: EN/JA searches for GA-878 found nothing outside BrickEmuPy. No change.",
+      "sources": [],
+      "confidence": {
+        "name": "Medium",
+        "manufacturer": "Medium",
+        "date": "Low",
+        "model": "High",
+        "clone_of": "High"
+      }
+    },
+    {
+      "brick": "MiconKC32",
+      "set": "miconkc32",
+      "core": "KS56CX2X",
+      "name": "Micon KC-32",
+      "readme": "Micon KC-32 (BJ6220A)",
+      "manufacturer": "Brick Game",
+      "date": "2000-01-01",
+      "keys": {
+        "btnSpeed": "DOWN|R"
+      },
+      "model": "KC-32",
+      "clone_of": null,
+      "notes": "Face prints brand 'MICON' and model 'KC-32'; no game title. Keychain brick game (BJ6220A), not a clone of GA878 (different ROM). SPEED is the down-arrow button. Date is a GUESS (search budget exhausted). | Second pass: Gap-fill: sold in Japan. Japanese resale listings (Suruga-ya 'キーチェーンゲーム テトリス(ブラック) MICON KC-32（LSI）', Yahoo! Auctions, Mercari) call it a keychain 'Tetris' mini game; one listing says 32-in-1. Company behind 'MICON' and date still unknown.",
+      "sources": [
+        "https://www.suruga-ya.jp/kaitori_detail/148008676",
+        "https://page.auctions.yahoo.co.jp/jp/auction/w448723711",
+        "https://jp.mercari.com/item/m49467598361"
+      ],
+      "confidence": {
+        "name": "High",
+        "manufacturer": "Medium",
+        "date": "Low",
+        "model": "High",
+        "clone_of": "High"
+      }
+    },
+    {
+      "brick": "PocketPuppy",
+      "set": "pocketpuppy",
+      "core": "KS57C21308",
+      "name": "Pocket Puppy",
+      "readme": "Pocket Puppy (KS57C21308)",
+      "manufacturer": "Cool Tec",
+      "date": "1997-01-01",
+      "keys": {},
+      "model": null,
+      "clone_of": null,
+      "notes": "Title printed on face. 'Pocket Puppy' virtual pet is attributed to Cool Tec (1997, 'Model 80000' in listings), but those show a dog-shaped shell while this face is an egg with Dalmatian spots - maker unconfirmed (Manley Toy Quest also sold a 'Pocket Puppy Paws'). | Second pass: Gap-fill: no change. All Pocket Puppy hits are Cool Tec dog-shaped keychains (1997) or Manley 'Pocket Puppy Paws'; nothing shows this egg/Dalmatian shell. Back-of-unit photo still needed.",
+      "sources": [
+        "https://virtual-pets.fandom.com/wiki/Pocket_Puppy",
+        "https://www.ebay.com/p/1005154151"
+      ],
+      "confidence": {
+        "name": "High",
+        "manufacturer": "Low",
+        "date": "Low",
+        "model": "Unknown",
+        "clone_of": "Medium"
+      }
+    },
+    {
+      "brick": "KotoKunekunetchyo",
+      "set": "kotokunekunetchyo",
+      "core": "KS57C2504",
+      "name": "Kunekunetchyo",
+      "readme": "Koto Laboratory & HIRO Kunekunetchyo, 1997 (Samsung KS57C2504)",
+      "manufacturer": "Hiro",
+      "date": "1997-09-01",
+      "keys": {},
+      "model": "LCD Keychain Series No.4",
+      "clone_of": null,
+      "notes": "くねっくねっちょ (small っ; Hepburn 'Kunekkunetcho'). Developed by Koto Laboratory (Gunpei Yokoi), published by Hiro (box: 'KOTO LABORATORY & HIRO'), ¥1,000, Sept 1997; one of Yokoi's final two games. Snake game, Game A/B. Same publisher as PocketBoyNo2.",
+      "sources": [
+        "http://blog.beforemario.com/2014/04/gunpei-yokois-final-two-games.html",
+        "https://ameblo.jp/showagamer/entry-12498261766.html"
+      ],
+      "confidence": {
+        "name": "High",
+        "manufacturer": "High",
+        "date": "Medium",
+        "model": "High",
+        "clone_of": "High"
+      }
+    },
+    {
+      "brick": "EdlaSpaceRescue",
+      "set": "edlaspacerescue",
+      "core": "LC5732",
+      "name": "Space Rescue",
+      "readme": "Edla Game Space Rescue, 1989? (Sanyo LC5732)",
+      "manufacturer": "Edla",
+      "date": "1989-01-01",
+      "keys": {},
+      "model": null,
+      "clone_of": null,
+      "notes": "Face shows only the 'Edla(R) Game' logo; title from the BrickEmuPy README. Year is the README author's guess ('1989?'). No web source found for the Edla brand. Unrelated to the Tronica MG-9, Casio CG-126 and Game Wizard Space Rescue games. Face labels: LEFT/SET, RIGHT/SELECT, START, MODE; Game A/B plus clock and alarm. | Second pass: Gap-fill: no change; no independent source for Edla. Possible OEM sibling: a 'PLAY&TIME Game Watch Space Rescue' (unverified).",
+      "sources": [
+        "https://handheldmuseum.com/Misc/GameWizardSpaceRescue.htm",
+        "https://www.worthpoint.com/worthopedia/play-time-electronic-handheld-game-252296849"
+      ],
+      "confidence": {
+        "name": "Low",
+        "manufacturer": "High",
+        "date": "Low",
+        "model": "Unknown",
+        "clone_of": "Medium"
+      }
+    },
+    {
+      "brick": "PocketBoyNo2",
+      "set": "pocketboyno2",
+      "core": "LC5732",
+      "name": "Dragon Makyuu no Nazo",
+      "readme": "Hiro Pocket Boy No.2, 1993 (Sanyo LC5732)",
+      "manufacturer": "Hiro",
+      "date": "1990-01-01",
+      "keys": {},
+      "model": "Pocket Boy No.2",
+      "clone_of": null,
+      "notes": "Face prints 'POCKET BOY', 'NO 2' and the title ドラゴン魔宮の謎 (Dragon Makyu no Nazo). If the series is kept: 'Pocket Boy No.2: Dragon Makyuu no Nazo'. Year conflict: README 1993 vs YouTube reviewer 1990; a blog says early 1990s. Maker HIRO (株式会社ヒロ). | Second pass: Date changed from README 1993 to 1990: YouTube reviewer tags Pocket Boy No.2/No.13 as 1990 (and the later New Pocket Boy No.7/No.12 as 1995/1996); a Yahoo! Flea Market seller lists 'HIRO POCKET BOY 1990年製'; blogs say ~1990. No source supports 1993 (may be a © on the back - unverified).",
+      "sources": [
+        "https://www.youtube.com/watch?v=U5P9EddtrKk",
+        "https://ameblo.jp/aas192508/entry-12652541067.html",
+        "https://paypayfleamarket.yahoo.co.jp/item/z473185234",
+        "https://www.youtube.com/watch?v=8ugHxjcvC9E",
+        "https://www.youtube.com/watch?v=U0RCIbhWEvI"
+      ],
+      "confidence": {
+        "name": "High",
+        "manufacturer": "High",
+        "date": "Low",
+        "model": "Medium",
+        "clone_of": "High"
+      }
+    },
+    {
+      "brick": "PocketPikachu",
+      "set": "pocketpikachu",
+      "core": "M37520",
+      "name": "Pocket Pikachu",
+      "readme": "Pocket Pikachu",
+      "manufacturer": "Nintendo",
+      "date": "1998-03-27",
+      "keys": {},
+      "model": "MPG-001",
+      "clone_of": null,
+      "notes": "Original monochrome 1998 model (developed by Jupiter), not Pocket Pikachu Color. Sold as 'Pokemon Pikachu' in NA (1998-11-02) and EU (Dec 1998). Face icons (clock, gift, coin slot game, 5-digit steps) and the Game Boy-style button set match the original. Dump region is presumably Japanese. Model number comes from listings only. Distributed without ROM.",
+      "sources": [
+        "https://www.serebii.net/virtualpet/pokemonpikachu/",
+        "https://en.wikipedia.org/wiki/Pok%C3%A9mon_Pikachu",
+        "https://pokemon.fandom.com/wiki/Pok%C3%A9mon_Pikachu",
+        "https://www.nintendo.co.jp/n09/pika_kg/index.html",
+        "https://www.pricecharting.com/de/game/pokemon-mini/pocket-pikachu-console"
+      ],
+      "confidence": {
+        "name": "High",
+        "manufacturer": "High",
+        "date": "High",
+        "model": "Medium",
+        "clone_of": "High"
+      }
+    },
+    {
+      "brick": "SMBNelsonic",
+      "set": "smbnelsonic",
+      "core": "MSM50XX",
+      "name": "Super Mario Bros. Game Watch",
+      "readme": "Tamagotchi Angel",
+      "manufacturer": "Nelsonic",
+      "date": "1989-01-01",
+      "keys": {},
+      "model": null,
+      "clone_of": null,
+      "notes": "Super Mario Bros. Game Watch by Nelsonic (Nintendo licensed), USA 1989; series suffix 'Game Watch'. Handoff README line 'Tamagotchi Angel' is a generator bug. Model number unknown; Service Merchandise code LSMN1WBF is a retailer code. Distributed without ROM. | Merge: name harmonised with ZeldaNelsonic to keep the \"Game Watch\" suffix printed on the box (avoids clashing with Nintendo titles).",
+      "sources": [
+        "https://www.mariowiki.com/Super_Mario_Bros._(Nelsonic_Game_Watch)",
+        "https://en.wikipedia.org/wiki/Nelsonic_Industries",
+        "https://www.handheldmuseum.com/Nelsonic/SMB.htm",
+        "https://vintagecomputing.com/?p=1076"
+      ],
+      "confidence": {
+        "name": "High",
+        "manufacturer": "High",
+        "date": "High",
+        "model": "Unknown",
+        "clone_of": "High"
+      }
+    },
+    {
+      "brick": "ZeldaNelsonic",
+      "set": "zeldanelsonic",
+      "core": "MSM50XX",
+      "name": "The Legend of Zelda Game Watch",
+      "readme": "The Legend of Zelda Game Watch",
+      "manufacturer": "Nelsonic",
+      "date": "1989-10-05",
+      "keys": {
+        "btnSet": "A|R",
+        "btnMode": "B|MINUS"
+      },
+      "model": "8321",
+      "clone_of": null,
+      "notes": "Nelsonic wristwatch licensed by Nintendo; manual titled 'THE LEGEND OF ZELDA 8321'. NA release Oct 5 1989 (one unverified source says Aug 1989); PAL re-release by Zeon May 1992. Colours black/red/white/pink. S1=Mode picks up items/drops bombs, S2=Set starts game/attacks, hence the override. Not the Nintendo G&W Zelda ZL-65. Distributed without ROM (Sean Riddle).",
+      "sources": [
+        "https://www.puissance-zelda.com/annexes/img/zw/f_manuel.pdf",
+        "https://en.wikipedia.org/wiki/The_Legend_of_Zelda_LCD_games",
+        "https://zeldawiki.wiki/wiki/The_Legend_of_Zelda_Game_Watch",
+        "https://www.vintagecomputing.com/index.php/archives/tag/1989",
+        "https://raw.githubusercontent.com/mamedev/mame/master/src/mame/handheld/hh_sm510.cpp"
+      ],
+      "confidence": {
+        "name": "High",
+        "manufacturer": "High",
+        "date": "Medium",
+        "model": "Medium",
+        "clone_of": "High"
+      }
+    },
+    {
+      "brick": "formel1",
+      "set": "formel1",
+      "core": "MSM50XX",
+      "name": "Formel 1",
+      "readme": "Formel 1 (Hartung Spiele Berlin/Epoch)",
+      "manufacturer": "Hartung",
+      "date": "1990-01-01",
+      "keys": {},
+      "model": "WG 032",
+      "clone_of": null,
+      "notes": "German Hartung Spiele Berlin LCD game ('GAME' logo, 'Formel 1'). Epoch origin claimed only by BrickEmuPy; Epoch original title not found (candidate: Epoch 'Excite Grand Prix / F1 Racer', unverified). Date is a GUESS (collectors: late 80s/early 90s). Oki MSM5055. | Second pass: Model 'WG 032' from a single Kleinanzeigen listing title (may be a seller ref). Same seller: 'Anfang der 90er Jahre' (supports ~1990). lcd-spiele.de (snippet) says Hartung titles were also sold as Epoch/Systema; Epoch original still unidentified. Red 'UFO' housing variant confirmed by a wanted ad.",
+      "sources": [
+        "https://pyra-handheld.com/boards/threads/suche-lcd-spiele-telespiele-hartung-spiele-berlin.98602/",
+        "https://www.handheldmuseum.com/Epoch/index.html",
+        "https://www.kleinanzeigen.de/s-anzeige/formel-1-ufo-lcd-spiel-hartung-spiele-berlin-90er-jahre-wg-032/3391260424-227-245",
+        "https://www.kleinanzeigen.de/s-hartung-lcd/k0"
+      ],
+      "confidence": {
+        "name": "High",
+        "manufacturer": "Medium",
+        "date": "Low",
+        "model": "Low",
+        "clone_of": "Medium"
+      }
+    },
+    {
+      "brick": "Apollo126in1B0202",
+      "set": "apollo126in1b0202",
+      "core": "SPL02",
+      "name": "126 in 1 (B0202)",
+      "readme": "Apollo 126 in 1 B0202 (SPL02)",
+      "manufacturer": "Apollo",
+      "date": "1995-01-01",
+      "keys": {},
+      "model": "B0202",
+      "clone_of": null,
+      "notes": "Full name 'Apollo 126 in 1 English Talking (B0202)' (habr). Black Apollo brick; reviewed unit dated April 1995 (unit date, not launch). Sunplus SPL02 (die PA2071-160), English speech. Shares speech samples with Apollo18in1B0302. Brand origin disputed (Bojoga: US importer 1989 - unverified).",
+      "sources": [
+        "https://habr.com/ru/articles/955488/",
+        "https://github.com/grayhex/ApolloBrickGames/pull/44",
+        "https://github.com/azya52/BrickEmuPy/blob/main/README.md",
+        "https://www.youtube.com/watch?v=rOtHSD-Q54E",
+        "https://bojoga.com.br/acervo/brinquedos-eletronicos/brick-game-132-em-1/"
+      ],
+      "confidence": {
+        "name": "Medium",
+        "manufacturer": "High",
+        "date": "Medium",
+        "model": "High",
+        "clone_of": "High"
+      }
+    },
+    {
+      "brick": "Apollo18in1B0302",
+      "set": "apollo18in1b0302",
+      "core": "SPL03",
+      "name": "18 in 1 (B0302)",
+      "readme": "Apollo 18 in 1 B0302 (SPL03)",
+      "manufacturer": "Apollo",
+      "date": "1995-01-01",
+      "keys": {},
+      "model": "B0302",
+      "clone_of": null,
+      "notes": "Retail description 'Apollo 18-in-1 English Talking Bricks Game Console B0302'. Date is a guess from sibling B0202 (1995). Sunplus SPL03. Not to be confused with 18 in 1 B0311 (Russian talking). | Second pass: B0302 main PCB silkscreen reads 'NYG-95' (habr board photo), supporting 1995.",
+      "sources": [
+        "https://habr.com/ru/articles/955488/",
+        "https://in.pinterest.com/pin/histria--822329213205564029/",
+        "https://www.youtube.com/watch?v=Wtnh27Eq7aY",
+        "https://emulation.gametechwiki.com/index.php/Brick_Game",
+        "https://habrastorage.org/r/w1560/getpro/habr/upload_files/ad8/98a/43c/ad898a43cf11e82e0c334f8ac6da530f.jpg"
+      ],
+      "confidence": {
+        "name": "Medium",
+        "manufacturer": "High",
+        "date": "Medium",
+        "model": "High",
+        "clone_of": "Medium"
+      }
+    },
+    {
+      "brick": "DPowerDigiviceEU101",
+      "set": "dpowerdigiviceeu101",
+      "core": "SPL61X",
+      "name": "D-Power Digivice (Europe)",
+      "readme": "D-Power Digivice EU 1.01, 2001 (SPL61X)",
+      "manufacturer": "Bandai",
+      "date": "2001-01-01",
+      "keys": {},
+      "model": null,
+      "clone_of": null,
+      "notes": "EU/Asia/Oceania Version 1 line (Wikimon firmware 'DP-EU V1.00'; dump is v1.01). Face LCD is 32x16, matching Version 1. Exact EU release unknown (Wikimon: 2001-2002); 2001 is the toy's copyright year, so the European street date may be 2002. Step/Card are virtual inputs for the pedometer and card slot. Distributed without ROM. | Second pass: Gap-fill: no change; no EU launch month found (Wikimon '?? 2001-2002', Baidu 'US/HK/EU 2001').",
+      "sources": [
+        "https://wikimon.net/D-Power_Digivice_Toy_(EU/AS)",
+        "https://wikimon.net/D-Power",
+        "https://lcd.withthewill.net/DPowerEuIntro"
+      ],
+      "confidence": {
+        "name": "High",
+        "manufacturer": "High",
+        "date": "Low",
+        "model": "Unknown",
+        "clone_of": "High"
+      }
+    },
+    {
+      "brick": "TetrisNugget",
+      "set": "tetrisnugget",
+      "core": "SPL81408",
+      "name": "Chicken McNugget Tetris",
+      "readme": "McDonald's Chicken Nugget, 2023 (SPL81408)",
+      "manufacturer": "McDonald's",
+      "date": "2023-05-24",
+      "keys": {
+        "btnDrop": "UP",
+        "btnRotate": "A|B"
+      },
+      "model": null,
+      "clone_of": null,
+      "notes": "McDonald's China McNugget 40th anniversary / Children's Day promo, +30 yuan with any order, 400,000 units, mainland China only. Licensed by The Tetris Company / Tetris Holding. No official product name (official: '麦乐鸡形状的俄罗斯方块游戏机'). OEM unknown. Needs LCDonald group check rework.",
+      "sources": [
+        "https://www.mcdonalds.com.cn/news/20230524-McNuggets-40-years",
+        "https://www.ithome.com/0/695/540.htm",
+        "https://gigazine.net/gsc_news/en/20230526-mcdonalds-celebrating-mcnugget-tetris-handheld",
+        "https://retrododo.com/mcdonalds-tetris-handheld/",
+        "https://gizmodo.com/tetris-chicken-nugget-mcnugget-handheld-mcdonalds-china-1850475404",
+        "https://www.famouscampaigns.com/2023/05/the-tetris-chicken-nugget/"
+      ],
+      "confidence": {
+        "name": "Low",
+        "manufacturer": "High",
+        "date": "High",
+        "model": "Unknown",
+        "clone_of": "High"
+      }
+    },
+    {
+      "brick": "Apollo2in1",
+      "set": "apollo2in1",
+      "core": "SPLB20",
+      "name": "2 in 1",
+      "readme": "Apollo 2 in 1 virtual pet",
+      "manufacturer": "Apollo",
+      "date": "1997-01-01",
+      "keys": {
+        "btnMode": "Y",
+        "btnExit": "B"
+      },
+      "model": null,
+      "clone_of": null,
+      "notes": "Egg-shaped virtual pet, face prints only '2 IN 1' (no brand). Possibly the '2 in 1'-labelled variant of Apollo 8 in 1 / Magic 8 Pets (virtual-pets wiki) - unverified. Date is a late-90s guess. FILE BUG: brick references Apollo2in1.bin but file is apollo2in1.bin. Key override optional. | Second pass: Gap-fill: no date/model found (EN/RU searches, virtual-pets wiki API, ROM string scan). A Russian collector list says Apollo 2 in 1 is 'the same as 99 in 1' (8 in 1 / Magic 8 Pets family).",
+      "sources": [
+        "https://github.com/azya52/BrickEmuPy/blob/main/README.md",
+        "https://yandex.ru/video/preview/16700142354299867404",
+        "https://virtual-pets.fandom.com/wiki/Apollo_8_in_1",
+        "https://virtual-pets.fandom.com/wiki/Apollo_3_in_1",
+        "https://willianna.tumblr.com/tamagotchi"
+      ],
+      "confidence": {
+        "name": "Medium",
+        "manufacturer": "Medium",
+        "date": "Low",
+        "model": "Unknown",
+        "clone_of": "Low"
+      }
+    },
+    {
+      "brick": "ApolloPrince&Princess_ch",
+      "set": "apolloprinceprincessch",
+      "core": "SPLB20",
+      "name": "Prince & Princess (Chinese)",
+      "readme": "Apollo 2 in 1 virtual pet",
+      "manufacturer": "Apollo",
+      "date": "1997-01-01",
+      "keys": {
+        "btnMode": "B|MINUS"
+      },
+      "model": null,
+      "clone_of": null,
+      "notes": "Same ROM as _en; language chosen by hardware strap on PA1 (port_pullup PA=62, PA1 pulled up). Handoff README line ('Apollo 2 in 1 virtual pet') is a generator error. Collector name 'Tamagotchi Apollo Prince and Princess' (90s). Date is a guess. Key override optional. | Second pass: Gap-fill: no date/model found (RU/EN searches, wiki API, ROM string scan); collector list files it under Apollo.",
+      "sources": [
+        "https://www.youtube.com/watch?v=KA7UQ8pQj3s",
+        "https://rutube.ru/video/d3e1ef5dc3b2a674105dac0ae03f0118/",
+        "https://mywishboard.com/wish/tamagoci-apollo-8in1-3in-4794962?lang=ru",
+        "https://batareikin.wixsite.com/tamagotchifanclub",
+        "https://willianna.tumblr.com/tamagotchi"
+      ],
+      "confidence": {
+        "name": "Medium",
+        "manufacturer": "Medium",
+        "date": "Low",
+        "model": "Unknown",
+        "clone_of": "Medium"
+      }
+    },
+    {
+      "brick": "ApolloPrince&Princess_en",
+      "set": "apolloprinceprincessen",
+      "core": "SPLB20",
+      "name": "Prince & Princess (English)",
+      "readme": "Apollo 2 in 1 virtual pet",
+      "manufacturer": "Apollo",
+      "date": "1997-01-01",
+      "keys": {
+        "btnMode": "B|MINUS"
+      },
+      "model": null,
+      "clone_of": null,
+      "notes": "Same ROM as _ch; English setting (port_pullup PA=60, PA1 strap grounded). If variants must point to a parent, use ApolloPrince&Princess_ch. Date is a guess. Key override optional. | Second pass: Gap-fill: as _ch, no change.",
+      "sources": [
+        "https://www.youtube.com/watch?v=KA7UQ8pQj3s",
+        "https://rutube.ru/video/d3e1ef5dc3b2a674105dac0ae03f0118/",
+        "https://mywishboard.com/wish/tamagoci-apollo-8in1-3in-4794962?lang=ru",
+        "https://batareikin.wixsite.com/tamagotchifanclub"
+      ],
+      "confidence": {
+        "name": "Medium",
+        "manufacturer": "Medium",
+        "date": "Low",
+        "model": "Unknown",
+        "clone_of": "Low"
+      }
+    },
+    {
+      "brick": "BigCat9in1",
+      "set": "bigcat9in1",
+      "core": "SPLB20",
+      "name": "Big Cat 9 in 1",
+      "readme": "Big Cat 9-in-1 (SPLB20)",
+      "manufacturer": "Unbranded",
+      "date": "1998-01-01",
+      "keys": {},
+      "model": null,
+      "clone_of": "Gyaoppi9in1",
+      "notes": "Tiger-head virtual pet, face prints '9 in1' and A-D. ROM is 72% byte-identical to Gyaoppi9in1 (Super Gyaoppi, U.I.) - a 4-button derivative; TamaTalk calls it an oversized Super Gyaoppi. No brand found; date is a guess (after Super Gyaoppi). | Second pass: Gap-fill: no brand/date found (EN search; TamaTalk thread blocked). Parent Super Gyaoppi is box-branded Nature Land, designed by U.I. Lingo & Suzuki.",
+      "sources": [
+        "https://www.tamatalk.com/threads/identification-help-with-lots-of-different-virtual-pets.195025/",
+        "https://virtual-pets.fandom.com/wiki/Gyaoppi"
+      ],
+      "confidence": {
+        "name": "Medium",
+        "manufacturer": "Low",
+        "date": "Low",
+        "model": "Unknown",
+        "clone_of": "High"
+      }
+    },
+    {
+      "brick": "ElfinTwins",
+      "set": "elfintwins",
+      "core": "SPLB20",
+      "name": "Elfin Twins",
+      "readme": "Elfin Twins GM-021",
+      "manufacturer": "Sparkle Crystal",
+      "date": "1997-01-01",
+      "keys": {
+        "btnEsc": "B|MINUS"
+      },
+      "model": "GM-021",
+      "clone_of": null,
+      "notes": "Model GM-021 printed on face. ROM signature (offset 0x7F27, ASCII+0x20): 'Sparkle Crystal Development Co.,Ltd. WangLaXian 1996.11.16' - developer, no brand on unit (alt group: Unbranded). Release 1996-11 or later; 1997 guessed. Esc+Enter = rescue/new twins. Fan GBA port by codanric. | Second pass: Gap-fill: no brand on unit found; no record of Sparkle Crystal Development Co. Ltd.; codanric README says 1996 (from ROM signature only).",
+      "sources": [
+        "https://github.com/codanric/elfin-twins-gba",
+        "https://github.com/codanric/elfin-twins-gba/releases/tag/v1.2",
+        "https://raw.githubusercontent.com/codanric/elfin-twins-gba/main/README.md"
+      ],
+      "confidence": {
+        "name": "High",
+        "manufacturer": "Medium",
+        "date": "Low",
+        "model": "High",
+        "clone_of": "High"
+      }
+    },
+    {
+      "brick": "Gyaoppi9in1",
+      "set": "gyaoppi9in1",
+      "core": "SPLB20",
+      "name": "Super Gyaoppi 9 in 1",
+      "readme": "Super Gyaoppi 9-in-1, 1997 (SPLB20)",
+      "manufacturer": "Nature Land",
+      "date": "1997-01-01",
+      "keys": {
+        "btnA": "LEFT|Y",
+        "btnB": "A|UP|DOWN",
+        "btnC": "RIGHT|B"
+      },
+      "model": null,
+      "clone_of": null,
+      "notes": "Japanese Tamagotchi knock-off (スーパーぎゃおッPi), 9 pets, made in China. Maker 'U.I.' per fan wiki/review (printed on back of shell; box has no maker). README says 1997; one review says produced 1998. Program code (first 22 KB) identical to BigCat9in1. Key override optional (Tamagotchi-style mapping). | Second pass: Box back: 'DESIGNED BY U.I. LINGO & SUZUKI', 'Nature Land®', MADE IN CHINA; unit back moulding 'U.I. MADE IN CHINA'. So Nature Land = brand on box, U.I. = designer (both earlier claims correct). Box front 'スーパーぎゃおッPi 28ビット!', 9 in 1, side 'デジタルペッツ 自然をたいせつに'. No year on box; 1997 vs 1998 unresolved.",
+      "sources": [
+        "https://virtual-pets.fandom.com/wiki/Gyaoppi",
+        "http://pixelpettingzoo.blogspot.com/2010/07/super-gyaoppi-9-in-1-review.html",
+        "https://enpedia.org/wiki/%E3%81%8E%E3%82%83%E3%81%8A%E3%83%83Pi",
+        "https://dailyportalz.jp/kiji/161110198017",
+        "https://auctions.yahoo.co.jp/jp/auction/n1234862033",
+        "https://auctions.yahoo.co.jp/jp/auction/u1233196028"
+      ],
+      "confidence": {
+        "name": "High",
+        "manufacturer": "High",
+        "date": "Low",
+        "model": "Unknown",
+        "clone_of": "Medium"
+      }
+    },
+    {
+      "brick": "Tamagotchi_v3_eu",
+      "set": "tamagotchiv3eu",
+      "core": "SPLB32",
+      "name": "Tamagotchi Connexion V3 (Europe)",
+      "readme": "Tamagotchi Connection V3 (SPLB32)",
+      "manufacturer": "Bandai",
+      "date": "2006-04-01",
+      "keys": {},
+      "model": "GPZ06331",
+      "clone_of": "Tamagotchi_v3_us",
+      "notes": "BrickEmuPy: high probability of errors in the dump. EU packaging reads 'Tamagotchi Connexion V3'; GPZ06331 is the Giochi Preziosi (Italy/Greece) code. EU month unknown (2006). | Second pass: EU release April 2006: Tamagotchi wiki V3 shell list marks all European Wave 1 shells 'April 2006' (US Wave 1 Feb 2006, Wave 2 Mar 2006); a Feb 2006 TamaTalk thread says V3 was not yet out in Europe, March/April rumoured. No per-country day-level date found. EU shells carry the vintage-style logo and a ball chain.",
+      "sources": [
+        "https://static.wikia.nocookie.net/tamagotchi/images/6/69/ConnectionV3EuropePackaging.png/revision/latest?cb=20230327182837",
+        "https://tamagotchi.fandom.com/wiki/Tamagotchi_Connection_(franchise)",
+        "https://smb.museum-digital.de/pdf/object/99369.pdf?lang=en",
+        "https://tamagotchi.fandom.com/wiki/Tamagotchi_Connection_Version_3/Shell_list",
+        "https://www.tamatalk.com/threads/tamagotchi-connection-version-3.36753/"
+      ],
+      "confidence": {
+        "name": "High",
+        "manufacturer": "High",
+        "date": "Medium",
+        "model": "Low",
+        "clone_of": "High"
+      }
+    },
+    {
+      "brick": "Tamagotchi_v3_us",
+      "set": "tamagotchiv3us",
+      "core": "SPLB32",
+      "name": "Tamagotchi Connection V3 (US)",
+      "readme": "Tamagotchi Connection V3 (SPLB32)",
+      "manufacturer": "Bandai",
+      "date": "2006-02-01",
+      "keys": {},
+      "model": "Asst. #19400",
+      "clone_of": null,
+      "notes": "BrickEmuPy: high probability of errors in the dump. Bandai America, (c) Bandai/WiZ 2004-2006. Same ROM as EU; configs differ only in PD pull-up (likely region strap). Per-colour item numbers 194xx.",
+      "sources": [
+        "https://tamagotchi.fandom.com/wiki/Tamagotchi_Connection_Version_3",
+        "https://archive.org/details/tamagotchi-connection-v3-instructions",
+        "https://static.wikia.nocookie.net/tamagotchi/images/c/c3/Version_3_box.jpg/revision/latest?cb=20191015141814",
+        "https://en.wikipedia.org/wiki/Tamagotchi_Connection"
+      ],
+      "confidence": {
+        "name": "High",
+        "manufacturer": "High",
+        "date": "Medium",
+        "model": "Medium",
+        "clone_of": "High"
+      }
+    },
+    {
+      "brick": "MiniClassicsSoccer",
+      "set": "miniclassicssoccer",
+      "core": "STK55C324",
+      "name": "Soccer",
+      "readme": "Mini Classics Soccer, 1998/2004 (STK55C324)",
+      "manufacturer": "Stadlbauer",
+      "date": "2004-01-01",
+      "keys": {
+        "btnStart": "A|PLUS"
+      },
+      "model": null,
+      "clone_of": null,
+      "notes": "Nintendo Mini Classics 'original title' (not a Game & Watch port), made by Stadlbauer (MAME: Mini Classics are by Stadlbauer, not Nintendo); file under Nintendo instead if Mini Classics are grouped by licensor. 1998 comes from listing titles; README '1998/2004' is unexplained. This dump is the white version with GAME, ALARM/START and PAUSE buttons; an orange TIME/ACTION version also exists. Config sits under BrickEmuPy assets/test/. Distributed without ROM. | Second pass: Date: README '1998/2004' read as series/licence year 1998 + this title's year 2004 (inference): Soccer is an 'original' non-G&W title introduced to the US by third distributor It's Outrageous among the 'newer Mini Classics', while Toymax's 1998-99 waves were G&W ports only. eBay/backloggd '1998' likely = series date. Keys: museum sheet confirms the big ALARM/START button is the action button -> keep override btnStart=A|PLUS. CONFIG BUG: brick face_path/rom_path still point to ./assets/test/ but the SVG now lives at assets/MiniClassicsSoccer.svg (commit b8763c2).",
+      "sources": [
+        "https://en.wikipedia.org/wiki/Nintendo_Mini_Classics",
+        "https://raw.githubusercontent.com/mamedev/mame/master/src/mame/handheld/hh_sm510.cpp",
+        "https://www.ebay.com/itm/366530625808",
+        "https://www.youtube.com/watch?v=Bl-t9Ra-uJo",
+        "https://www.youtube.com/watch?v=HA0N50rTCb0",
+        "https://iser.wisski.data.fau.de/sites/default/files/2024-06/Nintendo-MiniC.pdf"
+      ],
+      "confidence": {
+        "name": "Medium",
+        "manufacturer": "Medium",
+        "date": "Low",
+        "model": "Unknown",
+        "clone_of": "Medium",
+        "keys": "Medium"
+      }
+    },
+    {
+      "brick": "Gundam3in1",
+      "set": "gundam3in1",
+      "core": "T6770S",
+      "name": "Gundam Space Combat 3 in 1",
+      "readme": "Gundam Space Combat 3 in 1 (Toshiba 6770S)",
+      "manufacturer": "Bandai",
+      "date": "1981-10-01",
+      "keys": {
+        "btnStart": "A|PLUS"
+      },
+      "model": "16194",
+      "clone_of": null,
+      "notes": "Bandai Electronics 'Super Game Digital' (JA: LCDスーパーゲームデジタル GUNDAM SPACE COMBAT3in1). Games: Zgok vs Gundam, Zaku vs Gundam, mine-field run. Release Oct 1981 per a collector blog; HHM says 1981, EP says 1983. Box number 16194. The FIRE SPEED/START key is the fire button.",
+      "sources": [
+        "https://www.handheldmuseum.com/Bandai/Gundam3in1.htm",
+        "https://www.electronicplastic.com/game/?id=42",
+        "https://ameblo.jp/neo-izayoi-onepiece/entry-12223925850.html",
+        "https://ja.wikipedia.org/wiki/ガンダムシリーズゲーム作品一覧"
+      ],
+      "confidence": {
+        "name": "High",
+        "manufacturer": "High",
+        "date": "Medium",
+        "model": "Medium",
+        "clone_of": "High"
+      }
+    },
+    {
+      "brick": "AnimestSpaceCobra",
+      "set": "animestspacecobra",
+      "core": "T7741",
+      "name": "Space Cobra Professional",
+      "readme": "Popy (Bandai) Animest Space Cobra Professional CO-02, 1982 (Toshiba 6850)",
+      "manufacturer": "Popy",
+      "date": "1982-01-01",
+      "keys": {
+        "btnRightUp": "RIGHT|UP",
+        "btnLeftDown": "LEFT|DOWN"
+      },
+      "model": "CO-02",
+      "clone_of": null,
+      "notes": "Popy (Bandai subsidiary) Animest series, 'POPY ELECTRONICS GAME'. JP: スペースコブラ プロフェッショナル. Fold-up dual-screen case. Back mold: MODEL NO. CO-02, PAT.PEND.1982, ©寺沢武一・集英社・C.I.C.・フジテレビ. Also sold in Europe as 'Professional' (Bandai France/Italia box). HHM's 'Model# 72619' is the box JAN fragment. Mini-Arcade's Bandai/1983 not adopted.",
+      "sources": [
+        "https://www.handheldmuseum.com/Popy/Professional.htm",
+        "https://www.electronicplastic.com/game/?id=629",
+        "https://handheldempire.com/game.jsp?game=1393",
+        "https://en.wikipedia.org/wiki/List_of_Cobra_video_games"
+      ],
+      "confidence": {
+        "name": "High",
+        "manufacturer": "High",
+        "date": "High",
+        "model": "High",
+        "clone_of": "High"
+      }
+    },
+    {
+      "brick": "DorayakiHouse",
+      "set": "dorayakihouse",
+      "core": "T7741",
+      "name": "Dorayaki House",
+      "readme": "Popy (Bandai) Animest Dorayaki House DO-01, 1983 (Toshiba 6922)",
+      "manufacturer": "Popy",
+      "date": "1983-01-01",
+      "keys": {
+        "btnJump": "UP",
+        "btnAction": "A"
+      },
+      "model": "DO-01",
+      "clone_of": null,
+      "notes": "Popy Animest. JP box title ドラヤキハウス (Doraemon). Back label: MODEL NO. DO-01, PAT. PEND. 1983, Popy logo. HHM says 1982 but the label says 1983. Jump key is printed 'JUMP UP' at the top of the cross.",
+      "sources": [
+        "https://www.handheldmuseum.com/Popy/DorayakiHouse.htm",
+        "https://handheldempire.com/game.jsp?game=1377"
+      ],
+      "confidence": {
+        "name": "High",
+        "manufacturer": "High",
+        "date": "High",
+        "model": "High",
+        "clone_of": "High"
+      }
+    },
+    {
+      "brick": "DrSlumpAraleNchaBycha",
+      "set": "drslumparalenchabycha",
+      "core": "T7741",
+      "name": "Dr. Slump Arale: Ncha! Bycha",
+      "readme": "Popy (Bandai) Animest Dr. Slump Arale Ncha! Bycha AR-03, 1982 (Toshiba 6815)",
+      "manufacturer": "Popy",
+      "date": "1982-01-01",
+      "keys": {},
+      "model": "AR-03",
+      "clone_of": null,
+      "notes": "Popy Animest, Part III of the Arale trilogy (box: Dr.スランプ アラレちゃん んちゃ!ばいちゃ 第3巻). Back mold: MODEL NO. AR-03, PAT. PEND. 1982, ポピー. Three case colours exist.",
+      "sources": [
+        "https://www.handheldmuseum.com/Popy/DrSlump3.htm",
+        "https://www.electronicplastic.com/game/?id=636",
+        "https://handheldempire.com/game.jsp?game=3315"
+      ],
+      "confidence": {
+        "name": "High",
+        "manufacturer": "High",
+        "date": "High",
+        "model": "High",
+        "clone_of": "High"
+      }
+    },
+    {
+      "brick": "GakkenSoccer",
+      "set": "gakkensoccer",
+      "core": "T7741",
+      "name": "Soccer",
+      "readme": "Gakken Soccer LCD Card Game, 1981 (Toshiba 6814)",
+      "manufacturer": "Gakken",
+      "date": "1982-01-01",
+      "keys": {},
+      "model": null,
+      "clone_of": null,
+      "notes": "Gakken 'LCD CARD GAME' series. Year 1981 comes only from the BrickEmuPy README; Toshiba mask T6814 sits next to 1982 titles, so 1982 is possible. A different-looking Italian-market Soccer exists (HHM). Face art lacks the real unit's coloured stadium overlay. | Second pass: Date revised 1981->1982 (inferred, unconfirmed): HE/RHG place Soccer in Gakken's 'Cornerless card' series, whose dated members are 1982-83 (Pooyan 81709/1982, Moon Patrol 81728/1982, T&J Prank 81751/1983), while 1981 Gakken cards are the 'metal card' series (8155x); mask T6814 sits between 1982 titles. README 1981 unsourced; listings say 1980 or 1983. Model probably 817xx (not seen). Export box back lists sister titles Pinball and Circus. Also sold as 'Calcio' (R.E.G.E. S.r.l., Italy) and 'tacotronic Fussball' (Germany).",
+      "sources": [
+        "https://www.handheldmuseum.com/Gakken/Soccer.htm",
+        "https://www.retrohandheldgames.com/gakken",
+        "https://handheldempire.com/game.jsp?game=853",
+        "https://www.retrohandheldgames.com/gakken/soccer-862",
+        "https://www.retrohandheldgames.com/gakken/pooyan-1217",
+        "https://www.retrohandheldgames.com/gakken/moon-patrol-1562",
+        "https://www.retrohandheldgames.com/gakken/trojan-horse-cheval-de-troie-246"
+      ],
+      "confidence": {
+        "name": "High",
+        "manufacturer": "High",
+        "date": "Low",
+        "model": "Unknown",
+        "clone_of": "High"
+      }
+    },
+    {
+      "brick": "GundamGaidenII",
+      "set": "gundamgaidenii",
+      "core": "T7741",
+      "name": "SD Gundam Gaiden II: Taose! Psycho Golem",
+      "readme": "Bandai SD Gundam Gaiden II, 1985 (Toshiba 7704)",
+      "manufacturer": "Bandai",
+      "date": "1990-01-01",
+      "keys": {
+        "btnStart": "A|PLUS"
+      },
+      "model": "29908",
+      "clone_of": null,
+      "notes": "Bandai LSI GAME Pocket Club P-1 (JA: SDガンダム外伝II 倒せ!サイコゴーレム). README's 1985 is impossible: SD Gundam Gaiden dates from 1989 and Psycho Golem is the arc-II boss, so ~1990 is a reasoned guess. Config warning: .brick paths point to nonexistent assets/test/ and it declares a direct_connection link peripheral; looks unfinished. | Second pass: Box front prints 'BANDAI 1990 MADE IN JAPAN'; box back JAN 4902425299082 and Bandai code 103015-0029908-4800 (model = item code 29908). Unit back moulding reads 'BANDAI 1985 MADE IN JAPAN' (reused 1985 case mould), which explains the README's 1985.",
+      "sources": [
+        "https://ja.wikipedia.org/wiki/ガンダムシリーズゲーム作品一覧",
+        "https://ja.wikipedia.org/wiki/SDガンダム外伝_ジークジオン編",
+        "https://auctions.yahoo.co.jp/closedsearch/closedsearch/サイコゴーレム/0",
+        "https://auctions.yahoo.co.jp/jp/auction/v1241212455"
+      ],
+      "confidence": {
+        "name": "High",
+        "manufacturer": "High",
+        "date": "High",
+        "model": "Medium",
+        "clone_of": "High"
+      }
+    },
+    {
+      "brick": "IsogeDoraemon",
+      "set": "isogedoraemon",
+      "core": "T7741",
+      "name": "Isoge! Doraemon",
+      "readme": "Popy (Bandai) Animest Isoge! Doraemon DO-02, 1983 (Toshiba 6981)",
+      "manufacturer": "Popy",
+      "date": "1983-01-01",
+      "keys": {},
+      "model": "DO-02",
+      "clone_of": null,
+      "notes": "Popy Animest, Bandai era. JP box 急げ!ドラえもん shows both ポピー and BANDAI. Back label: MODEL NO. DO-02, PAT.PEND.1983, BANDAI. HHM/HE say 1982 but the label says 1983.",
+      "sources": [
+        "https://www.handheldmuseum.com/Popy/IsogeDoraemon.htm",
+        "https://handheldempire.com/game.jsp?game=1387"
+      ],
+      "confidence": {
+        "name": "High",
+        "manufacturer": "High",
+        "date": "High",
+        "model": "High",
+        "clone_of": "High"
+      }
+    },
+    {
+      "brick": "JumpingBoy",
+      "set": "jumpingboy",
+      "core": "T7741",
+      "name": "Jumping Boy",
+      "readme": "Gakken Jumping Boy / Pyonkichi / Lansay La Traversée (Toshiba T6813)",
+      "manufacturer": "Gakken",
+      "date": "1982-01-01",
+      "keys": {
+        "btnGameA": "DOWN|PLUS",
+        "btnGameB": "UP|MINUS"
+      },
+      "model": null,
+      "clone_of": null,
+      "notes": "Gakken 'LCD CARD GAME', game © Konami (per the back sticker). Japanese domestic title ぴょん吉 Pyonkichi (box NO. 81553); France: Lansay 'La Traversée'. The dumped face is the English Jumping Boy. Year from EP (1982). GAME A (▼) and GAME B (▲) are both start and jump keys.",
+      "sources": [
+        "https://www.handheldmuseum.com/Gakken/JumpingBoy.htm",
+        "https://www.handheldmuseum.com/Gakken/Pyonkichi.htm",
+        "https://www.handheldmuseum.com/Lansay/LaTraversee.htm",
+        "https://www.electronicplastic.com/game/?id=293",
+        "https://handheldempire.com/game.jsp?game=836"
+      ],
+      "confidence": {
+        "name": "High",
+        "manufacturer": "High",
+        "date": "Medium",
+        "model": "Unknown",
+        "clone_of": "High"
+      }
+    },
+    {
+      "brick": "ParmanDaiPinch",
+      "set": "parmandaipinch",
+      "core": "T7741",
+      "name": "Parman Dai-Pinch",
+      "readme": "Popy (Bandai) Animest Parman Dai-Pinch PA-01, 1983 (Toshiba 6923)",
+      "manufacturer": "Popy",
+      "date": "1983-01-01",
+      "keys": {},
+      "model": "PA-01",
+      "clone_of": null,
+      "notes": "Popy Animest, Bandai era. Back label: MODEL NO. PA-01, PAT.PEND.1983, ©藤子・小学館・テレビ朝日, BANDAI. Japanese title probably パーマン大ピンチ (unconfirmed). Not Bandai 'Tondeke Parman' or the VFD 'Kiteyo Parman'. | Second pass: Japanese title confirmed from box: パーマン大ピンチ! (ruby だい). Box: 'POPY ELECTRONIC GAME ANIMEST', 'BANDAI ポピー事業部', COMPUTER NUMBER 0309010 (cf. Tondeke Parman 0309011).",
+      "sources": [
+        "https://handheldempire.com/game.jsp?game=1389",
+        "https://auctions.yahoo.co.jp/jp/auction/j1233917683"
+      ],
+      "confidence": {
+        "name": "High",
+        "manufacturer": "High",
+        "date": "High",
+        "model": "High",
+        "clone_of": "High"
+      }
+    },
+    {
+      "brick": "Pengo",
+      "set": "pengo",
+      "core": "T7741",
+      "name": "Pengo",
+      "readme": "Bandai Pengo (Toshiba 6941)",
+      "manufacturer": "Bandai",
+      "date": "1983-01-01",
+      "keys": {
+        "btnStart": "A|PLUS"
+      },
+      "model": "0200011",
+      "clone_of": null,
+      "notes": "Bandai Electronics 'LCD Game Digital', licensed from Sega (box: 'Made and sold under license from SEGA Enterprises Ltd.'). Date split: HHM/EP 1982 vs Segaretro/BrickEmuPy 1983; 1983 chosen. btnStart is the ATTACK (select & attack) key. Distinct from the FL Pengo VFD tabletop (MAME bpengo).",
+      "sources": [
+        "https://www.handheldmuseum.com/Bandai/Pengo.htm",
+        "https://segaretro.org/Pengo_(LCD)",
+        "https://www.electronicplastic.com/game/?id=46",
+        "https://raw.githubusercontent.com/mamedev/mame/master/src/mame/handheld/hh_hmcs40.cpp"
+      ],
+      "confidence": {
+        "name": "High",
+        "manufacturer": "High",
+        "date": "Medium",
+        "model": "High",
+        "clone_of": "High"
+      }
+    },
+    {
+      "brick": "PowerFishing",
+      "set": "powerfishing",
+      "core": "T7741",
+      "name": "Power Fishing",
+      "readme": "Bandai Power Fishing, 1984 (Toshiba 7790)",
+      "manufacturer": "Bandai",
+      "date": "1984-01-01",
+      "keys": {
+        "btnRotateCCW": "DOWN|L",
+        "btnRotateCW": "UP|R"
+      },
+      "model": null,
+      "clone_of": null,
+      "notes": "JP title パワーフィッシング; fishing-rod shaped unit, Japan 1984. Original casts with a motion/tilt sensor (swing forward) and reels with a side crank; emulator exposes Throw as a button. Key override optional (mirrors BrickEmuPy hotkeys W/Up=CW, S/Down=CCW). Model number not found.",
+      "sources": [
+        "https://handheldempire.com/game.jsp?game=2649",
+        "http://www.electronicplastic.com/game/?company=&id=93&skip=&filter=&search=",
+        "https://www.youtube.com/watch?v=4wqZxO_0B1E",
+        "https://en.todocoleccion.net/video-games-and-consoles/power-fishing-lsi-game-watch-bandai-1984~x210343931",
+        "https://junksave.com/item/bandai-power-fishing-handheld-game-original-1980s-new"
+      ],
+      "confidence": {
+        "name": "High",
+        "manufacturer": "High",
+        "date": "High",
+        "model": "Unknown",
+        "clone_of": "High"
+      }
+    },
+    {
+      "brick": "SpicaDArtagnan",
+      "set": "spicadartagnan",
+      "core": "T7741",
+      "name": "D'Artagnan",
+      "readme": "Spica D'Artagnan SH-002B (Toshiba T7717S)",
+      "manufacturer": "Spica",
+      "date": "1985-01-01",
+      "keys": {
+        "btnJump": "UP|A"
+      },
+      "model": "SH-002B",
+      "clone_of": null,
+      "notes": "Two-screen vertical clamshell ('Flip and Clasp'); face prints only SPICA. Date is a guess from sister unit Spica UFO SH-002C (1985). RHG lists model as 'SH-0020' (likely misread; siblings SH-002C/SH-002F). Dog-musketeer art resembles Dogtanian/Wanwan Sanjushi - licence unverified. ROM dump by Milan Galcik; Toshiba T7717S. | Second pass: Unit back: 'MADE IN TAIWAN / FABRIQUE A TAIWAN', battery A76x2. Lid prints 'SH-002? D'ARTAGNAN' (last char unclear in photo: 0 or D, explains RHG 'SH-0020'; README SH-002B kept). Sibling 'Go Home SH-002' dated 1985 on LastDodo agrees with UFO SH-002C 1985. Art shows Dogtanian characters (D'Artagnan on horse, red-haired Juliette); no licence credit, so probably unlicensed. Link to Singapore 'Spica' (Gan & Beng, NES bootlegs, from 1986) unproven.",
+      "sources": [
+        "https://www.retrohandheldgames.com/spica/dartagnan-2850",
+        "https://www.retrohandheldgames.com/spica/ufo-182",
+        "https://www.retrohandheldgames.com/spica/ufo-183",
+        "https://www.retrohandheldgames.com/spica",
+        "https://github.com/azya52/BrickEmuPy/blob/main/README.md",
+        "https://www.lastdodo.com/en/items/6850625-go-home-sh-002",
+        "https://bootleggames.fandom.com/wiki/Spica"
+      ],
+      "confidence": {
+        "name": "High",
+        "manufacturer": "High",
+        "date": "Low",
+        "model": "Medium",
+        "clone_of": "Medium"
+      }
+    },
+    {
+      "brick": "TomJerryPrank",
+      "set": "tomjerryprank",
+      "core": "T7741",
+      "name": "Tom & Jerry Prank",
+      "readme": "Gakken Tom & Jerry Prank, 1983 (Toshiba 6909)",
+      "manufacturer": "Gakken",
+      "date": "1983-01-01",
+      "keys": {
+        "btnGameA": "LEFT|Y",
+        "btnGameB": "RIGHT|A"
+      },
+      "model": "81751",
+      "clone_of": null,
+      "notes": "Unit prints 'Gakken LCD CARD GAME' (series prefix, recommend dropping). Licensed MGM/UA. Game A: catch Jerry with Tom's rotating arm; Game B: lucky-number fortune; also clock/alarm. GAME A/B double as left/right rotate in play. Probable French release by Lansay as 'Tom & Jerry les Pieges et l'Horoscope' (inference). ROM dump by Milan Galcik; Toshiba 6909.",
+      "sources": [
+        "https://miniarcade.com/gakken/tomjerryprank.php",
+        "https://www.electronicplastic.com/game/?company=&id=300&skip=&filter=lcd&search=year:1983",
+        "http://handheldempire.com/game.jsp?game=862",
+        "https://www.retrohandheldgames.com/gakken/tom-jerry-prank-305",
+        "https://www.echtvintage.nl/product/tom-jerry-prank-lcd-game-gakken-alarm-clock-1983-new-old-stock/"
+      ],
+      "confidence": {
+        "name": "High",
+        "manufacturer": "High",
+        "date": "High",
+        "model": "Medium",
+        "clone_of": "High"
+      }
+    }
+  ],
+  "e0c6200_packed": [
+    {
+      "brick": "AlienFever",
+      "pack_id": "ALIENFEV",
+      "name": "Chibi Pachi: Alien Fever",
+      "manufacturer": "Epoch",
+      "date": "1997-01-01",
+      "model": null,
+      "clone_of": null,
+      "keys": {},
+      "notes": "Already packed as ALIENFEV. MAME: Epoch 'Chibi Pachi: Alien Fever', 1997, a pachislot keychain on E0C6S46 with a 39x16 LCD. The Japanese ちびパチ エイリアンフィーバー is assumed, not verified. The inlay prints 'ALIEN FEVER'.",
+      "sources": [
+        "https://raw.githubusercontent.com/mamedev/mame/master/src/mame/handheld/hh_e0c6200.cpp"
+      ],
+      "confidence": {
+        "name": "High",
+        "manufacturer": "High",
+        "date": "Medium",
+        "model": "Unknown",
+        "clone_of": "High"
+      }
+    },
+    {
+      "brick": "DigimonV1",
+      "pack_id": "DIGIMON",
+      "name": "Digital Monster Ver.1 (Japan, Rev. B)",
+      "manufacturer": "Bandai",
+      "date": "1997-06-26",
+      "model": null,
+      "clone_of": "DigimonV1JB",
+      "keys": {},
+      "notes": "Legacy pre-rename copy of DigimonV1JB (upstream commit c76422b renamed DigimonV1.brick -> DigimonV1JB.brick); handoff README line '1JA' is wrong. Recommend dropping/aliasing. Japanese title デジタルモンスター Ver.1; NA release 1997-12-05. Bandai Asia export code 1855 (not Japanese).",
+      "sources": [
+        "https://github.com/azya52/BrickEmuPy/commit/c76422b",
+        "https://wikimon.net/Digital_Monster_Ver._1",
+        "https://en.wikipedia.org/wiki/Digital_Monster",
+        "https://ja.wikipedia.org/wiki/デジタルモンスター"
+      ],
+      "confidence": {
+        "name": "High",
+        "manufacturer": "High",
+        "date": "High",
+        "model": "Unknown",
+        "clone_of": "High"
+      }
+    },
+    {
+      "brick": "DigimonV1ES",
+      "pack_id": "DIGIMONES",
+      "name": "Digital Monster Ver.1 (Europe)",
+      "manufacturer": "Bandai",
+      "date": "1998-01-01",
+      "model": null,
+      "clone_of": "DigimonV1JA",
+      "keys": {},
+      "notes": "English-text European export ROM (community labels: 'Ver. 1 (EU)', 'Ver. 1 (English)'); face = blue shell with light-grey trim, a documented European Ver.1 colour. No evidence of a Spanish-language unit - suggest renaming from 'Digital Monster (Spanish)'. European date not found: first English release NA 1997-12-05; Europe also got Ver.2, so 1998 is likely (Low). Packed 1997-01-01 predates the product. | Second pass: Gap-fill: no change. No EU or Spanish v-pet launch date found (EN+ES searches); no Spain-specific/Spanish-language Ver.1 exists in any source checked - supports dropping '(Spanish)'. Digimon anime only premiered in Spain 2000-03-30.",
+      "sources": [
+        "https://github.com/mabuchner/vpet-emu-zepp",
+        "https://github.com/itsbigcforme67/web-brick",
+        "https://withthewill.net/threads/digimon-v-pet-colours.8641/",
+        "https://withthewill.net/threads/virtual-pets-released-outside-of-japan.26496/",
+        "https://en.wikipedia.org/wiki/Digital_Monster"
+      ],
+      "confidence": {
+        "name": "Medium",
+        "manufacturer": "High",
+        "date": "Low",
+        "model": "Unknown",
+        "clone_of": "Medium"
+      }
+    },
+    {
+      "brick": "DigimonV1JA",
+      "pack_id": "DIGIMON",
+      "name": "Digital Monster Ver.1 (Japan, Rev. A)",
+      "manufacturer": "Bandai",
+      "date": "1997-06-26",
+      "model": null,
+      "clone_of": null,
+      "keys": {},
+      "notes": "Japanese Ver.1, ROM revision A (community label JP-A); brick identical to JB except ROM. Meaning of A/B (early vs late production?) undocumented. Handoff says JA.bin == JB.bin - verify, upstream treats them as two dumps. Launch 1997-06-26; extra colours Nov 1997.",
+      "sources": [
+        "https://github.com/mabuchner/vpet-emu-zepp",
+        "https://github.com/itsbigcforme67/web-brick",
+        "https://github.com/azya52/BrickEmuPy/commit/c76422b",
+        "https://wikimon.net/Digital_Monster_Ver._1"
+      ],
+      "confidence": {
+        "name": "Medium",
+        "manufacturer": "High",
+        "date": "High",
+        "model": "Unknown",
+        "clone_of": "Medium"
+      }
+    },
+    {
+      "brick": "DigimonV1JB",
+      "pack_id": "DIGIMON",
+      "name": "Digital Monster Ver.1 (Japan, Rev. B)",
+      "manufacturer": "Bandai",
+      "date": "1997-06-26",
+      "model": null,
+      "clone_of": "DigimonV1JA",
+      "keys": {},
+      "notes": "Japanese Ver.1, ROM revision B (community label JP-B); this was BrickEmuPy's original 'DigimonV1' dump before 2026-03-24. Revision date unknown.",
+      "sources": [
+        "https://github.com/azya52/BrickEmuPy/commit/c76422b",
+        "https://github.com/mabuchner/vpet-emu-zepp",
+        "https://dejideji.com/dejimonsyodai/"
+      ],
+      "confidence": {
+        "name": "Medium",
+        "manufacturer": "High",
+        "date": "High",
+        "model": "Unknown",
+        "clone_of": "Medium"
+      }
+    },
+    {
+      "brick": "DigimonV2",
+      "pack_id": "DIGIMONV2",
+      "name": "Digital Monster Ver.2",
+      "manufacturer": "Bandai",
+      "date": "1997-12-01",
+      "model": null,
+      "clone_of": "DigimonV2J",
+      "keys": {},
+      "notes": "Legacy pre-rename copy of DigimonV2J (same ROM). Japan December 1997 (day unknown), extra colours Feb 1998. Asia export code 1856.",
+      "sources": [
+        "https://wikimon.net/Digital_Monster_Ver._2",
+        "https://ja.wikipedia.org/wiki/デジタルモンスター",
+        "https://chromagi.com/bandai/vpet/1856/",
+        "https://github.com/azya52/BrickEmuPy/commit/c76422b"
+      ],
+      "confidence": {
+        "name": "High",
+        "manufacturer": "High",
+        "date": "High",
+        "model": "Unknown",
+        "clone_of": "High"
+      }
+    },
+    {
+      "brick": "DigimonV2J",
+      "pack_id": "DIGIMONV2",
+      "name": "Digital Monster Ver.2",
+      "manufacturer": "Bandai",
+      "date": "1997-12-01",
+      "model": null,
+      "clone_of": null,
+      "keys": {},
+      "notes": "Japanese Ver.2 ROM; released December 1997 (day unknown). Asia export code 1856.",
+      "sources": [
+        "https://wikimon.net/Digital_Monster_Ver._2",
+        "https://ja.wikipedia.org/wiki/デジタルモンスター",
+        "https://dejideji.com/dejimonsyodai/"
+      ],
+      "confidence": {
+        "name": "High",
+        "manufacturer": "High",
+        "date": "High",
+        "model": "Unknown",
+        "clone_of": "High"
+      }
+    },
+    {
+      "brick": "DigimonV3",
+      "pack_id": "DIGIMONV3",
+      "name": "Digital Monster Ver.3",
+      "manufacturer": "Bandai",
+      "date": "1998-03-01",
+      "model": null,
+      "clone_of": "DigimonV3J",
+      "keys": {},
+      "notes": "Legacy pre-rename copy of DigimonV3J (same ROM). Japan March 1998 (day unknown). Asia export code 1857B.",
+      "sources": [
+        "https://wikimon.net/Digital_Monster_Ver._3",
+        "https://ja.wikipedia.org/wiki/デジタルモンスター",
+        "https://github.com/azya52/BrickEmuPy/commit/c76422b"
+      ],
+      "confidence": {
+        "name": "High",
+        "manufacturer": "High",
+        "date": "High",
+        "model": "Unknown",
+        "clone_of": "High"
+      }
+    },
+    {
+      "brick": "DigimonV3J",
+      "pack_id": "DIGIMONV3",
+      "name": "Digital Monster Ver.3",
+      "manufacturer": "Bandai",
+      "date": "1998-03-01",
+      "model": null,
+      "clone_of": null,
+      "keys": {},
+      "notes": "Japanese Ver.3 ROM; released March 1998 (day unknown). Asia export code 1857B.",
+      "sources": [
+        "https://wikimon.net/Digital_Monster_Ver._3",
+        "https://ja.wikipedia.org/wiki/デジタルモンスター",
+        "https://dejideji.com/dejimonsyodai/"
+      ],
+      "confidence": {
+        "name": "High",
+        "manufacturer": "High",
+        "date": "High",
+        "model": "Unknown",
+        "clone_of": "High"
+      }
+    },
+    {
+      "brick": "DigimonV4J",
+      "pack_id": "DIGIMONV4",
+      "name": "Digital Monster Ver.4",
+      "manufacturer": "Bandai",
+      "date": "1998-05-01",
+      "model": null,
+      "clone_of": null,
+      "keys": {},
+      "notes": "Japanese Ver.4 ROM; released May 1998 (day unknown); clear red / clear blue, later D-1 Grand Prix silver editions. Asia export code 1858 (GTIN 4543112014467).",
+      "sources": [
+        "https://wikimon.net/Digital_Monster_Ver._4",
+        "https://ja.wikipedia.org/wiki/デジタルモンスター",
+        "https://dejideji.com/dejimonsyodai/",
+        "https://chromagi.com/bandai/vpet/1858-4543112014467/"
+      ],
+      "confidence": {
+        "name": "High",
+        "manufacturer": "High",
+        "date": "High",
+        "model": "Unknown",
+        "clone_of": "High"
+      }
+    },
+    {
+      "brick": "nikko",
+      "pack_id": "VENUSDM",
+      "name": "Venus Diet Monogatari",
+      "manufacturer": "Nikko",
+      "date": "1997-01-01",
+      "model": null,
+      "clone_of": null,
+      "keys": {},
+      "notes": "Real product name unidentified; only source is upstream's 'Nikko virtual pet' (added 2024-05-26, ROM distributed). No evidence for 'Venus' (packed VENUSDM) - confirm the maintainer's source or use a neutral title. Face: green bean/egg keychain shell, hearts and flowers, 3 yellow buttons, 32-column dot matrix, no printed text. Date is a 1997 virtual-pet-boom guess. Search budget ran out; needs follow-up (MAMEWorld thread, Yahoo Auctions ニッコー 育成). | Second pass: IDENTIFIED: MAME venusdm = Nikko 'Beans Collection: Venus Diet Monogatari' (1997); BrickEmuPy nikko.bin is byte-identical to MAME venusdm.bin (SHA1 22f6a2ede6259e76f1c8b9b50171c54d8a7de502, CRC 2228b081). Japanese listing title: ビーンズコレクション ヴィーナス ダイエットものがたり (NIKKO ニッコージャパン). Series prefix 'Beans Collection' - maintainer decides whether to keep it (full: 'Beans Collection: Venus Diet Monogatari'). Amazon.co.jp lists a ニッコー 'ビーンズコレクション ヴィーナス【ホワイト】' ref 103204 - possible model no. of a white variant, unverified. MAME: E0C6S46, 32x20 LCD.",
+      "sources": [
+        "https://github.com/azya52/BrickEmuPy/commit/0033af5",
+        "https://github.com/azya52/BrickEmuPy/blob/main/README.md",
+        "https://www.mameworld.info/ubbthreads/showthreaded.php?Cat=2&Number=398587&sb=5&fpart=1&vc=1",
+        "https://raw.githubusercontent.com/mamedev/mame/master/src/mame/handheld/hh_e0c6200.cpp",
+        "https://github.com/mamedev/www.mamedev.org/blob/master/releases/whatsnew_0274.txt",
+        "https://aucfan.com/intro/q-~a5b3a5eca5afa5b7a5e7a5f3204e494b4b4f/",
+        "https://www.amazon.co.jp/dp/B002TEX8QI"
+      ],
+      "confidence": {
+        "name": "High",
+        "manufacturer": "High",
+        "date": "Medium",
+        "model": "Unknown",
+        "clone_of": "Low"
+      }
+    },
+    {
+      "brick": "RadioShackStackChallenge",
+      "pack_id": "STACKCH",
+      "name": "Stack Challenge",
+      "manufacturer": "Tandy",
+      "date": "1991-01-01",
+      "model": "60-2247",
+      "clone_of": null,
+      "keys": {},
+      "notes": "Logo on unit: 'Radio Shack STACK CHALLENGE'. New in Radio Shack's Dec 1991 'Christmas Toys 1991' flyer and the 1992 catalogue (No. 472, p.163), $19.95; absent from the 1991 catalogue. Tetris-style brick game, OEM unknown. ROM matches MAME stackch (CRC 28b9310a). Real unit ignores simultaneous presses (MAME BTANB). README '(C6246D2E)' is a chip label, not the model.",
+      "sources": [
+        "https://www.radioshackcatalogs.com/flipbook/m-sale_1991_12.html",
+        "https://www.radioshackcatalogs.com/flipbook/1992_radioshack_catalog.html",
+        "https://www.radioshackcatalogs.com/flipbook/1991_radioshack_catalog.html",
+        "https://handheldmuseum.com/Tandy/StackChallenge.htm",
+        "https://raw.githubusercontent.com/mamedev/mame/master/src/mame/handheld/hh_e0c6200.cpp"
+      ],
+      "confidence": {
+        "name": "High",
+        "manufacturer": "High",
+        "date": "High",
+        "model": "High",
+        "clone_of": "High"
+      }
+    },
+    {
+      "brick": "TamagotchiAngel",
+      "pack_id": "TAMAANG",
+      "name": "Tenshitchi no Tamagotchi",
+      "manufacturer": "Bandai",
+      "date": "1997-08-01",
+      "model": null,
+      "clone_of": null,
+      "keys": {},
+      "notes": "てんしっちのたまごっち; shell art reads 'ANGEL GOTCH'. English release 'Tamagotchi Angel' (NA Feb 1998) used a localized ROM; alt display name 'Tamagotchi Angel (Japan)'. Face SVG shows the classic icons used only on the first Japanese production run, so the dump is likely an early JP unit. screenFrame (X) = vibration/tap sensor. US eBay MPN #1810 (Low).",
+      "sources": [
+        "https://tamagotchi.fandom.com/wiki/Tamagotchi_Angel",
+        "https://ja.wikipedia.org/wiki/たまごっち",
+        "https://dejideji.com/tamagochi-syoki-ichiran/",
+        "https://rekidai-carnival.com/tamagotchi-rekidai-hontai/",
+        "https://raw.githubusercontent.com/mamedev/mame/master/src/mame/handheld/hh_e0c6200.cpp"
+      ],
+      "confidence": {
+        "name": "High",
+        "manufacturer": "High",
+        "date": "High",
+        "model": "Unknown",
+        "clone_of": "High"
+      }
+    },
+    {
+      "brick": "TamagotchiGenjintch",
+      "pack_id": "TAMAGENJIN",
+      "name": "Genjintchi no Tamagotchi",
+      "manufacturer": "Bandai",
+      "date": "1997-11-01",
+      "model": null,
+      "clone_of": null,
+      "keys": {},
+      "notes": "原人っちのたまごっち; shell logo 'Genjintch'. Japan-only limited tie-in with Toei film 'Peking Man (北京原人 Who are you?)', sold at cinemas; JA Wikipedia and fandom say Nov 1997, while PC Watch (25 Nov 1997) ties the sale to the 13 Dec 1997 film opening. Programming similar to Mothra no Tamagotchi. ¥2,079.",
+      "sources": [
+        "https://tamagotchi.fandom.com/wiki/Genjintchi_Tamagotchi",
+        "https://ja.wikipedia.org/wiki/たまごっち",
+        "https://pc.watch.impress.co.jp/docs/article/yajiuma/9711.htm"
+      ],
+      "confidence": {
+        "name": "High",
+        "manufacturer": "High",
+        "date": "Medium",
+        "model": "Unknown",
+        "clone_of": "High"
+      }
+    },
+    {
+      "brick": "TamagotchiMorino",
+      "pack_id": "TAMAMORI",
+      "name": "Mori de Hakken!! Tamagotchi",
+      "manufacturer": "Bandai",
+      "date": "1998-02-01",
+      "model": null,
+      "clone_of": null,
+      "keys": {},
+      "notes": "森で発見!!たまごっち ('Morino'). JA Wikipedia/rekidai use '!!' (matches the '…で発見!!' series); fandom and some auction titles use a single '!'. US 'Tamagotchi Garden' cancelled. Face SVG = JP 'Yellow Ivy' shell. screenFrame (X) = vibration sensor.",
+      "sources": [
+        "https://tamagotchi.fandom.com/wiki/Mori_de_Hakken!_Tamagotchi",
+        "https://tamagotchi.fandom.com/wiki/Mori_de_Hakken!_Tamagotchi/Shell_list",
+        "https://ja.wikipedia.org/wiki/たまごっち",
+        "https://dejideji.com/tamagochi-syoki-ichiran/",
+        "https://rekidai-carnival.com/tamagotchi-rekidai-hontai/"
+      ],
+      "confidence": {
+        "name": "Medium",
+        "manufacturer": "High",
+        "date": "High",
+        "model": "Unknown",
+        "clone_of": "High"
+      }
+    },
+    {
+      "brick": "TamagotchiMothra",
+      "pack_id": "TAMAMOT",
+      "name": "Mothra no Tamagotchi",
+      "manufacturer": "Bandai",
+      "date": "1997-12-01",
+      "model": null,
+      "clone_of": null,
+      "keys": {},
+      "notes": "モスラのたまごっち; face art 'モスラ' + 'MOTHRA NO たまごっち'. Limited-production tie-in with Toho's 'Rebirth of Mothra II' (opened 1997-12-13), sold at cinemas; a version was also given to 5,000 advance-ticket buyers. Japan only.",
+      "sources": [
+        "https://tamagotchi.fandom.com/wiki/Mothra_Tamagotchi",
+        "https://ja.wikipedia.org/wiki/たまごっち",
+        "https://pc.watch.impress.co.jp/docs/article/yajiuma/9711.htm",
+        "https://wikizilla.org/wiki/Mothra_Tamagotchi",
+        "https://raw.githubusercontent.com/mamedev/mame/master/src/mame/handheld/hh_e0c6200.cpp"
+      ],
+      "confidence": {
+        "name": "High",
+        "manufacturer": "High",
+        "date": "High",
+        "model": "Unknown",
+        "clone_of": "High"
+      }
+    },
+    {
+      "brick": "TamagotchiP1",
+      "pack_id": "TAMA",
+      "name": "Tamagotchi (Gen. 1, International)",
+      "manufacturer": "Bandai",
+      "date": "1997-05-01",
+      "model": "1800",
+      "clone_of": "TamagotchiP1J",
+      "keys": {},
+      "notes": "English/World Gen 1 (MAME 'tama' = Gen. 1, World); region inferred, no ROM to verify. First English release Canada 1997-05-01, UK 1997-05-08, US 1997-05-28 (fandom). US item #1800 / UPC 045557018009 from eBay listings only (Low). | Second pass: US launch day is 1997-05-01 (Smithsonian; en.wikipedia citing Bandai America 1998 press page; FAO Schwarz sold out on day one). Fandom's 'NA 1997-05-28' is contradicted - drop it.",
+      "sources": [
+        "https://tamagotchi.fandom.com/wiki/Tamagotchi_(1996_Pet)",
+        "https://ja.wikipedia.org/wiki/たまごっち",
+        "https://raw.githubusercontent.com/mamedev/mame/master/src/mame/handheld/hh_e0c6200.cpp",
+        "https://www.ebay.com/itm/186981121728",
+        "https://www.smithsonianmag.com/innovation/keeping-tamagotchi-alive-180979264/",
+        "https://en.wikipedia.org/wiki/Tamagotchi"
+      ],
+      "confidence": {
+        "name": "Medium",
+        "manufacturer": "High",
+        "date": "High",
+        "model": "Low",
+        "clone_of": "High"
+      }
+    },
+    {
+      "brick": "TamagotchiP1J",
+      "pack_id": "TAMAJ",
+      "name": "Tamagotchi (Gen. 1, Japan)",
+      "manufacturer": "Bandai",
+      "date": "1996-11-23",
+      "model": null,
+      "clone_of": null,
+      "keys": {},
+      "notes": "たまごっち (P1). Official launch 1996-11-23 after test sales in Tokyo/Osaka from 1996-10-10; ¥1,980. Origin of TamagotchiP1 (international).",
+      "sources": [
+        "https://ja.wikipedia.org/wiki/たまごっち",
+        "https://tamagotchi.fandom.com/wiki/Tamagotchi_(1996_Pet)",
+        "https://www.beep-shop.com/tamagotchi/history/",
+        "https://www.westporttechmuseum.com/blogs/techtastic/today-in-toy-history-november-23rd-1996-bandi-releases-the-tamagotchi-in-japan"
+      ],
+      "confidence": {
+        "name": "High",
+        "manufacturer": "High",
+        "date": "High",
+        "model": "Unknown",
+        "clone_of": "High"
+      }
+    },
+    {
+      "brick": "TamagotchiP2",
+      "pack_id": "TAMAG2",
+      "name": "Tamagotchi (Gen. 2, Japan)",
+      "manufacturer": "Bandai",
+      "date": "1997-02-01",
+      "model": null,
+      "clone_of": null,
+      "keys": {},
+      "notes": "Official JP title 新種発見!!たまごっち (Shinshu Hakken!! Tamagotchi), 'Generation 2' / P2 ('Shin Tamagotchi' is not a real title). Region inferred from MAME tamag2 (Japan); an English Gen 2 also exists. Same hardware and engine as P1 with new graphics, characters and game.",
+      "sources": [
+        "https://www.beep-shop.com/tamagotchi/history/",
+        "https://ja.wikipedia.org/wiki/たまごっち",
+        "https://ja.wikipedia.org/wiki/新種発見!!たまごっち",
+        "https://news.mynavi.jp/article/20220615-2364411/",
+        "https://tamagotchi.fandom.com/wiki/Tamagotchi_(1996_Pet)",
+        "https://raw.githubusercontent.com/mamedev/mame/master/src/mame/handheld/hh_e0c6200.cpp"
+      ],
+      "confidence": {
+        "name": "Medium",
+        "manufacturer": "High",
+        "date": "High",
+        "model": "Unknown",
+        "clone_of": "Medium"
+      }
+    },
+    {
+      "brick": "TamagotchiUmino",
+      "pack_id": "TAMAUMI",
+      "name": "Umi de Hakken!! Tamagotchi",
+      "manufacturer": "Bandai",
+      "date": "1998-03-01",
+      "model": null,
+      "clone_of": null,
+      "keys": {},
+      "notes": "海で発見!!たまごっち ('Umino'); English release 'Tamagotchi Ocean' (US Aug 1998) - alt display name 'Tamagotchi Ocean (Japan)'. Face SVG is a plain translucent light-blue JP-style shell, so the dump is probably Japanese (commit says 'Umino/Ocean'). '!!' vs '!' conflict as for Morino. screenFrame (X) = vibration sensor.",
+      "sources": [
+        "https://tamagotchi.fandom.com/wiki/Tamagotchi_Ocean",
+        "https://ja.wikipedia.org/wiki/たまごっち",
+        "https://dejideji.com/tamagochi-syoki-ichiran/",
+        "https://rekidai-carnival.com/tamagotchi-rekidai-hontai/"
+      ],
+      "confidence": {
+        "name": "Medium",
+        "manufacturer": "High",
+        "date": "High",
+        "model": "Unknown",
+        "clone_of": "High"
+      }
+    },
+    {
+      "brick": "TamagotchiYasashii",
+      "pack_id": "TAMAYASA",
+      "name": "Yasashii Tamagotchi",
+      "manufacturer": "Bandai",
+      "date": "1998-10-01",
+      "model": null,
+      "clone_of": null,
+      "keys": {
+        "btnSelect": "A",
+        "btnCancel": "B",
+        "btnFood": "LEFT",
+        "btnSmile": "UP",
+        "btnHeart": "RIGHT",
+        "btnClean": "Y",
+        "btnBulb": "X",
+        "btnWeight": "DOWN",
+        "btnReset": "PLUS+MINUS"
+      },
+      "notes": "やさしいたまごっち: large (about 10 cm) 2xAA desk model, ¥2,814, six back-lit care buttons (しょくじ/ごきげん/あいじょう/トイレ/でんき/チェックメーター) + えらぶ (select) / とりけし (cancel) + reset. Date conflict: Oct 1998 (JA Wikipedia citing an official guidebook; BEEP) vs Sep 1998 (fandom, dejideji, rekidai). Key override is optional, for ergonomics only. | Second pass: Gap-fill: date kept 1998-10-01. NDL: companion book 『やさしいたまごっち大百科』 (勁文社, ISBN 4-7669-3069-X) issued 1998.10 - consistent with a Sep/Oct 1998 launch, not decisive.",
+      "sources": [
+        "https://tamagotchi.fandom.com/wiki/Yasashii_Tamagotchi",
+        "https://tamagotchi.fandom.com/wiki/Yasashii_Tamagotchi/Shell_list",
+        "https://ja.wikipedia.org/wiki/たまごっち",
+        "https://www.beep-shop.com/tamagotchi/history/",
+        "https://dejideji.com/tamagochi-syoki-ichiran/",
+        "https://rekidai-carnival.com/tamagotchi-rekidai-hontai/",
+        "https://ndlsearch.ndl.go.jp/books/R100000002-I000002698519"
+      ],
+      "confidence": {
+        "name": "High",
+        "manufacturer": "High",
+        "date": "Low",
+        "model": "Unknown",
+        "clone_of": "High"
+      }
+    }
+  ]
+}

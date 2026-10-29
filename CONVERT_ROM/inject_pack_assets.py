@@ -198,7 +198,9 @@ def validate_pack_bytes(buf: bytes) -> None:
                     # Loose sanity bounds, not exact validation (real atlas/col/line/word
                     # ranges vary per game) - catches gross corruption (byte-truncated
                     # arrays decoding into wildly implausible values), not subtle bugs.
-                    if id0 > 63 or id1 > 63 or screen > 8 or ptx > 8192 or pty > 8192 or stx > 8192 or sty > 8192:
+                    # id0 isn't checked: BrickEmuPy-core games use the whole u8 range
+                    # (HT943's display is its 256-nibble RAM, id0 = nibble index).
+                    if id1 > 63 or screen > 8 or ptx > 8192 or pty > 8192 or stx > 8192 or sty > 8192:
                         raise ValueError(
                             f"game {i} ({name!r}) segment {si}/{count} looks corrupted: "
                             f"id=({id0},{id1},{id2}) pos_tex=({ptx},{pty}) size_tex=({stx},{sty}) screen={screen}"
