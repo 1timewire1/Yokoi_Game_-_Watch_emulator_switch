@@ -1,6 +1,7 @@
 #include "switch_sound.h"
 
 #include <algorithm>
+#include <cmath>
 #include <cstring>
 #include <malloc.h>
 
@@ -8,16 +9,33 @@
 
 Virtual_Sound g_sound;
 
-constexpr float LIMIT_SQUARE = 0.8f;
 constexpr int kVoiceId = 0;
 constexpr int kSampleRate = 48000;
 
-// Self-heal thresholds - see play_sample()'s doc comment for what these
-// guard against. Same values D.Smile NX's switch_audio.cpp settled on for
-// the identical underlying issue.
-constexpr int kStuckFramesThreshold = 180;  // ~3s @60fps - well past any normal backpressure drop
-constexpr int kRetryCooldownFrames = 300;   // ~5s @60fps between reinit attempts, so a genuinely
-                                             // dead audio service isn't hammered every frame
+// Output level. The DC blocker turns the 0..1 buzzer signal into roughly
+// -0.5..+0.5, so 0.8 gives the same peak-to-peak loudness the old 0..0.8
+// unipolar square had.
+constexpr float kGain = 0.8f;
+// Gentle low-pass: takes the edge off the raw square wave without dulling
+// it (the real piezo is far from a perfect square either).
+constexpr float kLowPassHz = 9000.0f;
+// DC blocker cut-off: removes the offset of the unipolar square so tones
+// starting/stopping don't "pop".
+constexpr float kHighPassHz = 15.0f;
+
+// Frames of silence queued before playback starts (and again after any
+// underrun). 3 frames = ~50 ms of headroom against frame-time jitter.
+constexpr int kPrebufferFrames = 3;
+// If more than this many slots are queued, latency is drifting up: drop
+// this frame's audio to pull it back.
+constexpr int kMaxQueuedFrames = NB_BUFFER - 2;
+
+// Self-heal thresholds - see play_sample().
+constexpr int kStuckFramesThreshold = 180;  // ~3s @60fps
+constexpr int kRetryCooldownFrames = 300;   // ~5s @60fps between reinit attempts
+
+static const float kLpCoef = 1.0f - std::exp(-2.0f * 3.14159265f * kLowPassHz / kSampleRate);
+static const float kHpCoef = std::exp(-2.0f * 3.14159265f * kHighPassHz / kSampleRate);
 
 void Virtual_Sound::configure_sound() {
     static const AudioRendererConfig arConfig = {
@@ -71,6 +89,25 @@ void Virtual_Sound::free_buffers() {
     for (auto& b : buffer_sound) {
         b = nullptr;
     }
+    for (auto& wb : wavebuf) {
+        wb = {};
+    }
+    free(staging);
+    staging = nullptr;
+    free(silence);
+    silence = nullptr;
+    curr_sequence = 0;
+    primed = false;
+}
+
+void Virtual_Sound::reset_dsp_state() {
+    curr_wait_before_update = 0;
+    curr_value = false;
+    out_frac = 0.0f;
+    out_acc = 0.0f;
+    lp_state = 0.0f;
+    hp_prev_in = 0.0f;
+    hp_state = 0.0f;
 }
 
 void Virtual_Sound::initialize(uint32_t v_freq, uint32_t v_divide_freq, float v_fps_screen) {
@@ -81,36 +118,46 @@ void Virtual_Sound::initialize(uint32_t v_freq, uint32_t v_divide_freq, float v_
     free_buffers();
     stuck_frames = 0;
 
-    base_freq = v_freq;
+    base_freq = v_freq ? v_freq : 32768;
     divide_freq = v_divide_freq ? v_divide_freq : 1;
-    fps_screen = v_fps_screen;
+    fps_screen = (v_fps_screen > 1.0f) ? v_fps_screen : 60.0f;
 
-    length_max_sequence = (uint32_t)(base_freq / (fps_screen * divide_freq)) + 1;
-    length_max_sequence += SEQUENCE_SECURITY_ADD;
+    // One update_sound() "tick" (divide_freq CPU steps) lasts this many
+    // 48 kHz output samples.
+    tick_len = (float)kSampleRate * (float)divide_freq / (float)base_freq;
 
-    const size_t per_buffer_bytes = length_max_sequence * sizeof(int16_t);
+    samples_per_frame = (uint32_t)(kSampleRate / fps_screen + 0.5f);
+    // Room for a frame that runs long (e.g. CPU catch-up) without dropping.
+    length_max_sequence = samples_per_frame * 2 + SEQUENCE_SECURITY_ADD;
+
+    // Each slot 64-byte aligned inside a 4 KiB-aligned mempool.
+    const size_t per_buffer_bytes = (length_max_sequence * sizeof(int16_t) + 0x3F) & ~size_t(0x3F);
     mempool_size = (per_buffer_bytes * NB_BUFFER + 0xFFF) & ~size_t(0xFFF);
     mempool_ptr = memalign(0x1000, mempool_size);
-    if (!mempool_ptr) {
+    staging = (int16_t*)malloc(length_max_sequence * sizeof(int16_t));
+    silence = (int16_t*)calloc(samples_per_frame, sizeof(int16_t));
+    if (!mempool_ptr || !staging || !silence) {
+        free_buffers();
         return;
     }
     memset(mempool_ptr, 0, mempool_size);
+    armDCacheFlush(mempool_ptr, mempool_size);
 
     mempool_id = audrvMemPoolAdd(&drv, mempool_ptr, mempool_size);
     audrvMemPoolAttach(&drv, mempool_id);
 
     for (size_t i = 0; i < NB_BUFFER; i++) {
         buffer_sound[i] = (int16_t*)((uint8_t*)mempool_ptr + i * per_buffer_bytes);
-        curr_size_buffer[i] = base_freq / (uint32_t)(fps_screen * divide_freq);
         wavebuf[i] = {};
     }
 
     curr_buffer = 0;
     curr_sequence = 0;
-    curr_wait_before_update = 0;
-    accu_freq_sequence = 0;
-    curr_value = false;
+    primed = false;
+    reset_dsp_state();
 
+    // Native 48 kHz: we hand audren data at its own rate, so its resampler
+    // is never involved.
     voice_ok = audrvVoiceInit(&drv, kVoiceId, 1 /* mono */, PcmFormat_Int16, kSampleRate);
     if (voice_ok) {
         audrvVoiceSetDestinationMix(&drv, kVoiceId, AUDREN_FINAL_MIX_ID);
@@ -121,9 +168,6 @@ void Virtual_Sound::initialize(uint32_t v_freq, uint32_t v_divide_freq, float v_
     audrvUpdate(&drv);
 }
 
-// Full teardown + recreate of the renderer/driver/voice/buffers, restoring
-// the last-known per-game frequency/divide_freq/fps_screen (Exit() doesn't
-// touch those fields) - see play_sample()'s doc comment for when this runs.
 void Virtual_Sound::full_reinit() {
     Exit();
     configure_sound();
@@ -131,11 +175,28 @@ void Virtual_Sound::full_reinit() {
     reinit_generation_++;
 }
 
+// Low-pass + DC-block one 48 kHz sample and append it to the staging buffer.
+void Virtual_Sound::push_output_sample(float area) {
+    lp_state += kLpCoef * (area - lp_state);
+    const float y = lp_state - hp_prev_in + kHpCoef * hp_state;
+    hp_prev_in = lp_state;
+    hp_state = y;
+
+    if (curr_sequence < length_max_sequence) {
+        float s = y * kGain * 32767.0f;
+        s = std::min(32767.0f, std::max(-32768.0f, s));
+        staging[curr_sequence++] = (int16_t)std::lrintf(s);
+    }
+}
+
+// Called once per emulated CPU step (base_freq times per emulated second).
 void Virtual_Sound::update_sound(SM5XX* cpu) {
-    if (!voice_ok || !cpu) {
+    if (!voice_ok || !cpu || !staging) {
         return;
     }
 
+    // Same semantics as the 3DS backend: the pin counts as "on" for this
+    // tick if it was on at any point during the divide_freq steps.
     curr_wait_before_update += 1;
     curr_value = curr_value || cpu->get_active_sound();
     if (curr_wait_before_update < divide_freq) {
@@ -143,28 +204,80 @@ void Virtual_Sound::update_sound(SM5XX* cpu) {
     }
     curr_wait_before_update = 0;
 
-    if (curr_sequence < curr_size_buffer[curr_buffer] && curr_sequence < length_max_sequence) {
-        buffer_sound[curr_buffer][curr_sequence] = curr_value ? (int16_t)(INT16_MAX * LIMIT_SQUARE) : 0;
-        curr_sequence += 1;
-    }
+    const float level = curr_value ? 1.0f : 0.0f;
     curr_value = false;
+
+    // Exact area sampling: spread this tick (tick_len output samples long)
+    // over the 48 kHz output grid. Edges that fall mid-sample give an
+    // intermediate value instead of snapping, which is what kills the
+    // aliasing of a naive 32768 -> 48000 conversion.
+    float remaining = tick_len;
+    while (remaining > 0.0f) {
+        const float take = std::min(remaining, 1.0f - out_frac);
+        out_acc += level * take;
+        out_frac += take;
+        remaining -= take;
+        if (out_frac >= 0.99999f) {
+            push_output_sample(out_acc);
+            out_acc = 0.0f;
+            out_frac = 0.0f;
+        }
+    }
 }
 
-// Called once per rendered frame regardless of state, so it doubles as the
-// self-heal "tick": libnx's audrv/audren session (created once at startup
-// by configure_sound(), unlike the per-game initialize() call) has been
-// observed to get stuck - going silent for the rest of the process's life -
-// after the console is put to sleep and resumed, or after enough game loads
-// without a full relaunch. A relaunch (which re-runs configure_sound() from
-// scratch) always fixed it by hand; this automates that exact recovery
-// instead of requiring one. Ported from D.Smile NX's switch_audio.cpp
-// (switch_audio_push()), which hit and fixed the identical issue in its own
-// audrv-based Switch audio backend.
+bool Virtual_Sound::slot_is_free(uint8_t slot) const {
+    const auto st = wavebuf[slot].state;
+    return st == AudioDriverWaveBufState_Free || st == AudioDriverWaveBufState_Done;
+}
+
+int Virtual_Sound::count_in_flight() const {
+    int n = 0;
+    for (uint8_t i = 0; i < NB_BUFFER; i++) {
+        if (!slot_is_free(i)) {
+            n++;
+        }
+    }
+    return n;
+}
+
+// Copies `nsamples` into the next slot and queues it. Only ever writes to a
+// slot audren has finished with.
+bool Virtual_Sound::submit_slot(const int16_t* src, uint32_t nsamples) {
+    if (nsamples == 0) {
+        return true;
+    }
+    if (!slot_is_free(curr_buffer)) {
+        return false;
+    }
+    nsamples = std::min(nsamples, length_max_sequence);
+
+    int16_t* dst = buffer_sound[curr_buffer];
+    memcpy(dst, src, nsamples * sizeof(int16_t));
+    armDCacheFlush(dst, nsamples * sizeof(int16_t));
+
+    AudioDriverWaveBuf& wb = wavebuf[curr_buffer];
+    wb = {};
+    wb.data_pcm16 = dst;
+    wb.size = nsamples * sizeof(int16_t);
+    wb.start_sample_offset = 0;
+    wb.end_sample_offset = (int32_t)nsamples;
+    wb.is_looping = false;
+
+    if (!audrvVoiceAddWaveBuf(&drv, kVoiceId, &wb)) {
+        wb = {};
+        return false;
+    }
+    curr_buffer = (curr_buffer + 1) % NB_BUFFER;
+    return true;
+}
+
+// Called once per rendered frame. Hands the samples generated since the
+// last call to audren, keeping a small cushion queued. Also doubles as the
+// self-heal tick: the audren session has been observed to die after
+// sleep/resume or many game loads; if no slot frees up for ~3 s the whole
+// pipeline is rebuilt (same approach as D.Smile NX's switch_audio.cpp).
 void Virtual_Sound::play_sample() {
     if (!voice_ok) {
-        // Never initialized (or an earlier self-heal attempt also failed) -
-        // retry on a cooldown instead of every frame, so a genuinely dead
-        // audio service isn't hammered with reinit attempts 60 times/sec.
         if (retry_cooldown > 0) {
             retry_cooldown--;
             return;
@@ -176,49 +289,43 @@ void Virtual_Sound::play_sample() {
         }
     }
 
-    // Drop this frame's audio if the slot we'd reuse is still in flight,
-    // rather than overwriting a buffer audrv's own wavebuf queue may still
-    // be reading from (normal, occasional backpressure). But since this
-    // only ever retries the *same* slot (curr_buffer doesn't advance below
-    // on this path), staying stuck on one slot for way longer than a slow
-    // frame or two means that wavebuf's state will never come unstuck on
-    // its own - so if it drags on, self-heal the whole audio pipeline.
-    AudioDriverWaveBuf& wb = wavebuf[curr_buffer];
-    if (wb.state != AudioDriverWaveBufState_Free && wb.state != AudioDriverWaveBufState_Done) {
-        if (++stuck_frames > kStuckFramesThreshold) {
-            full_reinit();
-        }
-        return;
-    }
-    stuck_frames = 0;
-
-    const int16_t last_value = (curr_sequence > 0) ? buffer_sound[curr_buffer][curr_sequence - 1] : 0;
-    while (curr_sequence < curr_size_buffer[curr_buffer] && curr_sequence < length_max_sequence) {
-        buffer_sound[curr_buffer][curr_sequence] = last_value;
-        curr_sequence += 1;
-    }
-
-    const size_t nsamples = curr_size_buffer[curr_buffer];
-    wb.data_pcm16 = buffer_sound[curr_buffer];
-    wb.size = nsamples * sizeof(int16_t);
-    wb.start_sample_offset = 0;
-    wb.end_sample_offset = (int32_t)nsamples;
-    wb.is_looping = false;
-
-    armDCacheFlush(buffer_sound[curr_buffer], nsamples * sizeof(int16_t));
-    audrvVoiceAddWaveBuf(&drv, kVoiceId, &wb);
-    audrvVoiceStart(&drv, kVoiceId);
+    // Refresh wavebuf states before looking at them.
     audrvUpdate(&drv);
 
-    curr_buffer = (curr_buffer + 1) % NB_BUFFER;
-    curr_sequence = 0;
+    const int in_flight = count_in_flight();
 
-    accu_freq_sequence = accu_freq_sequence + base_freq;
-    curr_size_buffer[curr_buffer] = (size_t)(accu_freq_sequence / (fps_screen * divide_freq));
-    if (curr_size_buffer[curr_buffer] > length_max_sequence) {
-        curr_size_buffer[curr_buffer] = length_max_sequence;
+    // First frame, or the queue ran dry (underrun): put a cushion of
+    // silence in front so the next frames have room to arrive late.
+    if (!primed || in_flight == 0) {
+        for (int i = 0; i < kPrebufferFrames; i++) {
+            submit_slot(silence, samples_per_frame);
+        }
+        primed = true;
+    } else if (in_flight > kMaxQueuedFrames) {
+        // Latency crept up (emulation ran slightly faster than playback):
+        // drop this frame to bring it back down. If this never clears up,
+        // nothing is being consumed any more: the session is dead.
+        curr_sequence = 0;
+        if (++stuck_frames > kStuckFramesThreshold) {
+            full_reinit();
+            return;
+        }
+        audrvUpdate(&drv);
+        return;
     }
-    accu_freq_sequence = accu_freq_sequence - (uint32_t)(curr_size_buffer[curr_buffer] * fps_screen * divide_freq);
+
+    if (curr_sequence > 0) {
+        if (submit_slot(staging, curr_sequence)) {
+            stuck_frames = 0;
+        } else if (++stuck_frames > kStuckFramesThreshold) {
+            full_reinit();
+            return;
+        }
+        curr_sequence = 0;
+    }
+
+    audrvVoiceStart(&drv, kVoiceId);
+    audrvUpdate(&drv);
 }
 
 void Virtual_Sound::Quit_Game() {
