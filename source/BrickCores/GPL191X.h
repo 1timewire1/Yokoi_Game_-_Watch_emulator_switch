@@ -15,6 +15,18 @@
 // does (Python ints are unbounded, and the timer dividers are floats:
 // clock / 32768), so the two stay in lock-step.
 //
+// Matches BrickEmuPy exactly (CONVERT_ROM/tmp/review/compare.py), except
+// under digivice_quirks_ - five changes from angel_hp's port, made by someone
+// with the real D-Power Digivices to hand, kept but only for the "SPL61X"
+// core name (the D-Power Digivice is the only game that uses it):
+//   - an IRQ is held off for one instruction after CLI (a real 6502 trait);
+//   - port EF direction writes apply (bit 0 forced to input) - BrickEmuPy
+//     ignores them, with a TODO about Tamagotchi Mini 2017;
+//   - three ROM bank bits instead of two;
+//   - timer 0 in counter mode can count pulses on pin CD0;
+//   - any port CD input change re-evaluates the timers, not just pin CD1.
+// None of these changed the Digivice's behaviour in the comparison runs.
+//
 // Display: get_VRAM() is the 128-byte display RAM at 0x300 while the LCD and
 // the 32 kHz clock are on. Sound: each channel's tone (TONE mode) becomes
 // BrickCore's square tone - BrickEmuPy's direct (non-tone) writes are
@@ -22,7 +34,8 @@
 // there too.
 class GPL191X : public BrickCore {
 public:
-    explicit GPL191X(const char* name = "GPL191X") : BrickCore(name) {}
+    explicit GPL191X(const char* name = "GPL191X", bool digivice_quirks = false)
+        : BrickCore(name), digivice_quirks_(digivice_quirks) {}
 
 protected:
     void reset() override;
@@ -64,6 +77,8 @@ public:  // (public for the verification harness)
     static const OpFn kOps[256];
 #include "GPL191X_decl.inc"
 
+    const bool digivice_quirks_;  // see the class comment
+
     std::vector<uint8_t> mem_;
     size_t mem_size_ = 1;
     double sub_clock_div_ = 0;
@@ -95,8 +110,9 @@ public:  // (public for the verification harness)
     double ch_freq_[2] = {0, 0};   // what each channel is emitting, 0 = silent
 };
 
-// BrickEmuPy's "SPL61X" core name - the same chip family, same core.
+// BrickEmuPy's "SPL61X" core name - the same chip family, same core, plus
+// the Digivice-specific changes (see GPL191X's class comment).
 class SPL61X : public GPL191X {
 public:
-    SPL61X() : GPL191X("SPL61X") {}
+    SPL61X() : GPL191X("SPL61X", true) {}
 };

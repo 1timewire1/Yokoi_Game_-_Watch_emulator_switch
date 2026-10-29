@@ -286,6 +286,20 @@ def upsert_games_path(key: str, block: str):
 
 # --- main -----------------------------------------------------------------------
 
+def clock_lines(clock) -> list:
+    """brick_games.json "clock" (RAM cells of a real-time clock, found with
+    tmp/review/brick_clockprobe.exe) -> "clock.*" container options, read by
+    BrickCore::set_clock(): sec/min = [units, tens], hour = [units, tens] or
+    [one binary cell], pm = [addr, mask, 1 if set means PM else 0], start =
+    the .brick button that leaves a boot test screen (optional)."""
+    if not clock:
+        return []
+    lines = [f"clock.{k}=" + ",".join(str(int(v)) for v in clock[k]) for k in ("sec", "min", "hour", "pm") if k in clock]
+    if clock.get("start"):
+        lines.append(f"clock.start={clock['start']}")  # button that leaves a boot test screen
+    return lines
+
+
 def import_game(brick_dir: Path, game: dict) -> bool:
     if game.get("exclude"):
         print(f"skip {game['brick']}: excluded - {game['exclude']}")
@@ -305,6 +319,7 @@ def import_game(brick_dir: Path, game: dict) -> bool:
     d = DECOMPRESS / game["set"]
     d.mkdir(parents=True, exist_ok=True)
     options, blobs = flatten_options(cfg["mask_options"], brick_dir)
+    options += clock_lines(game.get("clock"))
     inputs, _ = input_lines(cfg, game.get("keys"))
     write_container(d / f"{game['set']}.brk", cfg["core"], cfg["clock"], options + inputs, blobs)
     face = brick_dir / cfg["face_path"]

@@ -9,6 +9,7 @@
 #include "SM5XX/SM530/SM530.h"
 #include "E0C6200/E0C6S46.h"
 #include "BrickCores/BrickCore.h"
+#include "std/savestate.h"
 #include "David_and_John/David_And_John_fake_cpu.h"
 #include "LCDonald/LCDonald_fake_cpu.h"
 
@@ -23,7 +24,15 @@ void yokoi_cpu_set_time_if_needed(SM5XX* cpu) {
         return;
     }
 
-    cpu->set_time((uint8_t)t->tm_hour, (uint8_t)t->tm_min, (uint8_t)t->tm_sec);
+    // BrickEmuPy-core watches keep their clock in game-specific RAM cells
+    // (BrickCore::set_clock(), laid out by the game's .brk); SM5XX::set_time()
+    // only knows the Sharp chips' time_addresses.
+    if (cpu->get_cpu_type_id() == CPU_TYPE_BRICK) {
+        BrickCore* brick = static_cast<BrickCore*>(cpu);
+        if (brick->has_clock()) brick->set_clock(t->tm_hour, t->tm_min, t->tm_sec);
+    } else {
+        cpu->set_time((uint8_t)t->tm_hour, (uint8_t)t->tm_min, (uint8_t)t->tm_sec);
+    }
     cpu->time_set(true);
 }
 

@@ -106,6 +106,31 @@ void BrickCore::update_sound() {
     }
 }
 
+bool BrickCore::set_clock(int hour, int minute, int second) {
+    const std::vector<long> sec = rom_.options.list("clock.sec");
+    const std::vector<long> min = rom_.options.list("clock.min");
+    const std::vector<long> hr = rom_.options.list("clock.hour");
+    const std::vector<long> pm = rom_.options.list("clock.pm");
+    if (sec.size() != 2 || min.size() != 2 || hr.empty() || hr.size() > 2) return false;
+    int h = hour;
+    if (pm.size() == 3) {
+        h = hour % 12 ? hour % 12 : 12;
+        const int cell = peek_ram((uint32_t)pm[0]);
+        if (cell < 0) return false;
+        const bool set = (hour >= 12) == (pm[2] != 0);
+        if (!poke_ram((uint32_t)pm[0], (uint8_t)(set ? (cell | pm[1]) : (cell & ~pm[1])))) return false;
+    }
+    bool ok = poke_ram((uint32_t)sec[0], (uint8_t)(second % 10)) && poke_ram((uint32_t)sec[1], (uint8_t)(second / 10)) &&
+              poke_ram((uint32_t)min[0], (uint8_t)(minute % 10)) && poke_ram((uint32_t)min[1], (uint8_t)(minute / 10));
+    if (hr.size() == 2) {
+        ok = ok && poke_ram((uint32_t)hr[0], (uint8_t)(h % 10)) && poke_ram((uint32_t)hr[1], (uint8_t)(h / 10));
+    } else {
+        ok = ok && poke_ram((uint32_t)hr[0], (uint8_t)h);
+    }
+    if (ok) segments_state_are_update = true;
+    return ok;
+}
+
 void BrickCore::set_button(const std::string& name, bool pressed) {
     auto d = direct_.find(name);
     if (d != direct_.end()) {

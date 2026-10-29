@@ -39,13 +39,21 @@ def main():
     if not game:
         sys.exit(f"{a.brick} is not in brick_games.json")
 
+    gp = HERE / "games_path_rgds.py"
+    # games_path_rgds.py isn't in git, so its backup lives next to it (not in
+    # the work dir this script wipes) and an existing one means an earlier
+    # run never got to restore it - stop rather than back up the one-game
+    # stand-in over the real list.
+    backup = HERE / "games_path_rgds.py.add_brick_game.bak"
+    if backup.exists():
+        sys.exit(f"{backup.name} exists - an earlier run was interrupted. Check it against "
+                 f"{gp.name}, restore whichever is the full list, then delete the .bak.")
+
     work = HERE / "tmp" / "add_brick_game"
     if work.exists():
         shutil.rmtree(work)
     work.mkdir(parents=True)
 
-    gp = HERE / "games_path_rgds.py"
-    backup = work / "games_path_rgds.py.bak"
     had_gp = gp.exists()
     if had_gp:
         shutil.copy2(gp, backup)
@@ -88,6 +96,7 @@ def main():
     finally:
         if had_gp:
             shutil.copy2(backup, gp)
+            backup.unlink()
         elif gp.exists():
             gp.unlink()
 

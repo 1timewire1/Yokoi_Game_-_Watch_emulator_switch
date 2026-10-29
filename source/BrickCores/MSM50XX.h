@@ -23,6 +23,8 @@ protected:
     int port_id(const std::string& name) const override;
     void port_input(int port, uint8_t mask, int level) override;
     void serialize(BrickStateIO& io) override;
+    bool poke_ram(uint32_t addr, uint8_t v) override { ram_at(addr) = v & 0xF; return true; }
+    int peek_ram(uint32_t addr) const override { return ram_[addr & (kRamSize - 1)]; }
 
 private:
     enum Port { kPS = 0, kPK = 1 };

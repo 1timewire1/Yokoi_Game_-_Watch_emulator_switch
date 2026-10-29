@@ -45,6 +45,7 @@
 #include "input/lcdonald_input_map.h"
 #include "input/rzone_input_map.h"
 #include "input/e0c6200_input_map.h"
+#include "input/brick_clock_setup.h"
 #include "input/brick_input_map.h"
 #include "BrickCores/BrickCore.h"
 #include "input/e0c6200_clock_setup.h"
@@ -416,8 +417,15 @@ int main(int argc, char* argv[]) {
         // e0c6200_clock_setup.h), it owns the K pins instead.
         // BrickEmuPy-ported cores: each game's ROM container carries its own
         // button bindings - see brick_input_map.h. g_input is null for these.
+        // While a watch's automatic clock setup is pressing its start button
+        // (brick_clock_setup.h), it owns the inputs instead.
         if (g_cpu && g_game && g_cpu->get_cpu_type_id() == CPU_TYPE_BRICK) {
-            apply_brick_input(static_cast<BrickCore*>(g_cpu.get()));
+            BrickCore* brick = static_cast<BrickCore*>(g_cpu.get());
+            if (brick_clock_setup_active()) {
+                brick_clock_setup_advance(brick);
+            } else {
+                apply_brick_input(brick);
+            }
         }
 
         if (g_cpu && g_game && g_cpu->get_cpu_type_id() == CPU_TYPE_E0C6S46) {

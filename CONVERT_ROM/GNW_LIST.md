@@ -223,14 +223,19 @@ Special editions are not supported in the emulator, refer to the Notes column fo
 
 ## Nelsonic
 
-<!-- Nelsonic Game Watches (SM530 CPU). Gated behind the Switch app's
-     "Experimental Games" setting. -->
+<!-- Nelsonic Game Watches (SM530 CPU; 04-05 OKI MSM50XX, ported from
+     BrickEmuPy - source/BrickCores/MSM50XX.cpp). Gated behind the Switch
+     app's "Experimental Games" setting. 04-05 boot to an all-segments test
+     screen; the app leaves it and sets the clock (brick_games.json "clock",
+     switch/source/input/brick_clock_setup.h). -->
 
 | No. | Model   | Filename            | Game Title                                                   | Release Date | CPU | Clone Of |
 |-----|---------|---------------------|--------------------------------------------------------------|--------------|-----|-------|
 | 01  | nstarfox| nstarfox.zip        | Star Fox                                                     | 1993.01.01   | SM530 |  |
 | 02  | nsmb3   | nsmb3.zip           | Super Mario Bros. 3                                           | 1990.01.01   | SM530 |  |
 | 03  | nsmw    | nsmw.zip            | Super Mario World                                            | 1991.01.01   | SM530 |  |
+| 04  | smbnelsonic | (BrickEmuPy)        | Super Mario Bros. Game Watch                                 | 1989.01.01   | MSM50XX |  |
+| 05  | zeldanelsonic | (BrickEmuPy)        | The Legend of Zelda Game Watch                               | 1989.10.05   | MSM50XX |  |
 
 ## V-Tech
 
@@ -278,6 +283,7 @@ Special editions are not supported in the emulator, refer to the Notes column fo
 | 16  | mametamagotch | (BrickEmuPy)        | Mame Game de Hakken!! Tamagotchi                             | 1997.01.01   | HT943 |  |
 | 17  | digimonja | (BrickEmuPy)        | Digital Monster Ver.1 (Japan, Rev. A)                        | 1997.06.26   | E0C6S48 | digimon |
 | 18  | tamaotch | (BrickEmuPy)        | Unknown Tamagotchi (Tamaotch)                                | 1997.01.01   | E0C6S48 |  |
+| 19  | dpowerdigiviceeu101 | (BrickEmuPy)        | D-Power Digivice (Europe)                                    | 2001.01.01   | SPL61X |  |
 
 ## Epoch
 
@@ -304,6 +310,15 @@ Special editions are not supported in the emulator, refer to the Notes column fo
 | No. | Model   | Filename            | Game Title                                                   | Release Date | CPU | Clone Of |
 |-----|---------|---------------------|--------------------------------------------------------------|--------------|-----|-------|
 | 01  | stackch | stackch.zip         | Stack Challenge                                              | 1991.01.01   | E0C6S46 |  |
+
+## Hartung
+
+<!-- Hartung Spiele Berlin's Formel 1 (OKI MSM50XX, ported from BrickEmuPy),
+     with a running clock the app sets on load. -->
+
+| No. | Model   | Filename            | Game Title                                                   | Release Date | CPU | Clone Of |
+|-----|---------|---------------------|--------------------------------------------------------------|--------------|-----|-------|
+| 01  | formel1 | (BrickEmuPy)        | Formel 1                                                     | 1990.01.01   | MSM50XX |  |
 
 ## Brick Game
 

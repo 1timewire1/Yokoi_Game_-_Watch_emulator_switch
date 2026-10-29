@@ -484,14 +484,18 @@ BrickEmuPy, not MAME. Each board's fast-oscillator (OSC3) speed is also
 BrickEmuPy's measured value rather than MAME's 1 MHz placeholder - Alien
 Fever, which runs on it full time, plays ~40% faster than in MAME.
 
-## BrickEmuPy ports: Holtek HT943, Sunplus SPL81408 (Experimental Games)
+## BrickEmuPy ports: Holtek HT943, Sunplus SPL81408, OKI MSM50XX, GeneralPlus GPL191X (Experimental Games)
 
 Games run on cores ported from [BrickEmuPy](https://github.com/azya52/BrickEmuPy)
 (CC0) - `source/BrickCores/`, one C++ class per BrickEmuPy core, each game's
 ROM a `.brk` container carrying its `.brick` config (`CONVERT_ROM/brick_import.py`).
 All of them are Experimental Games, whatever their group. Each core is
 checked instruction-for-instruction against BrickEmuPy's own Python core
-(`CONVERT_ROM/tmp/ht943/run_compare.py`, `CONVERT_ROM/tmp/spl/run_compare.py`).
+(`CONVERT_ROM/tmp/ht943/run_compare.py`, `CONVERT_ROM/tmp/spl/run_compare.py`,
+`CONVERT_ROM/tmp/review/compare.py`). The MSM50XX and GPL191X cores are
+angel_hp's ports; on the D-Power Digivice only, GPL191X also keeps five of
+their hardware-behaviour changes that BrickEmuPy doesn't have (see
+`source/BrickCores/GPL191X.h`).
 
 Buttons map straight to the device's: **D-pad** = its arrows, **A** = the
 main action (rotate / fire / start), **+** / **-** = start or on and
@@ -509,9 +513,27 @@ ACL button, where the device has one (holding it holds the chip in reset).
 | Puyolin | Start/Rotate | Start/Rotate | On/Off | Mute | X Pause, +/- ACL |
 | Space Intruder (TK-150I) | Fire/Start | On/Off | Pause | Sound | |
 | Chicken McNugget Tetris (McDonald's, SPL81408) | Rotate (also B) | Pause | On/Off | Mute | Up = hard drop |
+| The Legend of Zelda Game Watch (Nelsonic, MSM50XX) | Set | | Mode | Set | B = Mode too |
+| Super Mario Bros. Game Watch (Nelsonic, MSM50XX) | | | Mode | Set | |
+| Formel 1 (Hartung, MSM50XX) | | Game 1/2 | | Set | Left/Right steer |
+| D-Power Digivice (Bandai, SPL61X) | Step | | | | X = Step, repeating (10 a second) while held; B Card; +/- Reset |
 
 Several of these power off by halting the chip; the screen is blank until
 the power/on button wakes them, as on the real thing.
+
+**Clocks.** The Nelsonic Game Watches and Formel 1 are real-time clocks.
+Their time is written on every load, the way the Game & Watch clocks' is
+(`BrickCore::set_clock()`, cells listed in `CONVERT_ROM/brick_games.json`'s
+`"clock"`), and with Time Set Mode on **Automatic** the watch is also taken
+off its all-segments boot test screen (a Left press) and set again a second
+in (`switch/source/input/brick_clock_setup.cpp`) - a watch restored from a
+save state just gets its time synced. The D-Power Digivice has no clock.
+
+**D-Power Digivice.** Its pedometer counts one step per Step press, so X
+repeats Step for you while held (a `*` key in brick_games.json, see
+`switch/source/input/brick_input_map.h`) - not ZR, which would add steps
+whenever ZL+ZR opens the menu. The screen sleeps a while after the last
+press, as the real one does.
 
 ## McDonald's (LCDonald ports)
 

@@ -29,6 +29,7 @@
 #include "input/vesarif_clock_setup.h"
 #include "input/auto_confirm_press.h"
 #include "input/e0c6200_clock_setup.h"
+#include "input/brick_clock_setup.h"
 #include "pet_time.h"
 
 namespace {
@@ -244,6 +245,10 @@ void switch_load_game_by_index_and_init(uint16_t idx) {
     // this is an Experimental Feature.
     e0c6200_clock_setup_begin(g_game->ref,
                               g_time_set_mode == TimeSetMode::Automatic && g_experimental_features_enabled);
+    // BrickEmuPy-core watches (Nelsonic Game Watches, Formel 1): leave the
+    // boot test screen and set the clock a second in - brick_clock_setup.h.
+    brick_clock_setup_begin(g_time_set_mode == TimeSetMode::Automatic &&
+                            g_cpu->get_cpu_type_id() == CPU_TYPE_BRICK);
     pet_time_on_game_loaded();
 
     if (g_time_set_mode == TimeSetMode::Automatic) {

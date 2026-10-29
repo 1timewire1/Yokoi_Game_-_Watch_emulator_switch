@@ -534,6 +534,25 @@
         "date": "High",
         "model": "Unknown",
         "clone_of": "High"
+      },
+      "clock": {
+        "sec": [
+          117,
+          116
+        ],
+        "min": [
+          115,
+          114
+        ],
+        "hour": [
+          113
+        ],
+        "pm": [
+          112,
+          4,
+          1
+        ],
+        "start": "btnLeft"
       }
     },
     {
@@ -564,6 +583,26 @@
         "date": "Medium",
         "model": "Medium",
         "clone_of": "High"
+      },
+      "clock": {
+        "sec": [
+          112,
+          113
+        ],
+        "min": [
+          114,
+          115
+        ],
+        "hour": [
+          116,
+          117
+        ],
+        "pm": [
+          118,
+          1,
+          1
+        ],
+        "start": "btnLeft"
       }
     },
     {
@@ -590,6 +629,24 @@
         "date": "Low",
         "model": "Low",
         "clone_of": "Medium"
+      },
+      "clock": {
+        "sec": [
+          24,
+          25
+        ],
+        "min": [
+          16,
+          17
+        ],
+        "hour": [
+          18
+        ],
+        "pm": [
+          19,
+          1,
+          1
+        ]
       }
     },
     {
@@ -655,7 +712,7 @@
       "manufacturer": "Bandai",
       "date": "2001-01-01",
       "keys": {
-        "btnStep": "A|*ZR"
+        "btnStep": "A|*X"
       },
       "model": null,
       "clone_of": null,

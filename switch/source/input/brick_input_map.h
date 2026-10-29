@@ -12,6 +12,6 @@ class BrickCore;
 // hit by accident) takes priority over single-key bindings sharing one of
 // its keys, which stay released while the chord is held. Only changes are
 // passed on to the core.
-// A '*' in front of an alternative ("A|*ZR") makes it a turbo: held, it
+// A '*' in front of an alternative ("A|*X") makes it a turbo: held, it
 // presses and releases the button 10 times a second (see kTurboFrames).
 void apply_brick_input(BrickCore* core);

@@ -45,6 +45,8 @@ games_path_*.py
 # GitHub despite existing locally, breaking convert_original.py for anyone who
 # clones fresh (ModuleNotFoundError: source.games_path_utils). Re-include it.
 !CONVERT_ROM/source/games_path_utils.py
+# add_brick_game.py's backup of the (untracked) games_path_rgds.py.
+games_path_*.py.*
 
 # Per-machine tool configuration (copy from CONVERT_ROM/external_apps_template.py)
 CONVERT_ROM/external_apps.py

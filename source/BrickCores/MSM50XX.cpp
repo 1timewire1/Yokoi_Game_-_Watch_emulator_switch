@@ -247,6 +247,9 @@ void MSM50XX::load_options() {
     // here as doubles rather than through Options::list().
     for (int i = 0; i < 16; i++) freq_div_[i] = kDefaultFreqDiv[i];
     if (options().has("sound_freq_div_tbl")) {
+        // Entries past the game's own table are silent, not Zelda's (Formel 1
+        // only lists 4; BrickEmuPy would fail on a higher index there).
+        for (int i = 0; i < 16; i++) freq_div_[i] = 0;
         const std::string& s = options().str("sound_freq_div_tbl");
         size_t start = 0;
         for (int i = 0; i < 16 && start <= s.size(); i++) {

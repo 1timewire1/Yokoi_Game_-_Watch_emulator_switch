@@ -94,6 +94,31 @@ public:
     const std::vector<Binding>& bindings() const { return bindings_; }
     void set_button(const std::string& name, bool pressed);
 
+    // Real-time clock games (Nelsonic Game Watches, Formel 1): writes the
+    // time into the game's clock cells, per the container's "clock.*"
+    // options (brick_games.json "clock"), all RAM addresses as the CPU sees
+    // them, each cell one digit/nibble:
+    //   clock.sec=<units>,<tens>   clock.min=<units>,<tens>
+    //   clock.hour=<units>,<tens> (two digits) or =<cell> (one binary nibble)
+    //   clock.pm=<addr>,<mask>,<1 if the bit set means PM, 0 if it means AM>
+    //     - present = a 12-hour clock (1-12), absent = 24-hour.
+    //   clock.start=<button> - pressed to leave a boot test screen first
+    //     (switch/source/input/brick_clock_setup.h).
+    // False if the game has no clock layout or the core can't write RAM.
+    bool has_clock() const { return rom_.options.has("clock.sec"); }
+    bool set_clock(int hour, int minute, int second);
+    std::string clock_start_button() const {
+        return rom_.options.has("clock.start") ? rom_.options.str("clock.start") : std::string();
+    }
+    // Every segment lit (the first 32 display bytes all 0xFF) - the
+    // all-segments test screen some games boot to.
+    bool display_test_pattern() const {
+        for (int i = 0; i < 32; i++) {
+            if (display_byte(i) != 0xFF) return false;
+        }
+        return true;
+    }
+
     // Wall-clock time the last loaded state was saved at (0 = unknown).
     int64_t saved_unix_time() const { return saved_unix_time_; }
 
@@ -115,6 +140,11 @@ protected:
     // Called by the core when it drives an output port, so matrix-wired
     // buttons (input pin <- output pin while pressed) follow it.
     void port_output(int port, uint8_t value);
+
+    // RAM access for set_clock(), by CPU address; cores without it return
+    // false / -1.
+    virtual bool poke_ram(uint32_t, uint8_t) { return false; }
+    virtual int peek_ram(uint32_t) const { return -1; }
 
     void set_speaker(bool level) { speaker_ = level; }
     // Square wave at freq_hz, 0 = off. `noise` gives each half-wave a random

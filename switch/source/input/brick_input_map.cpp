@@ -24,7 +24,7 @@ uint64_t key_mask(const std::string& name) {
 }
 
 // One binding: pressed while any alternative ("|") has all its keys ("+") held.
-// An alternative written with a leading '*' ("A|*ZR") is a turbo: while it's
+// An alternative written with a leading '*' ("A|*X") is a turbo: while it's
 // held the button is pressed and released over and over (kTurboFrames each)
 // instead of staying down - e.g. the D-Power Digivice's Step button, whose
 // pedometer counts one step per press.
