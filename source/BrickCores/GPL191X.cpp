@@ -122,7 +122,7 @@ void GPL191X::port_input(int port, uint8_t mask, int level) {
     port_in_[port][0] &= ~(int64_t)mask;
     port_in_[port][1] &= ~(int64_t)mask;
     if (level >= 0) port_in_[port][level ? 1 : 0] |= mask;
-    if (port == kCD && (digivice_quirks_ || (mask & 0x02))) {
+    if (port == kCD) {
         if ((prev & 0x02) > (port_read(port) & 0x02)) IREQ_ |= kIntExt;
         update_timers_div();
     }
@@ -213,12 +213,10 @@ bool GPL191X::sfr_set(int64_t addr, int64_t value) {
         case 0x03: PLATCH_[kCD] = value; emit_port(kCD); update_timers_div(); break;
         case 0x04: PLATCH_[kEF] = value; emit_port(kEF); break;
         case 0x06:
-            // BrickEmuPy leaves PDIR_EF alone (Tamagotchi Mini 2017 writes 1
-            // there but reads its button on EF.0).
-            if (digivice_quirks_) PDIR_[kEF] = value & 0xFE;
+            PDIR_[kEF] = value & 0xFE;  // EF.0 always an input (Tamagotchi Mini 2017's button)
             emit_port(kEF);
             break;
-        case 0x07: BANK_ = value & (digivice_quirks_ ? 0x07 : 0x03); break;
+        case 0x07: BANK_ = value & 0x07; break;
         case 0x08: WAKEUP_CTRL_ = value; WAKEUPREQ_ &= value; break;
         case 0x09: ENTER_SLEEP_ = value; CPU_ENBL_ = 0; break;
         case 0x0A: TIME_BASE_ = value; update_timers_div(); break;
@@ -290,7 +288,7 @@ void GPL191X::update_timers_div() {
         } else if (port_read(kCD) & 0x01) {
             if (srcB == kCnt0SrcBTimeBaseH) TM0_div_ = (double)((kSubClock / 64) * tbh);
             else if (srcB == kCnt0SrcBClk128) TM0_div_ = (double)(kSubClock / 128);
-            else if (srcB == kCnt0SrcBVdd && digivice_quirks_) {
+            else if (srcB == kCnt0SrcBVdd) {
                 TM0_ += 1;
                 if (TM0_ > 0xFFFF) {
                     TM0_ = TM0_PRELOAD_;
@@ -400,7 +398,7 @@ double GPL191X::clock_step() {
         const uint8_t opcode = mem_[(size_t)(((pc & 0x7FFF) | (BANK_ * (pc & 0x8000))) % (int64_t)mem_size_)];
         exec_cycles = (double)((int64_t)(this->*kOps[opcode])() * CPU_DIV_);
         timers_clock(exec_cycles);
-        if (!IF_ && (IREQ_ & INT_CTRL_) && !(digivice_quirks_ && opcode == 0x58)) irq();  // 0x58: CLI
+        if (!IF_ && (IREQ_ & INT_CTRL_) && opcode != 0x58) irq();  // not right after CLI (0x58)
     } else {
         exec_cycles = sub_clock_div_;
         if (WAKEUP_CTRL_ & WAKEUPREQ_) {

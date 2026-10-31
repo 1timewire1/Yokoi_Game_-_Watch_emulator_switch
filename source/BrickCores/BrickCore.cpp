@@ -112,14 +112,24 @@ bool BrickCore::set_clock(int hour, int minute, int second) {
     const std::vector<long> min = rom_.options.list("clock.min");
     const std::vector<long> hr = rom_.options.list("clock.hour");
     const std::vector<long> pm = rom_.options.list("clock.pm");
-    if (sec.size() != 2 || min.size() != 2 || hr.empty() || hr.size() > 2) return false;
+    const bool bcd = rom_.options.num("clock.bcd", 0) != 0;
+    const size_t cells = bcd ? 1 : 2;
+    if (sec.size() != cells || min.size() != cells || hr.empty() || hr.size() > 2) return false;
     int h = hour;
     if (pm.size() == 3) {
-        h = hour % 12 ? hour % 12 : 12;
+        h = hour % 12;
+        if (h == 0 && !rom_.options.num("clock.hour_zero", 0)) h = 12;
         const int cell = peek_ram((uint32_t)pm[0]);
         if (cell < 0) return false;
         const bool set = (hour >= 12) == (pm[2] != 0);
         if (!poke_ram((uint32_t)pm[0], (uint8_t)(set ? (cell | pm[1]) : (cell & ~pm[1])))) return false;
+    }
+    if (bcd) {
+        auto to_bcd = [](int v) { return (uint8_t)(((v / 10) << 4) | (v % 10)); };
+        const bool ok = poke_ram((uint32_t)sec[0], to_bcd(second)) && poke_ram((uint32_t)min[0], to_bcd(minute)) &&
+                        poke_ram((uint32_t)hr[0], to_bcd(h));
+        if (ok) segments_state_are_update = true;
+        return ok;
     }
     bool ok = poke_ram((uint32_t)sec[0], (uint8_t)(second % 10)) && poke_ram((uint32_t)sec[1], (uint8_t)(second / 10)) &&
               poke_ram((uint32_t)min[0], (uint8_t)(minute % 10)) && poke_ram((uint32_t)min[1], (uint8_t)(minute / 10));

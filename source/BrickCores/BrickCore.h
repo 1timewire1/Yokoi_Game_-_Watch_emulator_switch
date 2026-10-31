@@ -104,11 +104,23 @@ public:
     //     - present = a 12-hour clock (1-12), absent = 24-hour.
     //   clock.start=<button> - pressed to leave a boot test screen first
     //     (switch/source/input/brick_clock_setup.h).
+    //   clock.bcd=1 - sec/min/hour are one cell each holding a BCD byte
+    //     (Pocket Pikachu) instead of one digit per cell.
+    //   clock.hour_zero=1 - a 12-hour clock that stores 12 o'clock as 0 (0-11).
+    //   clock.unset=<addr>,<value> - the clock hasn't been set (first boot)
+    //     while RAM[addr] == value; clock.confirm=<button> sets it from there.
     // False if the game has no clock layout or the core can't write RAM.
     bool has_clock() const { return rom_.options.has("clock.sec"); }
     bool set_clock(int hour, int minute, int second);
     std::string clock_start_button() const {
         return rom_.options.has("clock.start") ? rom_.options.str("clock.start") : std::string();
+    }
+    std::string clock_confirm_button() const {
+        return rom_.options.has("clock.confirm") ? rom_.options.str("clock.confirm") : std::string();
+    }
+    bool clock_unset() const {
+        const std::vector<long> u = rom_.options.list("clock.unset");
+        return u.size() == 2 && peek_ram((uint32_t)u[0]) == u[1];
     }
     // Every segment lit (the first 32 display bytes all 0xFF) - the
     // all-segments test screen some games boot to.

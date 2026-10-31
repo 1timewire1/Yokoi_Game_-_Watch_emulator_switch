@@ -83,6 +83,17 @@ Special editions are not supported in the emulator, refer to the Notes column fo
 | SM-35    | Game & Watch: Super Mario Bros. 35th Anniversary Edition     | 2020.11.13   | Modern remake of Game & Watch device     |
 | ZL-35    | Game & Watch: The Legend of Zelda 35th Anniversary Edition   | 2021.11.12   | Modern remake of Game & Watch device     |
 
+## Nintendo - Pocket Pikachu (BrickEmuPy)
+
+<!-- Mitsubishi M37520, angel_hp's port of BrickEmuPy's core. In the app's
+     Nintendo group, but - like every BrickEmuPy-core game - an Experimental
+     Game. Its clock is set automatically through its first-boot clock-set
+     screen (brick_games.json "clock", switch/source/input/brick_clock_setup.h). -->
+
+| No. | Model   | Filename            | Game Title                                                   | Release Date | CPU | Clone Of |
+|-----|---------|---------------------|--------------------------------------------------------------|--------------|-----|-------|
+| 01  | pocketpikachu | (BrickEmuPy)        | Pocket Pikachu                                               | 1998.03.27   | M37520 |  |
+
 ## List of Tronica games
 
 | No. | Model   | Filename            | Game Title                                                   | Release Date | CPU | Clone Of |
@@ -284,6 +295,7 @@ Special editions are not supported in the emulator, refer to the Notes column fo
 | 17  | digimonja | (BrickEmuPy)        | Digital Monster Ver.1 (Japan, Rev. A)                        | 1997.06.26   | E0C6S48 | digimon |
 | 18  | tamaotch | (BrickEmuPy)        | Unknown Tamagotchi (Tamaotch)                                | 1997.01.01   | E0C6S48 |  |
 | 19  | dpowerdigiviceeu101 | (BrickEmuPy)        | D-Power Digivice (Europe)                                    | 2001.01.01   | SPL61X |  |
+| 20  | dtectordigiviceusv2 | (BrickEmuPy)        | D-Tector (US V2)                                             | 2002.01.01   | GPL191X |  |
 
 ## Epoch
 

@@ -492,10 +492,11 @@ ROM a `.brk` container carrying its `.brick` config (`CONVERT_ROM/brick_import.p
 All of them are Experimental Games, whatever their group. Each core is
 checked instruction-for-instruction against BrickEmuPy's own Python core
 (`CONVERT_ROM/tmp/ht943/run_compare.py`, `CONVERT_ROM/tmp/spl/run_compare.py`,
-`CONVERT_ROM/tmp/review/compare.py`). The MSM50XX and GPL191X cores are
-angel_hp's ports; on the D-Power Digivice only, GPL191X also keeps five of
-their hardware-behaviour changes that BrickEmuPy doesn't have (see
-`source/BrickCores/GPL191X.h`).
+`CONVERT_ROM/tmp/review/compare.py`, `CONVERT_ROM/tmp/m37520/run_compare.py`),
+last against BrickEmuPy as of 2026-10-31. The MSM50XX, GPL191X and M37520
+cores are angel_hp's ports; five GPL191X changes they first made for the
+D-Power Digivice are now BrickEmuPy's own behaviour for every GPL191X game
+(see `source/BrickCores/GPL191X.h`) - the D-Tector's Step button needs one.
 
 Buttons map straight to the device's: **D-pad** = its arrows, **A** = the
 main action (rotate / fire / start), **+** / **-** = start or on and
@@ -516,25 +517,33 @@ ACL button, where the device has one (holding it holds the chip in reset).
 | The Legend of Zelda Game Watch (Nelsonic, MSM50XX) | Set | | Mode | Set | B = Mode too |
 | Super Mario Bros. Game Watch (Nelsonic, MSM50XX) | | | Mode | Set | |
 | Formel 1 (Hartung, MSM50XX) | | Game 1/2 | | Set | Left/Right steer |
-| D-Power Digivice (Bandai, SPL61X) | Step | | | | X = Step, repeating (10 a second) while held; B Card; +/- Reset |
-| Pocket Pikachu (Nintendo, M37520) | A | Start | Select | | B = B, D-pad = its arrows, X = reflector (IR sensor); +/- Reset |
+| D-Power Digivice (Bandai, SPL61X) | Card | | | | X = Step, repeating (10 a second) while held; +/- Reset |
+| D-Tector (Bandai, GPL191X) | B (middle) | | | Sensor | Left/Y = A, Up/Down = B too, Right/B = C; X = Step, repeating; L = Wave |
+| Pocket Pikachu (Nintendo, M37520) | A | Start | Select | | B = B, D-pad = its arrows, X = step sensor ("reflector"), repeating; +/- Reset |
 
 Several of these power off by halting the chip; the screen is blank until
 the power/on button wakes them, as on the real thing.
 
-**Clocks.** The Nelsonic Game Watches and Formel 1 are real-time clocks.
-Their time is written on every load, the way the Game & Watch clocks' is
-(`BrickCore::set_clock()`, cells listed in `CONVERT_ROM/brick_games.json`'s
-`"clock"`), and with Time Set Mode on **Automatic** the watch is also taken
-off its all-segments boot test screen (a Left press) and set again a second
-in (`switch/source/input/brick_clock_setup.cpp`) - a watch restored from a
-save state just gets its time synced. The D-Power Digivice has no clock.
+**Clocks.** The Nelsonic Game Watches, Formel 1 and Pocket Pikachu are
+real-time clocks. Their time is written on every load, the way the Game &
+Watch clocks' is (`BrickCore::set_clock()`, cells listed in
+`CONVERT_ROM/brick_games.json`'s `"clock"`), and with Time Set Mode on
+**Automatic** (`switch/source/input/brick_clock_setup.cpp`):
+- the Nelsonic watches are taken off their all-segments boot test screen (a
+  Left press) and set again a second in;
+- Pocket Pikachu, which boots into its own clock-set screen ("AM / とけいSET"),
+  has A pressed until the game reports its clock set (about 7 seconds), then
+  gets the time.
+A game restored from a save state just gets its time synced. The D-Power
+Digivice and the D-Tector have no clock.
 
-**D-Power Digivice.** Its pedometer counts one step per Step press, so X
-repeats Step for you while held (a `*` key in brick_games.json, see
+**Pedometers.** The D-Power Digivice, the D-Tector and Pocket Pikachu count
+one step per press of their step sensor, so X repeats it for you while held,
+10 times a second (a `*` key in brick_games.json, see
 `switch/source/input/brick_input_map.h`) - not ZR, which would add steps
-whenever ZL+ZR opens the menu. The screen sleeps a while after the last
-press, as the real one does.
+whenever ZL+ZR opens the menu. These screens sleep a while after the last
+press, as the real ones do. The D-Tector's red LED sits on its case, outside
+the screen area the app shows, so it isn't drawn.
 
 ## McDonald's (LCDonald ports)
 

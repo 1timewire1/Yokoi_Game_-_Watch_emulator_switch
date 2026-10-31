@@ -286,6 +286,18 @@ uint8_t M37520::read_mem(uint32_t addr) {
     return 0;
 }
 
+// set_clock()'s access: CPU RAM only (0x40-0x23F), never the SFRs/LCD.
+bool M37520::poke_ram(uint32_t addr, uint8_t v) {
+    if (addr < kRamOffset || addr >= kRamOffset + kRamSize) return false;
+    ram_[addr - kRamOffset] = v;
+    return true;
+}
+
+int M37520::peek_ram(uint32_t addr) const {
+    if (addr < kRamOffset || addr >= kRamOffset + kRamSize) return -1;
+    return ram_[addr - kRamOffset];
+}
+
 void M37520::write_mem(uint32_t addr, uint8_t value) {
     if (addr >= lcd_offset_ && addr < lcd_offset_ + kLcdSize) lcd_[addr - lcd_offset_] = value;
     else if (addr >= kRamOffset && addr < kRamOffset + kRamSize) ram_[addr - kRamOffset] = value;

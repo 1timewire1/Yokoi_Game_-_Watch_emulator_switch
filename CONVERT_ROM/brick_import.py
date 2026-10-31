@@ -291,12 +291,16 @@ def clock_lines(clock) -> list:
     tmp/review/brick_clockprobe.exe) -> "clock.*" container options, read by
     BrickCore::set_clock(): sec/min = [units, tens], hour = [units, tens] or
     [one binary cell], pm = [addr, mask, 1 if set means PM else 0], start =
-    the .brick button that leaves a boot test screen (optional)."""
+    the .brick button that leaves a boot test screen, bcd = 1 for one BCD
+    byte per field, hour_zero = 1 for 12 o'clock stored as 0, unset =
+    [addr, value] while the clock awaits its first setting and confirm = the
+    button that sets it (all optional - see BrickCore.h)."""
     if not clock:
         return []
-    lines = [f"clock.{k}=" + ",".join(str(int(v)) for v in clock[k]) for k in ("sec", "min", "hour", "pm") if k in clock]
-    if clock.get("start"):
-        lines.append(f"clock.start={clock['start']}")  # button that leaves a boot test screen
+    lines = [f"clock.{k}=" + ",".join(str(int(v)) for v in clock[k])
+             for k in ("sec", "min", "hour", "pm", "unset") if k in clock]
+    lines += [f"clock.{k}={int(clock[k])}" for k in ("bcd", "hour_zero") if clock.get(k)]
+    lines += [f"clock.{k}={clock[k]}" for k in ("start", "confirm") if clock.get(k)]
     return lines
 
 

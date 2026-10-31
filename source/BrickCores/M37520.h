@@ -29,6 +29,8 @@ protected:
     int port_id(const std::string& name) const override;
     void port_input(int port, uint8_t mask, int level) override;
     void serialize(BrickStateIO& io) override;
+    bool poke_ram(uint32_t addr, uint8_t v) override;
+    int peek_ram(uint32_t addr) const override;
 
 private:
 #define M37520_OPS(X) \

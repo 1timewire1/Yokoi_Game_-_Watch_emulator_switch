@@ -522,7 +522,9 @@
       "readme": "Pocket Pikachu",
       "manufacturer": "Nintendo",
       "date": "1998-03-27",
-      "keys": {},
+      "keys": {
+        "reflector": "*X"
+      },
       "model": "MPG-001",
       "clone_of": null,
       "notes": "Original monochrome 1998 model (developed by Jupiter), not Pocket Pikachu Color. Sold as 'Pokemon Pikachu' in NA (1998-11-02) and EU (Dec 1998). Face icons (clock, gift, coin slot game, 5-digit steps) and the Game Boy-style button set match the original. Dump region is presumably Japanese. Model number comes from listings only. Distributed without ROM.",
@@ -539,6 +541,29 @@
         "date": "High",
         "model": "Medium",
         "clone_of": "High"
+      },
+      "clock": {
+        "sec": [
+          87
+        ],
+        "min": [
+          88
+        ],
+        "hour": [
+          89
+        ],
+        "pm": [
+          90,
+          1,
+          1
+        ],
+        "bcd": 1,
+        "hour_zero": 1,
+        "unset": [
+          125,
+          3
+        ],
+        "confirm": "btnA"
       }
     },
     {
