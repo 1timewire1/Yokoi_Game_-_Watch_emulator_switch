@@ -2,6 +2,7 @@
 
 #include "GPL191X.h"
 #include "HT943.h"
+#include "M37520.h"
 #include "MSM50XX.h"
 #include "SPL81408.h"
 
@@ -248,6 +249,7 @@ BrickCore* make_core() { return new T(); }
 constexpr CoreEntry kCores[] = {
     {"GPL191X", make_core<GPL191X>},
     {"HT943", make_core<HT943>},
+    {"M37520", make_core<M37520>},
     {"MSM50XX", make_core<MSM50XX>},
     {"SPL61X", make_core<SPL61X>},
     {"SPL81408", make_core<SPL81408>},

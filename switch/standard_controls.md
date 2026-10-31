@@ -484,7 +484,7 @@ BrickEmuPy, not MAME. Each board's fast-oscillator (OSC3) speed is also
 BrickEmuPy's measured value rather than MAME's 1 MHz placeholder - Alien
 Fever, which runs on it full time, plays ~40% faster than in MAME.
 
-## BrickEmuPy ports: Holtek HT943, Sunplus SPL81408, OKI MSM50XX, GeneralPlus GPL191X (Experimental Games)
+## BrickEmuPy ports: Holtek HT943, Sunplus SPL81408, OKI MSM50XX, GeneralPlus GPL191X, Mitsubishi M37520 (Experimental Games)
 
 Games run on cores ported from [BrickEmuPy](https://github.com/azya52/BrickEmuPy)
 (CC0) - `source/BrickCores/`, one C++ class per BrickEmuPy core, each game's
@@ -517,6 +517,7 @@ ACL button, where the device has one (holding it holds the chip in reset).
 | Super Mario Bros. Game Watch (Nelsonic, MSM50XX) | | | Mode | Set | |
 | Formel 1 (Hartung, MSM50XX) | | Game 1/2 | | Set | Left/Right steer |
 | D-Power Digivice (Bandai, SPL61X) | Step | | | | X = Step, repeating (10 a second) while held; B Card; +/- Reset |
+| Pocket Pikachu (Nintendo, M37520) | A | Start | Select | | B = B, D-pad = its arrows, X = reflector (IR sensor); +/- Reset |
 
 Several of these power off by halting the chip; the screen is blank until
 the power/on button wakes them, as on the real thing.

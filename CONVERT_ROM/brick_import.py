@@ -48,7 +48,7 @@ GAMES_PATH = HERE / "games_path_rgds.py"
 
 # BrickEmuPy core names with a C++ port (source/BrickCores/BrickCore.cpp's
 # kCores). Kept in sync by hand.
-PORTED_CORES = {"GPL191X", "HT943", "MSM50XX", "SPL61X", "SPL81408"}
+PORTED_CORES = {"GPL191X", "HT943", "M37520", "MSM50XX", "SPL61X", "SPL81408"}
 
 
 def load_brick(path: Path) -> dict:

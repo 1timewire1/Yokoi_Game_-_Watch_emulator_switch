@@ -54,6 +54,37 @@
       }
     },
     {
+      "brick": "DTectorDigiviceUSv2",
+      "set": "dtectordigiviceusv2",
+      "core": "GPL191X",
+      "name": "D-Tector (US V2)",
+      "readme": "D-Tector Digivice US V2 (GPL191X)",
+      "manufacturer": "Bandai",
+      "date": "2002-01-01",
+      "keys": {
+        "btnA": "LEFT|Y",
+        "btnB": "A|UP|DOWN",
+        "btnC": "RIGHT|B",
+        "btnStep": "*X",
+        "btnSensor": "R",
+        "btnWave": "L"
+      },
+      "model": null,
+      "clone_of": null,
+      "notes": "Bandai America/Asia D-Tector (Digimon Frontier), firmware V2.0x ('D-TEC US V2'); the Japanese equivalent is the D-Scanner. Not listed in BrickEmuPy's brick_games.json - added here from the .brick/.bin/.svg supplied by the user. Year 2002 is the line's first release (Wikimon: V1 2002); the exact V2 date is unknown. Step is the virtual pedometer (turbo on X, one step per press, like the D-Power Digivice), Wave the wave-communication button (matrix input CD0/EF5), Sensor the IR sensor. The .brick's svg_output LED (port CD bit 3) is not rendered. Distributed without ROM.",
+      "sources": [
+        "https://wikimon.net/D-Tector_Toy",
+        "https://lcd.withthewill.net/DTectorIntro"
+      ],
+      "confidence": {
+        "name": "Medium",
+        "manufacturer": "High",
+        "date": "Low",
+        "model": "Unknown",
+        "clone_of": "Unknown"
+      }
+    },
+    {
       "brick": "TamagotchiMini2017",
       "set": "tamagotchimini2017",
       "core": "GPL191X",
@@ -712,7 +743,7 @@
       "manufacturer": "Bandai",
       "date": "2001-01-01",
       "keys": {
-        "btnStep": "A|*X"
+        "btnStep": "*X"
       },
       "model": null,
       "clone_of": null,
