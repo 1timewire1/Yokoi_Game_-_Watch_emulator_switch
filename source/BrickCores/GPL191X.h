@@ -42,6 +42,17 @@ protected:
     int port_id(const std::string& name) const override;
     void port_input(int port, uint8_t mask, int level) override;
     void serialize(BrickStateIO& io) override;
+    // RAM 0x40-0x37F (CPU RAM + display RAM) by CPU address - for the clock
+    // writes / checks (BrickCore::set_clock(), "clock.*" options).
+    bool poke_ram(uint32_t addr, uint8_t v) override {
+        if (addr < 0x40 || addr >= 0x380 || addr >= mem_size_) return false;
+        mem_[addr] = v;
+        return true;
+    }
+    int peek_ram(uint32_t addr) const override {
+        if (addr < 0x40 || addr >= 0x380 || addr >= mem_size_) return -1;
+        return mem_[addr];
+    }
 
 public:  // (public for the verification harness)
     enum Port { kAB = 0, kCD = 1, kEF = 2 };

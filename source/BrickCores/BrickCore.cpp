@@ -3,6 +3,8 @@
 #include "GPL191X.h"
 #include "HT943.h"
 #include "M37520.h"
+#include "SPL0X.h"
+#include "SPLB20.h"
 #include "MSM50XX.h"
 #include "SPL81408.h"
 
@@ -113,33 +115,52 @@ bool BrickCore::set_clock(int hour, int minute, int second) {
     const std::vector<long> hr = rom_.options.list("clock.hour");
     const std::vector<long> pm = rom_.options.list("clock.pm");
     const bool bcd = rom_.options.num("clock.bcd", 0) != 0;
-    const size_t cells = bcd ? 1 : 2;
-    if (sec.size() != cells || min.size() != cells || hr.empty() || hr.size() > 2) return false;
+    const bool binary = rom_.options.num("clock.binary", 0) != 0;
+    if ((bcd || binary) ? (sec.empty() || min.empty() || hr.empty())
+            : (sec.size() != 2 || min.size() != 2 || hr.empty() || hr.size() > 2)) {
+        return false;
+    }
     int h = hour;
     if (pm.size() == 3) {
-        h = hour % 12;
-        if (h == 0 && !rom_.options.num("clock.hour_zero", 0)) h = 12;
+        h = hour % 12 ? hour % 12 : 12;
+        if (h == 12 && rom_.options.num("clock.hour_zero", 0) != 0) h = 0;
         const int cell = peek_ram((uint32_t)pm[0]);
         if (cell < 0) return false;
         const bool set = (hour >= 12) == (pm[2] != 0);
         if (!poke_ram((uint32_t)pm[0], (uint8_t)(set ? (cell | pm[1]) : (cell & ~pm[1])))) return false;
     }
-    if (bcd) {
+    bool ok;
+    if (binary) {
+        const long scale = rom_.options.num("clock.sec_scale", 1);
+        ok = poke_ram((uint32_t)sec[0], (uint8_t)(second * (scale > 0 ? scale : 1))) &&
+             poke_ram((uint32_t)min[0], (uint8_t)minute) && poke_ram((uint32_t)hr[0], (uint8_t)h);
+    } else if (bcd) {
         auto to_bcd = [](int v) { return (uint8_t)(((v / 10) << 4) | (v % 10)); };
-        const bool ok = poke_ram((uint32_t)sec[0], to_bcd(second)) && poke_ram((uint32_t)min[0], to_bcd(minute)) &&
-                        poke_ram((uint32_t)hr[0], to_bcd(h));
-        if (ok) segments_state_are_update = true;
-        return ok;
-    }
-    bool ok = poke_ram((uint32_t)sec[0], (uint8_t)(second % 10)) && poke_ram((uint32_t)sec[1], (uint8_t)(second / 10)) &&
-              poke_ram((uint32_t)min[0], (uint8_t)(minute % 10)) && poke_ram((uint32_t)min[1], (uint8_t)(minute / 10));
-    if (hr.size() == 2) {
-        ok = ok && poke_ram((uint32_t)hr[0], (uint8_t)(h % 10)) && poke_ram((uint32_t)hr[1], (uint8_t)(h / 10));
+        ok = poke_ram((uint32_t)sec[0], to_bcd(second)) && poke_ram((uint32_t)min[0], to_bcd(minute)) &&
+             poke_ram((uint32_t)hr[0], to_bcd(h));
     } else {
-        ok = ok && poke_ram((uint32_t)hr[0], (uint8_t)h);
+        ok = poke_ram((uint32_t)sec[0], (uint8_t)(second % 10)) && poke_ram((uint32_t)sec[1], (uint8_t)(second / 10)) &&
+             poke_ram((uint32_t)min[0], (uint8_t)(minute % 10)) && poke_ram((uint32_t)min[1], (uint8_t)(minute / 10));
+        if (hr.size() == 2) {
+            ok = ok && poke_ram((uint32_t)hr[0], (uint8_t)(h % 10)) && poke_ram((uint32_t)hr[1], (uint8_t)(h / 10));
+        } else {
+            ok = ok && poke_ram((uint32_t)hr[0], (uint8_t)h);
+        }
     }
     if (ok) segments_state_are_update = true;
     return ok;
+}
+
+void BrickCore::fast_forward(uint64_t ticks) {
+    if (reset_held_) return;
+    // Same cycle accounting as update_sound(), a whole slice at once.
+    cycle_debt_ += (int64_t)rom_.clock_hz * (int64_t)ticks;
+    while (cycle_debt_ > 0) cycle_debt_ -= execute_scaled();
+    segments_state_are_update = true;
+}
+
+void BrickCore::release_all_buttons() {
+    for (const Binding& b : bindings_) set_button(b.name, false);
 }
 
 void BrickCore::set_button(const std::string& name, bool pressed) {
@@ -261,6 +282,9 @@ constexpr CoreEntry kCores[] = {
     {"HT943", make_core<HT943>},
     {"M37520", make_core<M37520>},
     {"MSM50XX", make_core<MSM50XX>},
+    {"SPL02", make_core<SPL02>},
+    {"SPL03", make_core<SPL03>},
+    {"SPLB20", make_core<SPLB20>},
     {"SPL61X", make_core<SPL61X>},
     {"SPL81408", make_core<SPL81408>},
 };

@@ -34,6 +34,9 @@ struct BrickRom {
         // Every key starting with `prefix` (e.g. "input."), prefix stripped.
         std::map<std::string, std::string> with_prefix(const std::string& prefix) const;
         void parse(const char* text, size_t size);
+        // Adds or replaces one key - built-in defaults for containers made
+        // before an option existed (switch/source/core/brick_pet_clock.cpp).
+        void set(const std::string& key, const std::string& value) { values_[key] = value; }
 
     private:
         std::map<std::string, std::string> values_;

@@ -418,13 +418,16 @@ int main(int argc, char* argv[]) {
         // BrickEmuPy-ported cores: each game's ROM container carries its own
         // button bindings - see brick_input_map.h. g_input is null for these.
         // While a watch's automatic clock setup is pressing its start button
-        // (brick_clock_setup.h), it owns the inputs instead.
+        // or filling in a set-time screen (brick_clock_setup.h), it owns the
+        // inputs instead.
         if (g_cpu && g_game && g_cpu->get_cpu_type_id() == CPU_TYPE_BRICK) {
             BrickCore* brick = static_cast<BrickCore*>(g_cpu.get());
-            if (brick_clock_setup_active()) {
+            if (brick_clock_setup_owns_input()) {
                 brick_clock_setup_advance(brick);
             } else {
                 apply_brick_input(brick);
+                // Watching for a set-time screen the player opens (Apollo 2 in 1).
+                if (brick_clock_setup_active()) brick_clock_setup_advance(brick);
             }
         }
 

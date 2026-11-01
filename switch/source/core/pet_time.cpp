@@ -8,11 +8,13 @@
 
 #include <switch.h>
 
+#include "BrickCores/BrickCore.h"
 #include "E0C6200/E0C6S46.h"
 #include "std/debug_log.h"
 #include "std/savestate.h"
 
 #include "e0c6200_clock.h"
+#include "input/brick_clock_setup.h"
 #include "input/e0c6200_clock_setup.h"
 #include "render/switch_ui.h"
 #include "switch_runtime_state.h"
@@ -21,7 +23,8 @@
 
 namespace {
 
-constexpr uint64_t kTicksPerSecond = 32768;   // E0C6S46 OSC1
+constexpr uint64_t kTicksPerSecond = 32768;   // E0C6S46 OSC1, BrickCore::kTickHz
+static_assert(kTicksPerSecond == BrickCore::kTickHz, "Pet Time slices both kinds of pet in the same ticks");
 constexpr uint64_t kSliceTicks = kTicksPerSecond / 4;
 constexpr uint64_t kFrameBudgetNs = 12'000'000;  // leave ~4.6 ms of each 60 fps frame for rendering
 constexpr int64_t kGapThresholdSeconds = 3;      // a mid-play stall at least this long counts as time away
@@ -38,19 +41,60 @@ struct CatchUp {
 CatchUp g_catch;
 int64_t g_last_frame_wall = 0;  // time() of the last emulated frame, 0 = none yet
 
-// The running pet and its clock layout, or nullptr if Pet Time doesn't apply.
-E0C6S46* pet(const E0C6200ClockLayout** layout_out) {
-    if (!g_cpu || !g_game || g_cpu->get_cpu_type_id() != CPU_TYPE_E0C6S46) return nullptr;
-    const E0C6200ClockLayout* layout = e0c6200_clock_layout(g_game->ref);
-    if (!layout) return nullptr;
-    *layout_out = layout;
-    return static_cast<E0C6S46*>(g_cpu.get());
+// The running pet, if Pet Time applies to it: an E0C6S46/S48 with a known
+// clock layout (core/e0c6200_clock.h), or a BrickEmuPy-core game marked as
+// a pet ("clock.pet" - Apollo 2 in 1, see brick_pet_clock.h).
+struct Pet {
+    E0C6S46* e0c = nullptr;
+    const E0C6200ClockLayout* layout = nullptr;
+    BrickCore* brick = nullptr;
+
+    explicit operator bool() const { return e0c || brick; }
+    SM5XX* cpu() const { return e0c ? static_cast<SM5XX*>(e0c) : static_cast<SM5XX*>(brick); }
+    bool clock_is_set() const { return e0c ? e0c6200_clock_is_set(e0c, *layout) : brick->clock_is_set(); }
+    void clock_write(time_t when) const {
+        if (e0c) {
+            e0c6200_clock_write(e0c, *layout, when);
+            return;
+        }
+        const tm* t = localtime(&when);
+        if (t) brick->set_clock(t->tm_hour, t->tm_min, t->tm_sec);
+    }
+    int64_t saved_unix_time() const { return e0c ? e0c->saved_unix_time() : brick->saved_unix_time(); }
+    void fast_forward(uint64_t ticks) const {
+        if (e0c) e0c->fast_forward(ticks);
+        else brick->fast_forward(ticks);
+    }
+    // Nobody's holding anything while away.
+    void release_inputs() const {
+        if (e0c) {
+            for (int line = 0; line < 8; line++) e0c->set_k_line(line, true);
+            e0c->set_reset_line(false);
+        } else {
+            brick->release_all_buttons();
+        }
+    }
+    // The automatic clock setup owns the first seconds of a fresh start.
+    bool setup_busy() const { return e0c ? e0c6200_clock_setup_active() : brick_clock_setup_owns_input(); }
+};
+
+Pet current_pet() {
+    Pet p;
+    if (!g_cpu || !g_game) return p;
+    if (g_cpu->get_cpu_type_id() == CPU_TYPE_E0C6S46) {
+        p.layout = e0c6200_clock_layout(g_game->ref);
+        if (p.layout) p.e0c = static_cast<E0C6S46*>(g_cpu.get());
+    } else if (g_cpu->get_cpu_type_id() == CPU_TYPE_BRICK) {
+        BrickCore* brick = static_cast<BrickCore*>(g_cpu.get());
+        if (brick->is_pet()) p.brick = brick;
+    }
+    return p;
 }
 
-void finish(E0C6S46* cpu, const E0C6200ClockLayout& layout) {
-    e0c6200_clock_write(cpu, layout, time(nullptr));  // also covers the time the catch-up itself took
-    cpu->segments_state_are_update = true;
-    update_segments_from_cpu(cpu);
+void finish(const Pet& pet) {
+    pet.clock_write(time(nullptr));  // also covers the time the catch-up itself took
+    pet.cpu()->segments_state_are_update = true;
+    update_segments_from_cpu(pet.cpu());
     g_catch = CatchUp{};
     g_last_frame_wall = (int64_t)time(nullptr);
 }
@@ -59,13 +103,12 @@ void finish(E0C6S46* cpu, const E0C6200ClockLayout& layout) {
 void apply_time_away(int64_t away, const char* why) {
     // Experimental Features off = as if Paused (the stored mode is kept).
     if (away <= 0 || !g_experimental_features_enabled || g_pet_time_mode == PetTimeMode::Paused) return;
-    const E0C6200ClockLayout* layout = nullptr;
-    E0C6S46* cpu = pet(&layout);
-    if (!cpu || !e0c6200_clock_is_set(cpu, *layout)) return;  // pet never started - nothing to age
+    const Pet pet = current_pet();
+    if (!pet || !pet.clock_is_set()) return;  // pet never started - nothing to age
 
     const time_t now = time(nullptr);
     if (g_pet_time_mode == PetTimeMode::ClockSync) {
-        e0c6200_clock_write(cpu, *layout, now);
+        pet.clock_write(now);
         YOKOI_LOG("pet_time: %s, %lld s away - clock synced", why, (long long)away);
         return;
     }
@@ -77,11 +120,9 @@ void apply_time_away(int64_t away, const char* why) {
     if (g_catch.skipped_seconds > 0) {
         // Jump over the part beyond the cap first, so the emulated stretch
         // ends exactly at now with the pet's day lined up with the real one.
-        e0c6200_clock_write(cpu, *layout, now - (time_t)emulate);
+        pet.clock_write(now - (time_t)emulate);
     }
-    // Nobody's holding anything while away.
-    for (int line = 0; line < 8; line++) cpu->set_k_line(line, true);
-    cpu->set_reset_line(false);
+    pet.release_inputs();
     g_catch.total_ticks = (uint64_t)emulate * kTicksPerSecond;
     g_catch.started_tick = armGetSystemTick();
     g_catch.active = true;
@@ -118,24 +159,21 @@ void pet_time_on_game_loaded() {
 }
 
 void pet_time_on_state_loaded() {
-    const E0C6200ClockLayout* layout = nullptr;
-    E0C6S46* cpu = pet(&layout);
-    if (!cpu) return;
-    const int64_t saved = cpu->saved_unix_time();
+    const Pet pet = current_pet();
+    if (!pet) return;
+    const int64_t saved = pet.saved_unix_time();
     if (saved == 0) return;  // older save without a timestamp - nothing to go on
     // Negative means the Switch clock moved backwards since - leave the pet alone.
     apply_time_away((int64_t)time(nullptr) - saved, "save state loaded");
 }
 
 bool pet_time_frame(uint64_t kDown) {
-    const E0C6200ClockLayout* layout = nullptr;
-    E0C6S46* cpu = pet(&layout);
-    if (!cpu) return false;
+    const Pet pet = current_pet();
+    if (!pet) return false;
 
     const int64_t now = (int64_t)time(nullptr);
     if (!g_catch.active) {
-        // The automatic clock setup owns the first seconds of a fresh start.
-        if (!e0c6200_clock_setup_active() && g_last_frame_wall != 0 && now - g_last_frame_wall >= kGapThresholdSeconds) {
+        if (!pet.setup_busy() && g_last_frame_wall != 0 && now - g_last_frame_wall >= kGapThresholdSeconds) {
             apply_time_away(now - g_last_frame_wall, "resumed after a pause");
         }
         g_last_frame_wall = now;
@@ -145,22 +183,22 @@ bool pet_time_frame(uint64_t kDown) {
     if (kDown & HidNpadButton_B) {
         YOKOI_LOG("pet_time: catch-up stopped early at %llu of %llu s", (unsigned long long)(g_catch.done_ticks / kTicksPerSecond),
                   (unsigned long long)(g_catch.total_ticks / kTicksPerSecond));
-        finish(cpu, *layout);
+        finish(pet);
         return true;
     }
 
     const uint64_t start = armGetSystemTick();
     while (g_catch.done_ticks < g_catch.total_ticks && armTicksToNs(armGetSystemTick() - start) < kFrameBudgetNs) {
         const uint64_t n = std::min(kSliceTicks, g_catch.total_ticks - g_catch.done_ticks);
-        cpu->fast_forward(n);
+        pet.fast_forward(n);
         g_catch.done_ticks += n;
     }
-    if (g_pet_time_display == PetTimeDisplay::FastForward) update_segments_from_cpu(cpu);
+    if (g_pet_time_display == PetTimeDisplay::FastForward) update_segments_from_cpu(pet.cpu());
 
     if (g_catch.done_ticks >= g_catch.total_ticks) {
         YOKOI_LOG("pet_time: caught up %llu s in %.1f s", (unsigned long long)(g_catch.total_ticks / kTicksPerSecond),
                   armTicksToNs(armGetSystemTick() - g_catch.started_tick) / 1e9);
-        finish(cpu, *layout);
+        finish(pet);
     }
     return true;
 }

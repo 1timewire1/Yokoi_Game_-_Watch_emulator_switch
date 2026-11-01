@@ -107,8 +107,24 @@ public:
     //   clock.bcd=1 - sec/min/hour are one cell each holding a BCD byte
     //     (Pocket Pikachu) instead of one digit per cell.
     //   clock.hour_zero=1 - a 12-hour clock that stores 12 o'clock as 0 (0-11).
+    //   clock.binary=1 - sec/min/hour are one cell each holding a plain
+    //     binary number (Tamagotchi Mini 2017; hour 0-23 without clock.pm).
+    //   clock.sec_scale=<n> - the seconds cell counts 1/n s (Tamagotchi Mini
+    //     2017: half-seconds, 0-119); binary only.
+    //   clock.unset_zero=1 - the clock hasn't been set while its sec/min/hour
+    //     cells are all 0 (it boots stopped at 00:00:00).
     //   clock.unset=<addr>,<value> - the clock hasn't been set (first boot)
     //     while RAM[addr] == value; clock.confirm=<button> sets it from there.
+    //   clock.set_screen=<addr>,<value> - the game's own set-time screen is
+    //     up while RAM[addr] == value, and/or
+    //   clock.set_screen_lcd=<byte>,<mask>,<byte>,<mask>... - while every
+    //     one of these display bits is lit (Apollo 2 in 1: its "SET" label
+    //     and the rest of that screen's fixed pixels - no RAM byte tells it
+    //     apart). It's reached by the player (language / pet choice first),
+    //     so the automatic setup waits for it instead of pressing anything at
+    //     boot, then writes the time and presses clock.confirm.
+    //   clock.pet=1 - a virtual pet: Pet Time (switch/source/core/pet_time.h)
+    //     catches it up on the time it spent not running.
     // False if the game has no clock layout or the core can't write RAM.
     bool has_clock() const { return rom_.options.has("clock.sec"); }
     bool set_clock(int hour, int minute, int second);
@@ -120,8 +136,45 @@ public:
     }
     bool clock_unset() const {
         const std::vector<long> u = rom_.options.list("clock.unset");
-        return u.size() == 2 && peek_ram((uint32_t)u[0]) == u[1];
+        if (u.size() == 2 && peek_ram((uint32_t)u[0]) == u[1]) return true;
+        if (rom_.options.num("clock.unset_zero", 0) != 0) {
+            for (const char* key : {"clock.sec", "clock.min", "clock.hour"}) {
+                for (long addr : rom_.options.list(key)) {
+                    if (peek_ram((uint32_t)addr) != 0) return false;
+                }
+            }
+            return true;
+        }
+        return false;
     }
+    bool has_clock_set_screen() const {
+        return rom_.options.has("clock.set_screen") || rom_.options.has("clock.set_screen_lcd");
+    }
+    bool clock_set_screen() const {
+        if (!has_clock_set_screen()) return false;
+        const std::vector<long> u = rom_.options.list("clock.set_screen");
+        if (u.size() == 2 && peek_ram((uint32_t)u[0]) != u[1]) return false;
+        const std::vector<long> lcd = rom_.options.list("clock.set_screen_lcd");
+        for (size_t i = 0; i + 1 < lcd.size(); i += 2) {
+            if ((display_byte((int)lcd[i]) & lcd[i + 1]) != lcd[i + 1]) return false;
+        }
+        return true;
+    }
+    bool is_pet() const { return has_clock() && rom_.options.num("clock.pet", 0) != 0; }
+    // The clock is running with a time the game accepted: not first-boot
+    // unset, not sitting on the set-time screen.
+    bool clock_is_set() const { return has_clock() && !clock_unset() && !clock_set_screen(); }
+    // Adds/replaces a container option (built-in defaults - see BrickRom::Options::set()).
+    void set_option(const std::string& key, const std::string& value) { rom_.options.set(key, value); }
+    bool has_option(const std::string& key) const { return rom_.options.has(key); }
+
+    // Runs `ticks` 1/kTickHz s of emulated time as fast as possible - no
+    // sound, no display refresh until the end (Pet Time's catch-up, like
+    // E0C6S46::fast_forward()).
+    void fast_forward(uint64_t ticks);
+    // Lets go of every bound button (nobody holds anything while away).
+    void release_all_buttons();
+
     // Every segment lit (the first 32 display bytes all 0xFF) - the
     // all-segments test screen some games boot to.
     bool display_test_pattern() const {

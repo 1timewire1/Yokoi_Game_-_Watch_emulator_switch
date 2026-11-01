@@ -30,6 +30,8 @@
 #include "input/auto_confirm_press.h"
 #include "input/e0c6200_clock_setup.h"
 #include "input/brick_clock_setup.h"
+#include "brick_pet_clock.h"
+#include "BrickCores/BrickCore.h"
 #include "pet_time.h"
 
 namespace {
@@ -176,6 +178,11 @@ void switch_load_game_by_index_and_init(uint16_t idx) {
     // (Type id check rather than dynamic_cast - this build is -fno-rtti.)
     if (g_cpu->get_cpu_type_id() == CPU_TYPE_E0C6S46) {
         static_cast<E0C6S46*>(g_cpu.get())->configure_for_ref(g_game->ref);
+    }
+    // BrickEmuPy-core pets/watches whose container predates their "clock"
+    // entry get it built in (Apollo 2 in 1) - see brick_pet_clock.h.
+    if (g_cpu->get_cpu_type_id() == CPU_TYPE_BRICK) {
+        brick_pet_clock_apply_builtin(static_cast<BrickCore*>(g_cpu.get()), g_game->ref);
     }
     g_cpu->load_rom(g_game->rom, g_game->size_rom);
     YOKOI_LOG("switch_load_game_by_index_and_init: cpu->load_rom() done");

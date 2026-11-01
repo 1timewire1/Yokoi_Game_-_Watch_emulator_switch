@@ -29,7 +29,11 @@ void yokoi_cpu_set_time_if_needed(SM5XX* cpu) {
     // only knows the Sharp chips' time_addresses.
     if (cpu->get_cpu_type_id() == CPU_TYPE_BRICK) {
         BrickCore* brick = static_cast<BrickCore*>(cpu);
-        if (brick->has_clock()) brick->set_clock(t->tm_hour, t->tm_min, t->tm_sec);
+        // Not the virtual pets ("clock.pet": Pocket Pikachu, Apollo 2 in 1):
+        // their clock is set by the automatic setup on a first boot
+        // (brick_clock_setup.h) and kept by Pet Time after that
+        // (core/pet_time.h) - a blind write here would undo Paused / Real Time.
+        if (brick->has_clock() && !brick->is_pet()) brick->set_clock(t->tm_hour, t->tm_min, t->tm_sec);
     } else {
         cpu->set_time((uint8_t)t->tm_hour, (uint8_t)t->tm_min, (uint8_t)t->tm_sec);
     }

@@ -13,8 +13,14 @@ constexpr int kPressFrames = 12;       // button held
 constexpr int kStartWaitFrames = 30;   // release -> the watch has left its test screen
 constexpr int kConfirmWaitFrames = 60; // release -> next look at the "unset" flag
 constexpr int kMaxConfirmPresses = 10; // intro screens can swallow a press or two
+constexpr int kSetScreenSettleFrames = 30;  // set-time screen up -> its cells initialised
+constexpr int kMaxSetScreenPresses = 5;
 
-enum class Step { Settle, Press, StartWait, ConfirmPress, ConfirmWait, Done };
+enum class Step {
+    Settle, Press, StartWait, ConfirmPress, ConfirmWait,
+    Watch, SetScreenSettle, SetScreenPress, SetScreenWait,
+    Done
+};
 
 Step g_step = Step::Done;
 int g_frames = 0;
@@ -41,6 +47,15 @@ void press_confirm(BrickCore* core) {
     go(Step::ConfirmPress, kPressFrames);
 }
 
+// Set-time screen games: the time goes in first, then the confirm press
+// accepts it (Apollo 2 in 1 keeps the seconds written, too).
+void fill_set_screen(BrickCore* core) {
+    write_now(core);
+    core->set_button(g_button, true);
+    g_presses++;
+    go(Step::SetScreenPress, kPressFrames);
+}
+
 }  // namespace
 
 void brick_clock_setup_begin(bool enabled) {
@@ -54,17 +69,36 @@ bool brick_clock_setup_active() {
     return g_step != Step::Done;
 }
 
+bool brick_clock_setup_owns_input() {
+    return g_step != Step::Done && g_step != Step::Watch;
+}
+
 void brick_clock_setup_advance(BrickCore* core) {
     if (!core || g_step == Step::Done) return;
     if (!core->has_clock()) {
         g_step = Step::Done;
         return;
     }
+    if (g_step == Step::Watch) {
+        // Every frame, with the player's input going through as usual.
+        if (core->clock_set_screen() && !core->clock_confirm_button().empty()) {
+            g_button = core->clock_confirm_button();
+            g_presses = 0;
+            core->release_all_buttons();
+            go(Step::SetScreenSettle, kSetScreenSettleFrames);
+        }
+        return;
+    }
     if (--g_frames > 0) return;
 
     switch (g_step) {
         case Step::Settle:
-            if (!core->clock_start_button().empty() && core->display_test_pattern()) {
+            if (core->has_clock_set_screen()) {
+                // A running pet is Pet Time's to sync; anything else gets
+                // the plain write. Then wait for the set-time screen.
+                if (core->clock_is_set() && !core->is_pet()) write_now(core);
+                g_step = Step::Watch;
+            } else if (!core->clock_start_button().empty() && core->display_test_pattern()) {
                 g_button = core->clock_start_button();
                 core->set_button(g_button, true);
                 go(Step::Press, kPressFrames);
@@ -72,7 +106,9 @@ void brick_clock_setup_advance(BrickCore* core) {
                 g_button = core->clock_confirm_button();
                 press_confirm(core);
             } else {
-                write_now(core);
+                // Already running (a save state): sync it - except a pet,
+                // whose time away is Pet Time's (core/pet_time.h).
+                if (!core->is_pet()) write_now(core);
                 g_step = Step::Done;
             }
             break;
@@ -95,8 +131,26 @@ void brick_clock_setup_advance(BrickCore* core) {
                 g_step = Step::Done;
             }
             break;
+        case Step::SetScreenSettle:
+            if (core->clock_set_screen()) fill_set_screen(core);
+            else g_step = Step::Watch;   // the player left it already
+            break;
+        case Step::SetScreenPress:
+            core->set_button(g_button, false);
+            go(Step::SetScreenWait, kConfirmWaitFrames);
+            break;
+        case Step::SetScreenWait:
+            if (!core->clock_set_screen()) {
+                g_step = Step::Watch;    // accepted - keep watching for the next time
+            } else if (g_presses < kMaxSetScreenPresses) {
+                fill_set_screen(core);
+            } else {
+                g_step = Step::Done;     // the screen won't take it - leave it to the player
+            }
+            break;
         case Step::StartWait:
         case Step::Done:
+        case Step::Watch:
             write_now(core);
             g_step = Step::Done;
             break;

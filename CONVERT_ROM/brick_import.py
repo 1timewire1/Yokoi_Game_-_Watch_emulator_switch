@@ -48,7 +48,7 @@ GAMES_PATH = HERE / "games_path_rgds.py"
 
 # BrickEmuPy core names with a C++ port (source/BrickCores/BrickCore.cpp's
 # kCores). Kept in sync by hand.
-PORTED_CORES = {"GPL191X", "HT943", "M37520", "MSM50XX", "SPL61X", "SPL81408"}
+PORTED_CORES = {"GPL191X", "HT943", "M37520", "MSM50XX", "SPL02", "SPL03", "SPL61X", "SPLB20", "SPL81408"}
 
 
 def load_brick(path: Path) -> dict:
@@ -289,18 +289,26 @@ def upsert_games_path(key: str, block: str):
 def clock_lines(clock) -> list:
     """brick_games.json "clock" (RAM cells of a real-time clock, found with
     tmp/review/brick_clockprobe.exe) -> "clock.*" container options, read by
-    BrickCore::set_clock(): sec/min = [units, tens], hour = [units, tens] or
-    [one binary cell], pm = [addr, mask, 1 if set means PM else 0], start =
-    the .brick button that leaves a boot test screen, bcd = 1 for one BCD
-    byte per field, hour_zero = 1 for 12 o'clock stored as 0, unset =
-    [addr, value] while the clock awaits its first setting and confirm = the
-    button that sets it (all optional - see BrickCore.h)."""
+    BrickCore (source/BrickCores/BrickCore.h has the full list): sec/min =
+    [units, tens], hour = [units, tens] or [one binary cell], pm = [addr,
+    mask, 1 if set means PM else 0], bcd = 1 (one BCD byte per field),
+    hour_zero = 1 (12 o'clock stored as 0), binary = 1 (one plain binary byte
+    per field), sec_scale = n (seconds cell counts 1/n s), unset_zero = 1
+    (unset while sec/min/hour are all 0), unset = [addr, value] (clock not
+    set yet), set_screen = [addr, value] / set_screen_lcd = [byte, mask, ...]
+    (the game's set-time screen is up: that RAM value / all those display bits),
+    start = the .brick button that leaves a boot test screen, confirm = the
+    one that accepts the time, pet = 1 (a virtual pet - Pet Time applies)."""
     if not clock:
         return []
     lines = [f"clock.{k}=" + ",".join(str(int(v)) for v in clock[k])
-             for k in ("sec", "min", "hour", "pm", "unset") if k in clock]
-    lines += [f"clock.{k}={int(clock[k])}" for k in ("bcd", "hour_zero") if clock.get(k)]
-    lines += [f"clock.{k}={clock[k]}" for k in ("start", "confirm") if clock.get(k)]
+             for k in ("sec", "min", "hour", "pm", "unset", "set_screen", "set_screen_lcd") if k in clock]
+    for k in ("bcd", "hour_zero", "binary", "sec_scale", "unset_zero", "pet"):
+        if clock.get(k):
+            lines.append(f"clock.{k}={int(clock[k])}")
+    for k in ("start", "confirm"):
+        if clock.get(k):
+            lines.append(f"clock.{k}={clock[k]}")  # .brick button names
     return lines
 
 

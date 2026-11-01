@@ -90,8 +90,9 @@ extern CloneFilterMode g_clone_filter_mode;
 enum class TimeSetMode : uint8_t { Automatic = 0, Manual = 1 };
 extern TimeSetMode g_time_set_mode;
 
-// "Pet Time" - what happens to an E0C6S46/S48 virtual pet (only the ones
-// whose clock layout is known - core/e0c6200_clock.h) for the time that
+// "Pet Time" - what happens to a virtual pet (the E0C6S46/S48 ones whose
+// clock layout is known - core/e0c6200_clock.h - and the BrickEmuPy-core
+// ones marked "clock.pet", like the Apollo 2 in 1) for the time that
 // passed while it wasn't running: the app closed (measured from its save
 // state's timestamp) or the game paused/suspended mid-play (HOME, console
 // sleep, the in-game settings screen). See core/pet_time.h.

@@ -2,11 +2,13 @@
 
 #include <cstdint>
 
-// Pet Time: makes time pass for E0C6S46/S48 virtual pets (only those with a
-// known clock layout - core/e0c6200_clock.h) while they aren't running, per
+// Pet Time: makes time pass for virtual pets while they aren't running - the
+// E0C6S46/S48 ones with a known clock layout (core/e0c6200_clock.h) and the
+// BrickEmuPy-core ones marked "clock.pet" (Apollo 2 in 1 - BrickCore.h,
+// core/brick_pet_clock.h) - per
 // g_pet_time_mode (switch_settings.h):
 //   - after a save state loads: the time since that state was saved (its
-//     timestamp - E0C6S46::saved_unix_time()),
+//     timestamp - E0C6S46/BrickCore::saved_unix_time()),
 //   - mid-play: any real-time gap between two emulated frames (HOME menu,
 //     console sleep, the in-game settings screen - anything that stops the
 //     main loop from stepping the CPU).
