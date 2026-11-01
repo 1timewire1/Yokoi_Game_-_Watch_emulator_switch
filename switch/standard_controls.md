@@ -418,7 +418,8 @@ through it on load (up to the Catch-Up Limit; **B** skips the rest), so it
 really aged - and can get hungry, sick or worse, just like a real one left
 alone. **Clock Sync** only sets its clock to now; **Paused** leaves it
 exactly where it was. Venus Diet, Alien Fever, Stack Challenge and Yasashii
-always pick up where they left off.
+always pick up where they left off. Pocket Pikachu, Apollo 2 in 1 and
+Tamagotchi Mini 2017 follow the same setting (see the BrickEmuPy section below).
 
 With Experimental Features on and Time Set Mode on **Automatic**, a fresh start sets the clock for you:
 about 3 seconds in, the game's own clock-set screen opens, the current
@@ -484,7 +485,7 @@ BrickEmuPy, not MAME. Each board's fast-oscillator (OSC3) speed is also
 BrickEmuPy's measured value rather than MAME's 1 MHz placeholder - Alien
 Fever, which runs on it full time, plays ~40% faster than in MAME.
 
-## BrickEmuPy ports: Holtek HT943, Sunplus SPL81408, OKI MSM50XX, GeneralPlus GPL191X, Mitsubishi M37520 (Experimental Games)
+## BrickEmuPy ports: Holtek HT943, Sunplus SPL81408, OKI MSM50XX, GeneralPlus GPL191X, Mitsubishi M37520, Sunplus SPL02 / SPL03 / SPLB20 (Experimental Games)
 
 Games run on cores ported from [BrickEmuPy](https://github.com/azya52/BrickEmuPy)
 (CC0) - `source/BrickCores/`, one C++ class per BrickEmuPy core, each game's
@@ -492,9 +493,10 @@ ROM a `.brk` container carrying its `.brick` config (`CONVERT_ROM/brick_import.p
 All of them are Experimental Games, whatever their group. Each core is
 checked instruction-for-instruction against BrickEmuPy's own Python core
 (`CONVERT_ROM/tmp/ht943/run_compare.py`, `CONVERT_ROM/tmp/spl/run_compare.py`,
-`CONVERT_ROM/tmp/review/compare.py`, `CONVERT_ROM/tmp/m37520/run_compare.py`),
-last against BrickEmuPy as of 2026-10-31. The MSM50XX, GPL191X and M37520
-cores are angel_hp's ports; five GPL191X changes they first made for the
+`CONVERT_ROM/tmp/review/compare.py`, `CONVERT_ROM/tmp/m37520/run_compare.py`,
+`CONVERT_ROM/tmp/spl0x/run_compare.py`), last against BrickEmuPy as of
+2026-11-01. The MSM50XX, GPL191X, M37520, SPL0X and SPLB20 cores are
+angel_hp's ports; five GPL191X changes they first made for the
 D-Power Digivice are now BrickEmuPy's own behaviour for every GPL191X game
 (see `source/BrickCores/GPL191X.h`) - the D-Tector's Step button needs one.
 
@@ -520,22 +522,45 @@ ACL button, where the device has one (holding it holds the chip in reset).
 | D-Power Digivice (Bandai, SPL61X) | Card | | | | X = Step, repeating (10 a second) while held; +/- Reset |
 | D-Tector (Bandai, GPL191X) | B (middle) | | | Sensor | Left/Y = A, Up/Down = B too, Right/B = C; X = Step, repeating; L = Wave |
 | Pocket Pikachu (Nintendo, M37520) | A | Start | Select | | B = B, D-pad = its arrows, X = step sensor ("reflector"), repeating; +/- Reset |
+| Apollo 126 in 1 (B0202, SPL02) / 18 in 1 (B0302, SPL03) | Rotate | Start / pause | On / off | Mute | D-pad = left / right / down; +/- Reset |
+| Apollo 2 in 1 (SPLB20) | Enter | | | | Y = Mode, B = Exit, X = Rev |
+| Tamagotchi Mini 2017 (Bandai, GPL191X) | Center | | | | Left/Y = Left, Up/Down = Center too, Right/B = Right |
 
 Several of these power off by halting the chip; the screen is blank until
 the power/on button wakes them, as on the real thing.
 
-**Clocks.** The Nelsonic Game Watches, Formel 1 and Pocket Pikachu are
-real-time clocks. Their time is written on every load, the way the Game &
-Watch clocks' is (`BrickCore::set_clock()`, cells listed in
-`CONVERT_ROM/brick_games.json`'s `"clock"`), and with Time Set Mode on
-**Automatic** (`switch/source/input/brick_clock_setup.cpp`):
-- the Nelsonic watches are taken off their all-segments boot test screen (a
-  Left press) and set again a second in;
-- Pocket Pikachu, which boots into its own clock-set screen ("AM / とけいSET"),
-  has A pressed until the game reports its clock set (about 7 seconds), then
-  gets the time.
-A game restored from a save state just gets its time synced. The D-Power
-Digivice and the D-Tector have no clock.
+**Clocks.** The Nelsonic Game Watches and Formel 1 are real-time clocks. Their
+time is written on every load, the way the Game & Watch clocks' is
+(`BrickCore::set_clock()`, cells listed in `CONVERT_ROM/brick_games.json`'s
+`"clock"`), and with Time Set Mode on **Automatic**
+(`switch/source/input/brick_clock_setup.cpp`) the watch is also taken off its
+all-segments boot test screen (a Left press) and set again a second in; one
+restored from a save state just gets its time synced. The D-Power Digivice
+and the D-Tector have no clock.
+
+**Pets.** Pocket Pikachu, Apollo 2 in 1 and Tamagotchi Mini 2017
+keep their own time: their clock isn't written on load, only set once by the
+**Automatic** setup, and after that it's Pet Time's (`"pet"` in the same
+`"clock"` entry, see `switch/source/core/pet_time.h` - Experimental Features
+on; **Real Time** fast-forwards through the time away, **Clock Sync** just sets
+the clock, **Paused** leaves it). The automatic setup, per game:
+- Pocket Pikachu boots into its own clock-set screen ("AM / とけいSET"): A is
+  pressed until the game reports its clock set (about 7 seconds), then it gets
+  the time.
+- Apollo 2 in 1: you choose the language and pet as usual; when its set-time
+  screen comes up the real time goes in and Exit is pressed for you. Nothing
+  in RAM marks that screen, so it's recognised by its pixels ("clock.set_screen_lcd"
+  lit, "clock.set_screen_lcd_off" dark - the lights-off screen lights nearly
+  everything, so lit pixels alone aren't enough). With **Automatic** on, that
+  screen is filled in every time it appears; use **Manual** to set it by hand.
+- Tamagotchi Mini 2017 boots stopped at 00:00:00: Center is pressed until it
+  starts (three presses, about 5 seconds), then it gets the time. It's the
+  slowest pet to fast-forward, so a low Catch-Up Limit suits it, and BrickEmuPy
+  flags this dump as "high probability of errors".
+
+On the Apollo 126 in 1 and 18 in 1, BrickEmuPy mixes two tones, noise and a
+speech DAC; Yokoi has one tone and a 1-bit speaker, so effects play as normal
+but the talking voice is crude, and only heard while no tone is playing.
 
 **Pedometers.** The D-Power Digivice, the D-Tector and Pocket Pikachu count
 one step per press of their step sensor, so X repeats it for you while held,

@@ -15,9 +15,9 @@ class BrickCore;
 //   PM flag 0xA2 (1 = PM). Its set-time screen (reached after the language
 //   and pet choices on a first boot; Enter = minute+, Mode = hour+, Exit =
 //   done) is told apart by its fixed pixels - no RAM byte does it - (the
-//   "SET" label etc.; checked over ~70 emulated minutes of play with button
-//   presses, they never all show anywhere else); the clock has never been
-//   set while RAM[0x9B] == 0.
+//   "SET" label etc. all lit, and the pixels that screen never lights all
+//   dark: the lights-off screen lights nearly everything, so the lit ones
+//   alone match it too); the clock has never been set while RAM[0x9B] == 0.
 //   POCKETPIKACHU (Pocket Pikachu, M37520) - brick_games.json's "clock"
 //   entry: one BCD byte each for seconds 0x57, minutes 0x58, hour 0x59
 //   (0-11), PM flag 0x5A bit 0; first boot sits on a set screen while

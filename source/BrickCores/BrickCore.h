@@ -123,6 +123,10 @@ public:
     //     apart). It's reached by the player (language / pet choice first),
     //     so the automatic setup waits for it instead of pressing anything at
     //     boot, then writes the time and presses clock.confirm.
+    //   clock.set_screen_lcd_off=<byte>,<mask>... - and none of these are:
+    //     the pixels that screen never lights, whatever time it shows. Apollo
+    //     2 in 1's lights-off screen lights nearly everything, so the lit test
+    //     alone mistakes it for the set-time screen.
     //   clock.pet=1 - a virtual pet: Pet Time (switch/source/core/pet_time.h)
     //     catches it up on the time it spent not running.
     // False if the game has no clock layout or the core can't write RAM.
@@ -157,6 +161,10 @@ public:
         const std::vector<long> lcd = rom_.options.list("clock.set_screen_lcd");
         for (size_t i = 0; i + 1 < lcd.size(); i += 2) {
             if ((display_byte((int)lcd[i]) & lcd[i + 1]) != lcd[i + 1]) return false;
+        }
+        const std::vector<long> off = rom_.options.list("clock.set_screen_lcd_off");
+        for (size_t i = 0; i + 1 < off.size(); i += 2) {
+            if (display_byte((int)off[i]) & off[i + 1]) return false;
         }
         return true;
     }

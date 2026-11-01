@@ -297,12 +297,13 @@ def clock_lines(clock) -> list:
     (unset while sec/min/hour are all 0), unset = [addr, value] (clock not
     set yet), set_screen = [addr, value] / set_screen_lcd = [byte, mask, ...]
     (the game's set-time screen is up: that RAM value / all those display bits),
+    set_screen_lcd_off = [byte, mask, ...] (and none of these display bits),
     start = the .brick button that leaves a boot test screen, confirm = the
     one that accepts the time, pet = 1 (a virtual pet - Pet Time applies)."""
     if not clock:
         return []
     lines = [f"clock.{k}=" + ",".join(str(int(v)) for v in clock[k])
-             for k in ("sec", "min", "hour", "pm", "unset", "set_screen", "set_screen_lcd") if k in clock]
+             for k in ("sec", "min", "hour", "pm", "unset", "set_screen", "set_screen_lcd", "set_screen_lcd_off") if k in clock]
     for k in ("bcd", "hour_zero", "binary", "sec_scale", "unset_zero", "pet"):
         if clock.get(k):
             lines.append(f"clock.{k}={int(clock[k])}")
@@ -343,6 +344,8 @@ def import_game(brick_dir: Path, game: dict) -> bool:
     info = sb.split(face, d, game["set"], pad=float(game.get("screen_pad", 0.03)))
     sb.face_thumbnail(face, CONSOLE / f"{game['set']}.png")
     key = re.sub(r"[^A-Za-z0-9]+", "_", game["name"]).strip("_")
+    if key[0].isdigit():
+        key = f"_{key}"  # becomes a C++ name in GW_ALL_rgds.h, like generate_games_path.py's
     upsert_games_path(key, games_path_block(key, game, info))
     print(f"{game['brick']} -> {game['set']} ({key})")
     return True

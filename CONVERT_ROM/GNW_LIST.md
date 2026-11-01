@@ -296,6 +296,7 @@ Special editions are not supported in the emulator, refer to the Notes column fo
 | 18  | tamaotch | (BrickEmuPy)        | Unknown Tamagotchi (Tamaotch)                                | 1997.01.01   | E0C6S48 |  |
 | 19  | dpowerdigiviceeu101 | (BrickEmuPy)        | D-Power Digivice (Europe)                                    | 2001.01.01   | SPL61X |  |
 | 20  | dtectordigiviceusv2 | (BrickEmuPy)        | D-Tector (US V2)                                             | 2002.01.01   | GPL191X |  |
+| 21  | tamagotchimini2017 | (BrickEmuPy)        | Tamagotchi Mini (20th Anniversary)                           | 2017.04.08   | GPL191X |  |
 
 ## Epoch
 
@@ -346,6 +347,14 @@ Special editions are not supported in the emulator, refer to the Notes column fo
 | 03  | ga888   | (BrickEmuPy)        | Block Game & Echo Key                                        | 1996.01.01   | HT943 |  |
 | 04  | keychainpinball | (BrickEmuPy)        | Keychain Pin Ball                                            | 1996.01.01   | HT943 |  |
 | 05  | spaceintrudertk150i | (BrickEmuPy)        | Space Intruder                                               | 1998.01.01   | HT943 |  |
+
+## Apollo
+
+| No. | Model   | Filename            | Game Title                                                   | Release Date | CPU | Clone Of |
+|-----|---------|---------------------|--------------------------------------------------------------|--------------|-----|-------|
+| 01  | apollo126in1b0202 | (BrickEmuPy)        | 126 in 1 (B0202)                                             | 1995.01.01   | SPL02 |  |
+| 02  | apollo18in1b0302 | (BrickEmuPy)        | 18 in 1 (B0302)                                              | 1995.01.01   | SPL03 |  |
+| 03  | apollo2in1 | (BrickEmuPy)        | 2 in 1                                                       | 1997.01.01   | SPLB20 |  |
 
 ## Gametech
 
