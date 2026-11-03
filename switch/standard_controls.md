@@ -543,7 +543,7 @@ ACL button, where the device has one (holding it holds the chip in reset).
 | GA-878 (KS56CX2X) | Rotate | On/Pause | Mode | Sound | Left/Right/Down = arrows |
 | Micon KC-32 (KS56CX2X) | Rotate | Start/Pause | On/Off | Speed | L = Sound, Down = Speed too |
 | Brick Game E-33 2 in 1 (EM73000) | Rotate | Start | On/Off | Mute | Left/Right/Down = arrows |
-| Hitorikko Chicken (EM73000) | A | B | C | D | |
+| Hitorikko Chicken (EM73000) | A | | | | B = B, X = C, Y = D |
 | Monster Panic (Epoch, D750X) | Attack | | Mode | Adjust | B = Jump, Left/Right = arrows |
 | Space Rescue (Edla, LC5732) | | Start | Mode | | Left/Right = arrows |
 | Dragon Makyuu no Nazo (Hiro, LC5732) | | Start | Mode | Sound | D-pad = arrows |
@@ -565,8 +565,8 @@ the power/on button wakes them, as on the real thing.
 **Tamagotchi Connection V3.** Its save data lives in an HT24LC08 EEPROM, kept
 inside the save state here rather than BrickEmuPy's `.eeprom` file. The infrared
 link isn't emulated (BrickEmuPy talks to a serial port for it). BrickEmuPy warns
-this ROM dump probably has errors, and its hour digits count past 23 at
-midnight, which a Clock Sync on the next load puts right.
+this ROM dump probably has errors. Its calendar goes in with the clock
+(`"date"` in its `"clock"` entry), or it would stay on January 1.
 
 **Toshiba test screens.** Most of the T7741 games boot to an all-segments
 screen for about 2 minutes (Dr. Slump: 3) and ignore the buttons meanwhile, as
@@ -615,6 +615,13 @@ the clock, **Paused** leaves it). The automatic setup, per game:
   (`"hour_nibble"`).
 - Elfin Twins' clock runs from boot at 12:00:00, with no set-up step, so a fresh
   start simply gets the time written; a restored one is Pet Time's.
+- Hitorikko Chicken comes up on its set-time screen about 7 seconds in, by
+  itself: the real time goes in and C is pressed for you. It runs at 480 kHz
+  rather than its `.brick`'s 500 (`"clock_hz"`), at which its clock gains an
+  hour a day.
+- Tamagotchi Connection V3: Center past the first screen; on its set screen the
+  time and date go in and Center is pressed for you. The birthday and name
+  screens that follow are yours.
 - Tamagotchi Mini 2017 boots stopped at 00:00:00: Center is pressed until it
   starts (three presses, about 5 seconds), then it gets the time. It's the
   slowest pet to fast-forward, so a low Catch-Up Limit suits it, and BrickEmuPy

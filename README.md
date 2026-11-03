@@ -125,4 +125,6 @@ No attribution required :)
 Original Project Code by RetroValou and aminch
 Code inspired by MAME, Game & Watch FPGA projects (Adam Gastineau), and official Sharp documentation.  
 ROMs and artwork are based on MAME ROMs.  
-Thanks to everyone who contributed to MAME, Adam Gastineau, and all those who worked on Game & Watch ROMs and artwork!
+The cores in `source/BrickCores/`, and those games' configurations and face art, come from [BrickEmuPy](https://github.com/azya52/BrickEmuPy) by azya52 (CC0), which also supplied the Tamagotchi and Digital Monster faces and board speeds. Most of those cores were ported to C++ by angel_hp.  
+The McDonald's and Burger Bard games are ported from [LCDonald](https://tvc-16.science/lcdonald.html).  
+Thanks to everyone who contributed to MAME, Adam Gastineau, azya52, and all those who worked on Game & Watch ROMs and artwork!

@@ -49,8 +49,6 @@
     {
       "brick": "HitorikkoChicken",
       "clock_hz": 480000,
-      "screen_pad": 1.0,
-      "screen_pad": 1.0,
       "set": "hitorikkochicken",
       "core": "EM73000",
       "name": "Hitorikko Chicken",

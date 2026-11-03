@@ -385,6 +385,7 @@ Special editions are not supported in the emulator, refer to the Notes column fo
 | No. | Model   | Filename            | Game Title                                                   | Release Date | CPU | Clone Of |
 |-----|---------|---------------------|--------------------------------------------------------------|--------------|-----|-------|
 | 01  | bigcat9in1 | (BrickEmuPy)        | Big Cat 9 in 1                                               | 1998.01.01   | SPLB20 | gyaoppi9in1 |
+| 02  | hitorikkochicken | (BrickEmuPy)        | Hitorikko Chicken                                            | 1997.01.01   | EM73000 |  |
 
 ## Popy
 

@@ -73,6 +73,7 @@ struct Pet {
         if (e0c) {
             for (int line = 0; line < 8; line++) e0c->set_k_line(line, true);
             e0c->set_reset_line(false);
+            e0c->set_sensor_chatter(false);
         } else {
             brick->release_all_buttons();
         }

@@ -67,6 +67,8 @@ GLASS_IDS = ("reflector", "background", "screenFrame")
 DRAWN_IDS = ("body", "display", "overlay")
 # Faces with more than one LCD, by file stem -> arrangement (see the module doc).
 MULTI_SCREEN_FACES = {"AnimestSpaceCobra": "horizontal", "SpicaDArtagnan": "vertical"}
+# Faces whose LCD glass has no id to look for, by file stem -> x, y, w, h.
+SCREEN_AREAS = {"HitorikkoChicken": (684.88, 1066.32, 1706, 1156)}
 
 
 def e0c6200_segment_title(byte: int, bit: int) -> str:
@@ -143,7 +145,7 @@ def _groups(intervals, gap):
     return [g[2] for g in groups]
 
 
-def screen_rects(root, pad: float = 0.03, arrangement: str = "single"):
+def screen_rects(root, pad: float = 0.03, arrangement: str = "single", area=None):
     """The visible LCD(s): returns (arrangement, [(rect, member keys), ...]).
 
     Each screen is its segments' bounding box plus `pad` (fraction of its
@@ -187,6 +189,8 @@ def screen_rects(root, pad: float = 0.03, arrangement: str = "single"):
             inset = float(_by_id(root, glass).get("stroke-width", 0) or 0) / 2
             x0, y0 = max(x0, rx + inset), max(y0, ry + inset)
             x1, y1 = min(x1, rx + rw - inset), min(y1, ry + rh - inset)
+        if area is not None:
+            x0, y0, x1, y1 = area[0], area[1], area[0] + area[2], area[1] + area[3]
         out.append(((x0, y0, x1 - x0, y1 - y0), set(keys)))
     return arrangement, out
 
@@ -262,7 +266,8 @@ def split(face: Path, out_dir: Path, name: str, scheme: str = "brick", height: i
 
     out_dir.mkdir(parents=True, exist_ok=True)
     root = load_face(face)
-    arrangement, screens = screen_rects(root, pad, MULTI_SCREEN_FACES.get(Path(face).stem, "single"))
+    arrangement, screens = screen_rects(root, pad, MULTI_SCREEN_FACES.get(Path(face).stem, "single"),
+                                        SCREEN_AREAS.get(Path(face).stem))
     body = _keep_only(root, ("body",))
     overlay_only = _keep_only(root, ("overlay",)) if _by_id(root, "overlay") is not None else None
 
