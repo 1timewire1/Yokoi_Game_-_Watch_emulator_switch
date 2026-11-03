@@ -20,6 +20,18 @@ enum class Step { Settle, OpenPress, OpenWait, NudgePress, NudgeWait, ConfirmPre
 const E0C6200ClockLayout* g_layout = nullptr;
 Step g_step = Step::Done;
 int g_frames = 0;
+int g_nudges = 0;
+int g_confirms = 0;
+int g_seconds = 0;  // the clock's seconds cells when the confirm was released
+
+// Some sets ignore a confirm depending on when it lands (Tamaotch), so these
+// check that the clock started, and confirm again if it didn't.
+constexpr int kConfirmCheckFrames = 90;
+constexpr int kMaxConfirms = 6;
+
+int clock_seconds(const E0C6S46* cpu, const E0C6200ClockLayout& l) {
+    return cpu->ram_nibble(l.base) | (cpu->ram_nibble(l.base + 1) << 4);
+}
 
 void go(Step s, int frames) {
     g_step = s;
@@ -31,6 +43,8 @@ void go(Step s, int frames) {
 void e0c6200_clock_setup_begin(const std::string& ref, bool enabled) {
     g_step = Step::Done;
     g_layout = enabled ? e0c6200_clock_layout(ref) : nullptr;
+    g_nudges = 0;
+    g_confirms = 0;
     if (g_layout) go(Step::Settle, kSettleFrames);
 }
 
@@ -64,6 +78,11 @@ void e0c6200_clock_setup_advance(E0C6S46* cpu) {
             }
             [[fallthrough]];
         case Step::NudgeWait:
+            if (l.nudge_line >= 0 && ++g_nudges < l.nudge_presses) {
+                cpu->set_k_line(l.nudge_line, false);
+                go(Step::NudgePress, kPressFrames);
+                break;
+            }
             e0c6200_clock_write(cpu, l, time(nullptr));
             cpu->set_k_line(l.confirm_line, false);
             go(Step::ConfirmPress, kPressFrames);
@@ -74,9 +93,18 @@ void e0c6200_clock_setup_advance(E0C6S46* cpu) {
             break;
         case Step::ConfirmPress:
             cpu->set_k_line(l.confirm_line, true);
-            go(Step::ConfirmWait, kConfirmWaitFrames);
+            g_seconds = clock_seconds(cpu, l);
+            go(Step::ConfirmWait, l.nudge_line >= 0 ? kConfirmCheckFrames : kConfirmWaitFrames);
             break;
         case Step::ConfirmWait:
+            if (l.nudge_line >= 0 && clock_seconds(cpu, l) == g_seconds && ++g_confirms < kMaxConfirms) {
+                e0c6200_clock_write(cpu, l, time(nullptr));
+                cpu->set_k_line(l.confirm_line, false);
+                go(Step::ConfirmPress, kPressFrames);
+                break;
+            }
+            g_step = Step::Done;
+            break;
         case Step::Done:
             g_step = Step::Done;
             break;

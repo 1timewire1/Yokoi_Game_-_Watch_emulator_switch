@@ -58,18 +58,18 @@ These are in the pack already (`games_path_rgds.py`, `GNW_LIST.md`), but a few f
 | Chip family | Cores | Configs | Port status |
 |---|---|---|---|
 | Seiko Epson E0C6200 | E0C6200 | 21 | done (E0C6200 core) |
-| Toshiba 4-bit | T6770S, T7741 | 13 | not ported yet |
-| 6502 family (Sunplus) | SPL02, SPL03, SPL81408, SPLB20, SPLB32 | 11 | not ported yet |
-| Holtek 4-bit | HT943, HTG12N0 | 10 | not ported yet |
-| Samsung 4-bit | KS56CX2X, KS57C21308, KS57C2504 | 4 | not ported yet |
-| Oki 4-bit | MSM50XX | 3 | not ported yet |
-| Sanyo LC57 | LC5732 | 2 | not ported yet |
-| 6502 family (Sunplus, runs on GPL191X) | SPL61X | 1 | not ported yet |
-| EMC 4-bit | EM73000 | 1 | not ported yet |
-| NEC uPD750x | D750X | 1 | not ported yet |
-| 6502 family (Sitronix?) | STK55C324 | 1 | not ported yet |
-| 6502 family (Mitsubishi 740) | M37520 | 1 | not ported yet |
-| 6502 family (Generalplus) | GPL191X | 1 | not ported yet |
+| Toshiba 4-bit | T6770S, T7741 | 13 | ported |
+| 6502 family (Sunplus) | SPL02, SPL03, SPL81408, SPLB20, SPLB32 | 11 | ported |
+| Holtek 4-bit | HT943, HTG12N0 | 10 | ported |
+| Samsung 4-bit | KS56CX2X, KS57C21308, KS57C2504 | 4 | ported |
+| Oki 4-bit | MSM50XX | 3 | ported |
+| Sanyo LC57 | LC5732 | 2 | ported |
+| 6502 family (Sunplus, runs on GPL191X) | SPL61X | 1 | ported |
+| EMC 4-bit | EM73000 | 1 | ported |
+| NEC uPD750x | D750X | 1 | ported |
+| 6502 family (Sitronix?) | STK55C324 | 1 | ported |
+| 6502 family (Mitsubishi 740) | M37520 | 1 | ported |
+| 6502 family (Generalplus) | GPL191X | 1 | ported |
 
 ## Per-game details
 

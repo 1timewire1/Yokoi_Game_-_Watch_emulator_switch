@@ -106,6 +106,21 @@ public:
     //     (switch/source/input/brick_clock_setup.h).
     //   clock.bcd=1 - sec/min/hour are one cell each holding a BCD byte
     //     (Pocket Pikachu) instead of one digit per cell.
+    //   clock.hour_nibble=1 - with clock.bcd: the hour is plain binary in the
+    //     cell's low nibble, its high nibble left alone (Super Gyaoppi, Big
+    //     Cat: 0-11 there, the high nibble is the AM/PM flag - clock.pm's mask).
+    //   clock.hour12=1 - a 12-hour clock (1-12) with no AM/PM flag (the
+    //     Toshiba LCD games), for when there's no clock.pm to imply it.
+    //   clock.hour_blank=<n> - two-digit hour: what the tens cell holds
+    //     below 10 (Dr. Slump: 15, a blank digit), default 0.
+    //   clock.nibbles=1 - sec and min are binary, split <low>,<high> over two
+    //     cells (Pocket Puppy).
+    //   clock.sec_fives=1 - sec=<half-seconds 0-9>,<fives 0-11> (Pengo).
+    //   clock.weekday=<addr> - a cell for the day of the week, 0 = Sunday,
+    //     set by the automatic setup only (set_weekday()).
+    //   clock.resync=<seconds> - the clock stands still for that long after
+    //     boot (an all-segments test screen, as on the Popy games), so the
+    //     automatic setup writes the time once more then.
     //   clock.hour_zero=1 - a 12-hour clock that stores 12 o'clock as 0 (0-11).
     //   clock.binary=1 - sec/min/hour are one cell each holding a plain
     //     binary number (Tamagotchi Mini 2017; hour 0-23 without clock.pm).
@@ -113,10 +128,11 @@ public:
     //     2017: half-seconds, 0-119); binary only.
     //   clock.unset_zero=1 - the clock hasn't been set while its sec/min/hour
     //     cells are all 0 (it boots stopped at 00:00:00).
-    //   clock.unset=<addr>,<value> - the clock hasn't been set (first boot)
-    //     while RAM[addr] == value; clock.confirm=<button> sets it from there.
-    //   clock.set_screen=<addr>,<value> - the game's own set-time screen is
-    //     up while RAM[addr] == value, and/or
+    //   clock.unset=<addr>,<value>[,<mask>] - the clock hasn't been set
+    //     (first boot) while RAM[addr] == value, the mask applied first if
+    //     given; clock.confirm=<button> sets it from there.
+    //   clock.set_screen=<addr>,<value>[,<mask>] - the game's own set-time
+    //     screen is up while RAM[addr] == value (same mask), and/or
     //   clock.set_screen_lcd=<byte>,<mask>,<byte>,<mask>... - while every
     //     one of these display bits is lit (Apollo 2 in 1: its "SET" label
     //     and the rest of that screen's fixed pixels - no RAM byte tells it
@@ -131,7 +147,12 @@ public:
     //     catches it up on the time it spent not running.
     // False if the game has no clock layout or the core can't write RAM.
     bool has_clock() const { return rom_.options.has("clock.sec"); }
+    int clock_resync_seconds() const { return (int)rom_.options.num("clock.resync", 0); }
     bool set_clock(int hour, int minute, int second);
+    void set_weekday(int weekday) {
+        const std::vector<long> cell = rom_.options.list("clock.weekday");
+        if (cell.size() == 1) poke_ram((uint32_t)cell[0], (uint8_t)weekday);
+    }
     std::string clock_start_button() const {
         return rom_.options.has("clock.start") ? rom_.options.str("clock.start") : std::string();
     }
@@ -139,8 +160,7 @@ public:
         return rom_.options.has("clock.confirm") ? rom_.options.str("clock.confirm") : std::string();
     }
     bool clock_unset() const {
-        const std::vector<long> u = rom_.options.list("clock.unset");
-        if (u.size() == 2 && peek_ram((uint32_t)u[0]) == u[1]) return true;
+        if (ram_matches(rom_.options.list("clock.unset"))) return true;
         if (rom_.options.num("clock.unset_zero", 0) != 0) {
             for (const char* key : {"clock.sec", "clock.min", "clock.hour"}) {
                 for (long addr : rom_.options.list(key)) {
@@ -157,7 +177,7 @@ public:
     bool clock_set_screen() const {
         if (!has_clock_set_screen()) return false;
         const std::vector<long> u = rom_.options.list("clock.set_screen");
-        if (u.size() == 2 && peek_ram((uint32_t)u[0]) != u[1]) return false;
+        if (u.size() >= 2 && !ram_matches(u)) return false;
         const std::vector<long> lcd = rom_.options.list("clock.set_screen_lcd");
         for (size_t i = 0; i + 1 < lcd.size(); i += 2) {
             if ((display_byte((int)lcd[i]) & lcd[i + 1]) != lcd[i + 1]) return false;
@@ -241,6 +261,13 @@ protected:
     uint32_t clock_hz() const { return rom_.clock_hz; }
 
 private:
+    // A clock.unset / clock.set_screen test: <addr>,<value>[,<mask>].
+    bool ram_matches(const std::vector<long>& t) const {
+        if (t.size() != 2 && t.size() != 3) return false;
+        const int v = peek_ram((uint32_t)t[0]);
+        return v >= 0 && (t.size() == 3 ? (v & t[2]) : v) == t[1];
+    }
+
     void update_sound() override;   // one engine tick - see the class comment
     void execute_curr_opcode() override {}
     bool no_pc_increase(uint8_t) override { return true; }
@@ -255,6 +282,7 @@ private:
 
     struct DirectInput { int port; uint8_t mask; int level; };
     struct MatrixInput { int port; uint8_t mask; int out_port; uint8_t out_mask; };
+    struct Connection { int in_port; uint8_t in_mask; int out_port; uint8_t out_mask; };
     void update_matrix();
 
     BrickRom rom_;
@@ -262,6 +290,7 @@ private:
     std::map<std::string, DirectInput> direct_;
     std::map<std::string, MatrixInput> matrix_;
     std::map<std::string, bool> matrix_pressed_;
+    std::vector<Connection> connections_;
     std::map<int, uint8_t> port_out_;
     bool reset_held_ = false;
 

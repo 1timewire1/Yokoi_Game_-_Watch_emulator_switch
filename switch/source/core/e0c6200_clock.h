@@ -17,7 +17,8 @@ class E0C6S46;
 //             unset (0x20 at power-on). Tamagotchi Gen. 1 and its relatives.
 //   Digimon - hour 1-12, then a PM flag nibble; hour 0 means unset (the
 //             clock stops). Digital Monster, Mothra, Genjintchi.
-//   Tama1Zero - hour as Tama1, but the cells boot as all zeros, so "unset"
+//   Tama1Zero - hour 0-11 in BCD, units then tens, with bit 3 of the tens set for PM
+//             (12 AM/PM read as 0); the cells boot as all zeros, so "unset"
 //             is all six zero with the game's clock-running flag
 //             (set_flag_addr/mask) clear. The unidentified "Tamaotch".
 // The games read these cells as the live time once the clock is running, so
@@ -32,10 +33,12 @@ struct E0C6200ClockLayout {
     int confirm_line;  // K pin of the button that confirms it
     // K pin pressed once on the set screen before the time is written, for
     // games whose confirm is ignored until the time has been edited by hand
-    // (Tamaotch: an hour+ press). -1 = none.
+    // (Tamaotch, which also ignores some confirms depending on their timing,
+    // so the setup checks the clock started and confirms again). -1 = none.
     int nudge_line = -1;
     int set_flag_addr = -1;  // Tama1Zero: RAM nibble whose set_flag_mask bit means "clock running"
     int set_flag_mask = 0;
+    int nudge_presses = 1;
 };
 
 // nullptr if `ref` isn't a pet with a known clock layout.

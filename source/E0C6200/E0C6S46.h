@@ -239,6 +239,7 @@ private:
 
     Model model_;
     int rom_words_;   // 0x1800 (S46) / 0x2000 (S48)
+    bool tamaotch_icons_ = false;  // see get_segments_state()
     int ram_size_;    // 0x280 / 0x300
     int vram_size_;   // 0x50 / 0x66 per bank
     uint8_t p_input_[4] = {0, 0, 0, 0};  // what each P port reads when set to input

@@ -14,9 +14,11 @@
 // ("mask" = pin number), each with a mask-option pull-up and halt wake-up.
 class HT943 : public BrickCore {
 public:
-    HT943() : BrickCore("HT943") {}
+    HT943() : HT943("HT943") {}
 
 protected:
+    explicit HT943(const char* name) : BrickCore(name) {}
+
     void reset() override;
     int execute() override;
     uint8_t display_byte(int index) const override;
@@ -24,11 +26,13 @@ protected:
     void port_input(int port, uint8_t mask, int level) override;
     void serialize(BrickStateIO& io) override;
 
-private:
     enum Port { kPP = 0, kPM = 1, kPS = 2, kPA = 3 };
 
+    // What the rest of the HT4BIT family changes (HTG12N0.h).
+    virtual uint8_t& ram(int rp) { return ram_[(wr_[rp + 1] << 4) | wr_[rp]]; }
+    virtual void io_op(uint8_t op);     // opcodes 0x30, 0x32-0x35
+
     uint8_t rom_byte(uint32_t addr) const { return rom()[addr % rom().size()]; }
-    uint8_t& ram(int rp) { return ram_[(wr_[rp + 1] << 4) | wr_[rp]]; }
     void interrupt(uint32_t location);
     void load_options();
 

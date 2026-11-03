@@ -418,8 +418,9 @@ through it on load (up to the Catch-Up Limit; **B** skips the rest), so it
 really aged - and can get hungry, sick or worse, just like a real one left
 alone. **Clock Sync** only sets its clock to now; **Paused** leaves it
 exactly where it was. Venus Diet, Alien Fever, Stack Challenge and Yasashii
-always pick up where they left off. Pocket Pikachu, Apollo 2 in 1 and
-Tamagotchi Mini 2017 follow the same setting (see the BrickEmuPy section below).
+always pick up where they left off. Pocket Pikachu, Apollo 2 in 1, Prince &
+Princess, Super Gyaoppi, Big Cat, Elfin Twins, Mickey Deluxe, Pocket Puppy,
+Tamagotchi Connection V3 and Tamagotchi Mini 2017 follow the same setting (see the BrickEmuPy section below).
 
 With Experimental Features on and Time Set Mode on **Automatic**, a fresh start sets the clock for you:
 about 3 seconds in, the game's own clock-set screen opens, the current
@@ -427,8 +428,8 @@ time is entered and confirmed (the egg then starts hatching as usual) -
 `switch/source/input/e0c6200_clock_setup.cpp`. Your buttons are ignored for
 those ~5 seconds. It never runs on a pet restored from a save state (it
 checks the clock is still unset first). Supported: every Tamagotchi except
-Yasashii, every Digital Monster. (Tamaotch's set screen only accepts the
-confirm after an hour change, so its sequence adds an A press.) Yasashii Tamagotchi and Venus Diet still
+Yasashii, every Digital Monster. (Tamaotch's set screen needs an edit first and can ignore a confirm depending
+on its timing, so its sequence adds two A presses and repeats C until the clock runs.) Yasashii Tamagotchi and Venus Diet still
 need setting by hand; Alien Fever and Stack Challenge have no clock.
 
 **Tamagotchi / Digital Monster / Venus Diet Monogatari** (`TAMA`, `TAMAG2`,
@@ -485,7 +486,7 @@ BrickEmuPy, not MAME. Each board's fast-oscillator (OSC3) speed is also
 BrickEmuPy's measured value rather than MAME's 1 MHz placeholder - Alien
 Fever, which runs on it full time, plays ~40% faster than in MAME.
 
-## BrickEmuPy ports: Holtek HT943, Sunplus SPL81408, OKI MSM50XX, GeneralPlus GPL191X, Mitsubishi M37520, Sunplus SPL02 / SPL03 / SPLB20 (Experimental Games)
+## BrickEmuPy ports: Holtek HT943, Sunplus SPL81408, OKI MSM50XX, GeneralPlus GPL191X, Mitsubishi M37520, Sunplus SPL02 / SPL03 / SPLB20 / SPLB32, Toshiba T7741 / T6770S, Holtek HTG12N0, Samsung KS56 / KS57, Sanyo LC5732, EMC EM73000, NEC D750X, Sitronix STK55C324 (Experimental Games)
 
 Games run on cores ported from [BrickEmuPy](https://github.com/azya52/BrickEmuPy)
 (CC0) - `source/BrickCores/`, one C++ class per BrickEmuPy core, each game's
@@ -495,7 +496,7 @@ checked instruction-for-instruction against BrickEmuPy's own Python core
 (`CONVERT_ROM/tmp/ht943/run_compare.py`, `CONVERT_ROM/tmp/spl/run_compare.py`,
 `CONVERT_ROM/tmp/review/compare.py`, `CONVERT_ROM/tmp/m37520/run_compare.py`,
 `CONVERT_ROM/tmp/spl0x/run_compare.py`), last against BrickEmuPy as of
-2026-11-01. The MSM50XX, GPL191X, M37520, SPL0X and SPLB20 cores are
+2026-11-01. The MSM50XX, GPL191X, M37520, SPL0X, SPLB20 and T7741/T6770S cores are
 angel_hp's ports; five GPL191X changes they first made for the
 D-Power Digivice are now BrickEmuPy's own behaviour for every GPL191X game
 (see `source/BrickCores/GPL191X.h`) - the D-Tector's Step button needs one.
@@ -524,10 +525,49 @@ ACL button, where the device has one (holding it holds the chip in reset).
 | Pocket Pikachu (Nintendo, M37520) | A | Start | Select | | B = B, D-pad = its arrows, X = step sensor ("reflector"), repeating; +/- Reset |
 | Apollo 126 in 1 (B0202, SPL02) / 18 in 1 (B0302, SPL03) | Rotate | Start / pause | On / off | Mute | D-pad = left / right / down; +/- Reset |
 | Apollo 2 in 1 (SPLB20) | Enter | | | | Y = Mode, B = Exit, X = Rev |
+| Prince & Princess (Apollo, SPLB20) | Enter | | Mode | | B = Mode too, Left/Right = their arrows |
+| Super Gyaoppi 9 in 1 (Nature Land, SPLB20) | B | | | | Left/Y = A, Up/Down = B too, Right/B = C |
+| Big Cat 9 in 1 (SPLB20) | A | | | | B = B, X = C, Y = D |
+| Elfin Twins (Sparkle Crystal, SPLB20) | Enter | | Esc | Clock | B = Esc too, D-pad = its arrows |
 | Tamagotchi Mini 2017 (Bandai, GPL191X) | Center | | | | Left/Y = Left, Up/Down = Center too, Right/B = Right |
+| Mickey Deluxe (VGS, HTG12N0) | Left | | | Ear Right | B = Right, Left/L = Ear Left, Right = Ear Right too; +/- Reset |
+| Pocket Puppy (Cool Tec, KS57C21308) | Circle | | | | B = Square, Left/Right = arrows |
+| Tamagotchi Connection V3 (Bandai, SPLB32) | Center | | | | Left/Y = Left, Up/Down = Center too, Right/B = Right |
+| Kunekunetchyo (Hiro, KS57C2504) | | Start | Select | Sound | D-pad = arrows |
+| GA-878 (KS56CX2X) | Rotate | On/Pause | Mode | Sound | Left/Right/Down = arrows |
+| Micon KC-32 (KS56CX2X) | Rotate | Start/Pause | On/Off | Speed | L = Sound, Down = Speed too |
+| Brick Game E-33 2 in 1 (EM73000) | Rotate | Start | On/Off | Mute | Left/Right/Down = arrows |
+| Monster Panic (Epoch, D750X) | Attack | | Mode | Adjust | B = Jump, Left/Right = arrows |
+| Space Rescue (Edla, LC5732) | | Start | Mode | | Left/Right = arrows |
+| Dragon Makyuu no Nazo (Hiro, LC5732) | | Start | Mode | Sound | D-pad = arrows |
+| Soccer (Mini Classics, STK55C324) | Start | Start | Game | | X = Pause, D-pad = arrows |
+| Space Cobra Professional (Popy, T7741) | Fire | Game | Mode | Alarm | Right/Up = RightUp, Left/Down = LeftDown; +/- ACL |
+| Dr. Slump Arale (Popy, T7741) | Ncha | Game 1 | Game 2 | Alarm | X = Mode, Left/Right = turn; +/- ACL |
+| Dorayaki House, Parman Dai-Pinch (Popy, T7741) | Action | | Mode | | Dorayaki: Up = Jump; +/- ACL |
+| Isoge! Doraemon (Popy, T7741) | Action | | Mode | | +/- ACL |
+| Soccer (Gakken, T7741) | Shoot | | | Time | B = Pass, L = Alarm; +/- ACL |
+| Jumping Boy (Gakken, T7741) | | Game A | Game B | Time | Down/Up = Game A/B too, L = Alarm; +/- ACL |
+| Tom & Jerry Prank (Gakken, T7741) | Game B | | | Time | Left/Y = Game A, Right = Game B too, L = Alarm; +/- ACL |
+| Pengo, Gundam Space Combat 3 in 1, SD Gundam Gaiden II (Bandai) | Start | Start | | | Gundam 3 in 1: R = Time; +/- Reset or ACL |
+| Power Fishing (Bandai, T7741) | Throw | Start | | Rotate CW | L = Rotate CCW, Up/Down too; +/- Reset |
+| D'Artagnan (Spica, T7741) | Jump | Start | | | Up = Jump too |
 
 Several of these power off by halting the chip; the screen is blank until
 the power/on button wakes them, as on the real thing.
+
+**Tamagotchi Connection V3.** Its save data lives in an HT24LC08 EEPROM, kept
+inside the save state here rather than BrickEmuPy's `.eeprom` file. The infrared
+link isn't emulated (BrickEmuPy talks to a serial port for it). BrickEmuPy warns
+this ROM dump probably has errors, and its hour digits count past 23 at
+midnight, which a Clock Sync on the next load puts right.
+
+**Toshiba test screens.** Most of the T7741 games boot to an all-segments
+screen for about 2 minutes (Dr. Slump: 3) and ignore the buttons meanwhile, as
+in BrickEmuPy; the game's demo follows. Space Cobra, Soccer and Tom & Jerry's
+clock stands still until then, and Dr. Slump's seconds restart, so **Automatic**
+writes the time again at that point (`"resync"`). Jumping Boy's and Pengo's
+clocks wait for a first Time / Start press, which **Automatic** makes for you;
+their shown time catches up at the next minute.
 
 **Clocks.** The Nelsonic Game Watches and Formel 1 are real-time clocks. Their
 time is written on every load, the way the Game & Watch clocks' is
@@ -538,8 +578,9 @@ all-segments boot test screen (a Left press) and set again a second in; one
 restored from a save state just gets its time synced. The D-Power Digivice
 and the D-Tector have no clock.
 
-**Pets.** Pocket Pikachu, Apollo 2 in 1 and Tamagotchi Mini 2017
-keep their own time: their clock isn't written on load, only set once by the
+**Pets.** Pocket Pikachu, Apollo 2 in 1, Prince & Princess, Super Gyaoppi,
+Big Cat, Elfin Twins, Mickey Deluxe, Pocket Puppy, Tamagotchi Connection V3 and
+Tamagotchi Mini 2017 keep their own time: their clock isn't written on load, only set once by the
 **Automatic** setup, and after that it's Pet Time's (`"pet"` in the same
 `"clock"` entry, see `switch/source/core/pet_time.h` - Experimental Features
 on; **Real Time** fast-forwards through the time away, **Clock Sync** just sets
@@ -553,6 +594,18 @@ the clock, **Paused** leaves it). The automatic setup, per game:
   lit, "clock.set_screen_lcd_off" dark - the lights-off screen lights nearly
   everything, so lit pixels alone aren't enough). With **Automatic** on, that
   screen is filled in every time it appears; use **Manual** to set it by hand.
+- Prince & Princess: Enter past the title as usual; when its set-time screen
+  comes up (data RAM `$105E` bit 0) the real time goes in and Enter is pressed
+  for you. As on Apollo 2 in 1, with **Automatic** on that screen is filled in
+  every time it appears. The game zeroes the seconds on Enter, so the time is
+  written once more afterwards.
+- Super Gyaoppi and Big Cat: pick a pet (the game's B button accepts), and
+  press its B again for the clock; on its set screen (`$90 & 0x0F == 0x0F`) the time goes in and
+  C is pressed for you, through the alarm screen that follows it. Their hour
+  is a plain 0-11 in the low nibble, with AM/PM in the high one
+  (`"hour_nibble"`).
+- Elfin Twins' clock runs from boot at 12:00:00, with no set-up step, so a fresh
+  start simply gets the time written; a restored one is Pet Time's.
 - Tamagotchi Mini 2017 boots stopped at 00:00:00: Center is pressed until it
   starts (three presses, about 5 seconds), then it gets the time. It's the
   slowest pet to fast-forward, so a low Catch-Up Limit suits it, and BrickEmuPy

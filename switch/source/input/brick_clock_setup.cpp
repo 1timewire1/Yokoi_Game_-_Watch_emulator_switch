@@ -19,7 +19,7 @@ constexpr int kMaxSetScreenPresses = 5;
 enum class Step {
     Settle, Press, StartWait, ConfirmPress, ConfirmWait,
     Watch, SetScreenSettle, SetScreenPress, SetScreenWait,
-    Done
+    Resync, Done
 };
 
 Step g_step = Step::Done;
@@ -35,12 +35,26 @@ void go(Step s, int frames) {
 void write_now(BrickCore* core) {
     const time_t now = time(nullptr);
     const tm* t = localtime(&now);
-    if (t) core->set_clock(t->tm_hour, t->tm_min, t->tm_sec);
+    if (t) {
+        core->set_clock(t->tm_hour, t->tm_min, t->tm_sec);
+        core->set_weekday(t->tm_wday);
+    }
 }
 
 // No write before the press: Pocket Pikachu's intro/set screen goes wrong if
 // its time cells change under it. It confirms its own default time; the
 // real one goes in once the game reports the clock set.
+// The time is in. A fresh boot whose clock stands still for a while gets it
+// again once it runs ("clock.resync"); a restored game is already past that.
+void finish(BrickCore* core) {
+    const int seconds = core->clock_resync_seconds();
+    if (seconds > 0 && core->saved_unix_time() == 0) {
+        go(Step::Resync, seconds * 60);
+    } else {
+        g_step = Step::Done;
+    }
+}
+
 void press_confirm(BrickCore* core) {
     core->set_button(g_button, true);
     g_presses++;
@@ -70,7 +84,7 @@ bool brick_clock_setup_active() {
 }
 
 bool brick_clock_setup_owns_input() {
-    return g_step != Step::Done && g_step != Step::Watch;
+    return g_step != Step::Done && g_step != Step::Watch && g_step != Step::Resync;
 }
 
 void brick_clock_setup_advance(BrickCore* core) {
@@ -107,9 +121,11 @@ void brick_clock_setup_advance(BrickCore* core) {
                 press_confirm(core);
             } else {
                 // Already running (a save state): sync it - except a pet,
-                // whose time away is Pet Time's (core/pet_time.h).
-                if (!core->is_pet()) write_now(core);
-                g_step = Step::Done;
+                // whose time away is Pet Time's (core/pet_time.h). A pet
+                // with no state loaded is a fresh start whose clock simply
+                // runs from boot, with no "unset" flag (Elfin Twins).
+                if (!core->is_pet() || core->saved_unix_time() == 0) write_now(core);
+                finish(core);
             }
             break;
         case Step::Press:
@@ -128,7 +144,7 @@ void brick_clock_setup_advance(BrickCore* core) {
                 press_confirm(core);
             } else {
                 write_now(core);
-                g_step = Step::Done;
+                finish(core);
             }
             break;
         case Step::SetScreenSettle:
@@ -141,18 +157,23 @@ void brick_clock_setup_advance(BrickCore* core) {
             break;
         case Step::SetScreenWait:
             if (!core->clock_set_screen()) {
-                g_step = Step::Watch;    // accepted - keep watching for the next time
+                // Accepted - some games zero the seconds on confirm (Prince
+                // & Princess). Keep watching for the next time.
+                write_now(core);
+                g_step = Step::Watch;
             } else if (g_presses < kMaxSetScreenPresses) {
                 fill_set_screen(core);
             } else {
                 g_step = Step::Done;     // the screen won't take it - leave it to the player
             }
             break;
+        case Step::Resync:
         case Step::StartWait:
         case Step::Done:
         case Step::Watch:
             write_now(core);
-            g_step = Step::Done;
+            if (g_step == Step::StartWait) finish(core);
+            else g_step = Step::Done;
             break;
     }
 }

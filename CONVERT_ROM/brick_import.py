@@ -48,7 +48,8 @@ GAMES_PATH = HERE / "games_path_rgds.py"
 
 # BrickEmuPy core names with a C++ port (source/BrickCores/BrickCore.cpp's
 # kCores). Kept in sync by hand.
-PORTED_CORES = {"GPL191X", "HT943", "M37520", "MSM50XX", "SPL02", "SPL03", "SPL61X", "SPLB20", "SPL81408"}
+PORTED_CORES = {"D750X", "EM73000", "GPL191X", "HT943", "HTG12N0", "KS56CX2X", "KS57C21308", "KS57C2504", "LC5732", "M37520", "MSM50XX", "SPL02", "SPL03", "SPL61X", "SPLB20", "SPLB32", "SPL81408",
+                "STK55C324", "T6770S", "T7741"}
 
 
 def load_brick(path: Path) -> dict:
@@ -57,6 +58,13 @@ def load_brick(path: Path) -> dict:
 
 
 # --- options / container ----------------------------------------------------
+
+def asset_path(brick_dir: Path, value: str) -> Path:
+    """A path from a .brick. A few point at folders the repo doesn't have
+    (GundamGaidenII.brick: assets/test/) - those files sit in assets/."""
+    path = brick_dir / value
+    return path if path.exists() else brick_dir / "assets" / Path(value).name
+
 
 def flatten_options(mask: dict, brick_dir: Path):
     """mask_options -> (["key=value", ...], {blob name: bytes}). Paths to
@@ -72,6 +80,10 @@ def flatten_options(mask: dict, brick_dir: Path):
         elif isinstance(v, (list, tuple)):
             # Whole numbers as ints (as before); fractions kept as written -
             # MSM50XX's sound_freq_div_tbl has dividers like 5.5.
+            if v and isinstance(v[0], (list, tuple)):  # a table: "key.<row>=..."
+                for i, row in enumerate(v):
+                    walk(f"{prefix}.{i}", row)
+                return
             lines.append(f"{prefix}=" + ",".join(
                 str(int(x)) if float(x).is_integer() else repr(float(x)) for x in v))
         elif isinstance(v, bool):
@@ -83,9 +95,9 @@ def flatten_options(mask: dict, brick_dir: Path):
 
     for key, value in mask.items():
         if key == "rom_path":
-            blobs["rom"] = (brick_dir / value).read_bytes()
+            blobs["rom"] = asset_path(brick_dir, value).read_bytes()
         elif key.endswith("_path") and isinstance(value, str):
-            blobs[key[:-5]] = (brick_dir / value).read_bytes()
+            blobs[key[:-5]] = asset_path(brick_dir, value).read_bytes()
         else:
             walk(key, value)
     return lines, blobs
@@ -180,6 +192,10 @@ def input_lines(brick: dict, overrides=None):
     for name, m in matrix.items():
         if name in keys:
             lines.append(f"input.{name}=matrix;{m['port']};{m['mask']};{m['level']['port']};{m['level']['mask']};{keys[name]}")
+    c = p.get("direct_connection")
+    if c:  # one output pin wired to an input pin (SD Gundam Gaiden II)
+        i, o = c["input"], c["output"]
+        lines.append(f"connect.0={i['port']};{i['mask']};{o['port']};{o['mask']}")
     return lines, keys
 
 
@@ -292,10 +308,14 @@ def clock_lines(clock) -> list:
     BrickCore (source/BrickCores/BrickCore.h has the full list): sec/min =
     [units, tens], hour = [units, tens] or [one binary cell], pm = [addr,
     mask, 1 if set means PM else 0], bcd = 1 (one BCD byte per field),
-    hour_zero = 1 (12 o'clock stored as 0), binary = 1 (one plain binary byte
+    hour_zero = 1 (12 o'clock stored as 0), hour_nibble = 1 (with bcd: hour in
+    the cell's low nibble, high nibble kept), hour12 = 1 (1-12, no AM/PM flag),
+    hour_blank = n (tens cell below 10 o'clock), sec_fives = 1 (sec = [half
+    seconds 0-9, fives 0-11]), weekday = cell (0 = Sunday), resync = n (write again n s after a fresh boot,
+    the clock stands still until then), binary = 1 (one plain binary byte
     per field), sec_scale = n (seconds cell counts 1/n s), unset_zero = 1
-    (unset while sec/min/hour are all 0), unset = [addr, value] (clock not
-    set yet), set_screen = [addr, value] / set_screen_lcd = [byte, mask, ...]
+    (unset while sec/min/hour are all 0), unset = [addr, value[, mask]] (clock
+    not set yet), set_screen = [addr, value[, mask]] / set_screen_lcd = [byte, mask, ...]
     (the game's set-time screen is up: that RAM value / all those display bits),
     set_screen_lcd_off = [byte, mask, ...] (and none of these display bits),
     start = the .brick button that leaves a boot test screen, confirm = the
@@ -304,7 +324,8 @@ def clock_lines(clock) -> list:
         return []
     lines = [f"clock.{k}=" + ",".join(str(int(v)) for v in clock[k])
              for k in ("sec", "min", "hour", "pm", "unset", "set_screen", "set_screen_lcd", "set_screen_lcd_off") if k in clock]
-    for k in ("bcd", "hour_zero", "binary", "sec_scale", "unset_zero", "pet"):
+    for k in ("bcd", "hour_nibble", "hour_zero", "hour12", "hour_blank", "sec_fives", "resync", "weekday", "nibbles",
+              "binary", "sec_scale", "unset_zero", "pet"):
         if clock.get(k):
             lines.append(f"clock.{k}={int(clock[k])}")
     for k in ("start", "confirm"):
@@ -335,7 +356,7 @@ def import_game(brick_dir: Path, game: dict) -> bool:
     options += clock_lines(game.get("clock"))
     inputs, _ = input_lines(cfg, game.get("keys"))
     write_container(d / f"{game['set']}.brk", cfg["core"], cfg["clock"], options + inputs, blobs)
-    face = brick_dir / cfg["face_path"]
+    face = asset_path(brick_dir, cfg["face_path"])
     # "screen_pad" (brick_games.json, optional): margin around the segments as
     # a fraction, clipped to the LCD glass - a large value (1.0) crops to the
     # whole glass, for faces whose dot matrix sits in a bigger window (D-Power

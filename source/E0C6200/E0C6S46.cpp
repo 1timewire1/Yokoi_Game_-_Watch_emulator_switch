@@ -73,6 +73,7 @@ void E0C6S46::configure_for_ref(const std::string& ref) {
     for (const Osc3& b : kOsc3Boards) {
         if (ref == b.ref) s_.osc3 = b.hz;
     }
+    tamaotch_icons_ = ref == "TAMAOTCH";
     // Digital Monster's P20 is the (unemulated) link port, read high when idle.
     std::memset(p_input_, 0, sizeof(p_input_));
     if (ref.rfind("DIGIMON", 0) == 0) p_input_[2] = 0xf;
@@ -80,6 +81,19 @@ void E0C6S46::configure_for_ref(const std::string& ref) {
 
 bool E0C6S46::get_segments_state(uint8_t col, uint8_t line, uint8_t word) {
     if (col >= 16 || line >= 51 || word != 0) return false;
+    if (tamaotch_icons_) {
+        // TamaOtch drives its 8 menu icons from other pins than the Gen. 1
+        // layout its art comes from: (0,8) (0,17) (0,18) (0,19) along the top
+        // and (15,39) (15,38) (15,37) (15,28) along the bottom, left to right.
+        struct Icon { uint8_t col, line, pin_col, pin_line; };
+        static const Icon kIcons[] = {
+            {1, 8, 0, 17}, {2, 8, 0, 18}, {3, 8, 0, 19},
+            {12, 28, 15, 39}, {13, 28, 15, 38}, {14, 28, 15, 37},
+        };
+        for (const Icon& i : kIcons) {
+            if (col == i.col && line == i.line) return s_.lcd[i.pin_col][i.pin_line] != 0;
+        }
+    }
     return s_.lcd[col][line] != 0;
 }
 

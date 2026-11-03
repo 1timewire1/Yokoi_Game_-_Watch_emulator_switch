@@ -28,16 +28,17 @@ protected:
     int port_id(const std::string& name) const override;
     void port_input(int port, uint8_t mask, int level) override;
     void serialize(BrickStateIO& io) override;
-    // CPU RAM (0x80-0xFF) and data RAM (0x200-0x7FF), by CPU address - for
-    // the clock writes / checks (BrickCore::set_clock(), "clock.*" options).
+    // CPU RAM (0x80-0xFF) and data RAM (0x200-0x7FF and its mirrors, as in
+    // read_mem()), by CPU address - for the clock writes / checks
+    // (BrickCore::set_clock(), "clock.*" options).
     bool poke_ram(uint32_t addr, uint8_t v) override {
         if (addr >= 0x80 && addr < 0x100) { ram_[addr - 0x80] = v; return true; }
-        if (addr >= 0x200 && addr < 0x800) { data_[addr] = v; return true; }
+        if (addr >= 0x200 && (addr & 0x8FFF) < 0x800) { data_[addr & 0xFFF] = v; return true; }
         return false;
     }
     int peek_ram(uint32_t addr) const override {
         if (addr >= 0x80 && addr < 0x100) return ram_[addr - 0x80];
-        if (addr >= 0x200 && addr < 0x800) return data_[addr];
+        if (addr >= 0x200 && (addr & 0x8FFF) < 0x800) return data_[addr & 0xFFF];
         return -1;
     }
 

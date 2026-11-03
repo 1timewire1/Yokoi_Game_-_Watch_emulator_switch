@@ -26,6 +26,24 @@
         "date": "Medium",
         "model": "Low",
         "clone_of": "Medium"
+      },
+      "clock": {
+        "sec": [
+          32,
+          47
+        ],
+        "min": [
+          46,
+          45
+        ],
+        "hour": [
+          44
+        ],
+        "pm": [
+          43,
+          8,
+          1
+        ]
       }
     },
     {
@@ -381,6 +399,31 @@
         "date": "Low",
         "model": "Unknown",
         "clone_of": "Medium"
+      },
+      "clock": {
+        "sec": [
+          55,
+          56
+        ],
+        "min": [
+          57,
+          58
+        ],
+        "hour": [
+          59,
+          60
+        ],
+        "unset": [
+          126,
+          11
+        ],
+        "set_screen": [
+          126,
+          11
+        ],
+        "confirm": "btnLeft",
+        "weekday": 63,
+        "pet": 1
       }
     },
     {
@@ -402,6 +445,26 @@
         "date": "Low",
         "model": "High",
         "clone_of": "High"
+      },
+      "clock": {
+        "sec": [
+          26,
+          27
+        ],
+        "min": [
+          28,
+          29
+        ],
+        "hour": [
+          30,
+          31
+        ],
+        "pm": [
+          31,
+          8,
+          1
+        ],
+        "hour_zero": 1
       }
     },
     {
@@ -453,6 +516,27 @@
         "date": "Low",
         "model": "Unknown",
         "clone_of": "Medium"
+      },
+      "clock": {
+        "sec": [
+          20,
+          21
+        ],
+        "min": [
+          18,
+          19
+        ],
+        "hour": [
+          17
+        ],
+        "nibbles": 1,
+        "pm": [
+          16,
+          2,
+          1
+        ],
+        "hour_zero": 1,
+        "pet": 1
       }
     },
     {
@@ -483,7 +567,7 @@
       "brick": "EdlaSpaceRescue",
       "set": "edlaspacerescue",
       "core": "LC5732",
-      "name": "Space Rescue",
+      "name": "Space Rescue (Edla)",
       "readme": "Edla Game Space Rescue, 1989? (Sanyo LC5732)",
       "manufacturer": "Edla",
       "date": "1989-01-01",
@@ -501,6 +585,20 @@
         "date": "Low",
         "model": "Unknown",
         "clone_of": "Medium"
+      },
+      "clock": {
+        "sec": [
+          1,
+          2
+        ],
+        "min": [
+          3,
+          4
+        ],
+        "hour": [
+          5
+        ],
+        "hour12": 1
       }
     },
     {
@@ -1112,6 +1210,30 @@
         "date": "Low",
         "model": "Unknown",
         "clone_of": "Medium"
+      },
+      "clock": {
+        "sec": [
+          150
+        ],
+        "min": [
+          149
+        ],
+        "hour": [
+          148
+        ],
+        "binary": 1,
+        "sec_scale": 2,
+        "unset": [
+          180,
+          0
+        ],
+        "set_screen": [
+          4190,
+          1,
+          1
+        ],
+        "confirm": "btnEnter",
+        "pet": 1
       }
     },
     {
@@ -1140,6 +1262,30 @@
         "date": "Low",
         "model": "Unknown",
         "clone_of": "Low"
+      },
+      "clock": {
+        "sec": [
+          150
+        ],
+        "min": [
+          149
+        ],
+        "hour": [
+          148
+        ],
+        "binary": 1,
+        "sec_scale": 2,
+        "unset": [
+          180,
+          0
+        ],
+        "set_screen": [
+          4190,
+          1,
+          1
+        ],
+        "confirm": "btnEnter",
+        "pet": 1
       }
     },
     {
@@ -1164,6 +1310,37 @@
         "date": "Low",
         "model": "Unknown",
         "clone_of": "High"
+      },
+      "clock": {
+        "sec": [
+          139
+        ],
+        "min": [
+          138
+        ],
+        "hour": [
+          137
+        ],
+        "pm": [
+          137,
+          240,
+          1
+        ],
+        "bcd": 1,
+        "hour_nibble": 1,
+        "hour_zero": 1,
+        "unset": [
+          144,
+          12,
+          12
+        ],
+        "set_screen": [
+          144,
+          15,
+          15
+        ],
+        "confirm": "btnC",
+        "pet": 1
       }
     },
     {
@@ -1191,6 +1368,20 @@
         "date": "Low",
         "model": "High",
         "clone_of": "High"
+      },
+      "clock": {
+        "sec": [
+          130
+        ],
+        "min": [
+          132
+        ],
+        "hour": [
+          131
+        ],
+        "binary": 1,
+        "sec_scale": 2,
+        "pet": 1
       }
     },
     {
@@ -1223,6 +1414,37 @@
         "date": "Low",
         "model": "Unknown",
         "clone_of": "Medium"
+      },
+      "clock": {
+        "sec": [
+          139
+        ],
+        "min": [
+          138
+        ],
+        "hour": [
+          137
+        ],
+        "pm": [
+          137,
+          240,
+          1
+        ],
+        "bcd": 1,
+        "hour_nibble": 1,
+        "hour_zero": 1,
+        "unset": [
+          144,
+          12,
+          12
+        ],
+        "set_screen": [
+          144,
+          15,
+          15
+        ],
+        "confirm": "btnC",
+        "pet": 1
       }
     },
     {
@@ -1250,6 +1472,32 @@
         "date": "Medium",
         "model": "Low",
         "clone_of": "High"
+      },
+      "clock": {
+        "sec": [
+          65,
+          66
+        ],
+        "min": [
+          67,
+          68
+        ],
+        "hour": [
+          69
+        ],
+        "pm": [
+          70,
+          1,
+          1
+        ],
+        "unset_zero": 1,
+        "set_screen": [
+          63,
+          4,
+          4
+        ],
+        "confirm": "btnCenter",
+        "pet": 1
       }
     },
     {
@@ -1276,13 +1524,39 @@
         "date": "Medium",
         "model": "Medium",
         "clone_of": "High"
+      },
+      "clock": {
+        "sec": [
+          65,
+          66
+        ],
+        "min": [
+          67,
+          68
+        ],
+        "hour": [
+          69
+        ],
+        "pm": [
+          70,
+          1,
+          1
+        ],
+        "unset_zero": 1,
+        "set_screen": [
+          63,
+          4,
+          4
+        ],
+        "confirm": "btnCenter",
+        "pet": 1
       }
     },
     {
       "brick": "MiniClassicsSoccer",
       "set": "miniclassicssoccer",
       "core": "STK55C324",
-      "name": "Soccer",
+      "name": "Soccer (Mini Classics)",
       "readme": "Mini Classics Soccer, 1998/2004 (STK55C324)",
       "manufacturer": "Stadlbauer",
       "date": "2004-01-01",
@@ -1307,6 +1581,24 @@
         "model": "Unknown",
         "clone_of": "Medium",
         "keys": "Medium"
+      },
+      "clock": {
+        "sec": [
+          18
+        ],
+        "min": [
+          17
+        ],
+        "hour": [
+          16
+        ],
+        "bcd": 1,
+        "hour12": 1,
+        "unset": [
+          15,
+          0
+        ],
+        "confirm": "btnStart"
       }
     },
     {
@@ -1364,6 +1656,21 @@
         "date": "High",
         "model": "High",
         "clone_of": "High"
+      },
+      "clock": {
+        "sec": [
+          82,
+          83
+        ],
+        "min": [
+          84,
+          85
+        ],
+        "hour": [
+          86
+        ],
+        "hour12": 1,
+        "resync": 125
       }
     },
     {
@@ -1416,6 +1723,23 @@
         "date": "High",
         "model": "High",
         "clone_of": "High"
+      },
+      "clock": {
+        "sec": [
+          32,
+          33
+        ],
+        "min": [
+          48,
+          49
+        ],
+        "hour": [
+          50,
+          51
+        ],
+        "hour12": 1,
+        "hour_blank": 15,
+        "resync": 185
       }
     },
     {
@@ -1445,6 +1769,21 @@
         "date": "Low",
         "model": "Unknown",
         "clone_of": "High"
+      },
+      "clock": {
+        "sec": [
+          66,
+          67
+        ],
+        "min": [
+          68,
+          69
+        ],
+        "hour": [
+          70
+        ],
+        "hour12": 1,
+        "resync": 125
       }
     },
     {
@@ -1527,6 +1866,26 @@
         "date": "Medium",
         "model": "Unknown",
         "clone_of": "High"
+      },
+      "clock": {
+        "sec": [
+          36,
+          37
+        ],
+        "min": [
+          44,
+          45
+        ],
+        "hour": [
+          46,
+          47
+        ],
+        "hour12": 1,
+        "unset": [
+          39,
+          15
+        ],
+        "confirm": "btnTime"
       }
     },
     {
@@ -1579,6 +1938,26 @@
         "date": "Medium",
         "model": "High",
         "clone_of": "High"
+      },
+      "clock": {
+        "sec": [
+          64,
+          65
+        ],
+        "min": [
+          66,
+          67
+        ],
+        "hour": [
+          68
+        ],
+        "hour12": 1,
+        "sec_fives": 1,
+        "unset": [
+          15,
+          15
+        ],
+        "confirm": "btnStart"
       }
     },
     {
@@ -1670,6 +2049,21 @@
         "date": "High",
         "model": "Medium",
         "clone_of": "High"
+      },
+      "clock": {
+        "sec": [
+          65,
+          66
+        ],
+        "min": [
+          67,
+          68
+        ],
+        "hour": [
+          69
+        ],
+        "hour12": 1,
+        "resync": 125
       }
     }
   ],

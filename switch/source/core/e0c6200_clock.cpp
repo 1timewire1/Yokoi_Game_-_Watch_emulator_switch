@@ -17,9 +17,9 @@ constexpr E0C6200ClockLayout kLayouts[] = {
     {"DIGIMONV3", Kind::Digimon, 0x01A, 1, 0}, {"DIGIMONES", Kind::Digimon, 0x01A, 1, 0},
     {"DIGIMONV4", Kind::Digimon, 0x01A, 1, 0}, {"TAMAMOT", Kind::Digimon, 0x01A, 1, 0},
     {"TAMAGENJIN", Kind::Digimon, 0x01A, 1, 0}, {"DIGIMONJA", Kind::Digimon, 0x01A, 1, 0},
-    // Unidentified S48 Tamagotchi: Gen. 1-style cells at 0x102, confirm only
-    // takes after an A (hour+) press; 0x101 bit 3 is set while the clock runs.
-    {"TAMAOTCH", Kind::Tama1Zero, 0x102, 1, 0, 2, 0x101, 0x8},
+    // Unidentified S48 Tamagotchi: Gen. 1-style cells at 0x102, its confirm is
+    // only taken at some moments; 0x101 bit 3 is set while the clock runs.
+    {"TAMAOTCH", Kind::Tama1Zero, 0x102, 1, 0, 2, 0x101, 0x8, 2},
 };
 
 }  // namespace
@@ -51,7 +51,11 @@ void e0c6200_clock_write(E0C6S46* cpu, const E0C6200ClockLayout& l, time_t when)
     const int h = t->tm_hour, m = t->tm_min, s = t->tm_sec;
     const uint8_t digits[4] = {(uint8_t)(s % 10), (uint8_t)(s / 10), (uint8_t)(m % 10), (uint8_t)(m / 10)};
     for (int i = 0; i < 4; i++) cpu->set_ram_nibble(l.base + i, digits[i]);
-    if (l.kind == Kind::Tama1 || l.kind == Kind::Tama1Zero) {
+    if (l.kind == Kind::Tama1Zero) {  // 12-hour BCD, 12 AM/PM as 0; tens bit 3 = PM
+        const int h12 = h % 12;
+        cpu->set_ram_nibble(l.base + 4, h12 % 10);
+        cpu->set_ram_nibble(l.base + 5, (h12 / 10) | (h >= 12 ? 8 : 0));
+    } else if (l.kind == Kind::Tama1) {
         cpu->set_ram_nibble(l.base + 4, h & 0xf);
         cpu->set_ram_nibble(l.base + 5, h >> 4);
     } else {

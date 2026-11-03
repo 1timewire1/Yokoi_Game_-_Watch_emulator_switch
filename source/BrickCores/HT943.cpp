@@ -142,6 +142,17 @@ void HT943::sound_clock(int cycles) {
 
 // --- CPU -----------------------------------------------------------------------
 
+void HT943::io_op(uint8_t op) {
+    switch (op) {
+        case 0x30: pa_ = acc_; port_output(kPA, pa_); break;    // OUT PA,A
+        case 0x32: acc_ = pins_[kPM]; break;                    // IN A,PM
+        case 0x33: acc_ = pins_[kPS]; break;                    // IN A,PS
+        case 0x34: acc_ = pins_[kPP]; break;                    // IN A,PP
+        default: break;                                         // 0x35: NOP
+    }
+    pc_++;
+}
+
 int HT943::execute() {
     if (halt_) return 8;
 
@@ -208,11 +219,10 @@ int HT943::execute() {
         case 0x2D: ei_ = 0; pc_++; break;
         case 0x2E: pc_ = (pc_ & 0xF000) | (stack_ & 0xFFF); stack_ = 0; break;                      // RET
         case 0x2F: pc_ = (pc_ & 0xF000) | (stack_ & 0xFFF); cf_ = (stack_ >> 12) & 1; stack_ = 0; break; // RETI
-        case 0x30: pa_ = acc_; port_output(kPA, pa_); pc_++; break;  // OUT PA,A (HT943)
+        case 0x30: case 0x32: case 0x33: case 0x34: case 0x35:
+            io_op(op);
+            break;
         case 0x31: acc_ = (acc_ + 1) & 0xF; pc_++; break;
-        case 0x32: acc_ = pins_[kPM]; pc_++; break;                 // IN A,PM (HT943)
-        case 0x33: acc_ = pins_[kPS]; pc_++; break;                 // IN A,PS (HT943)
-        case 0x34: acc_ = pins_[kPP]; pc_++; break;                 // IN A,PP (HT943)
         case 0x36:                                                  // DAA
             if (acc_ > 9 || cf_) {
                 acc_ = (acc_ + 6) & 0xF;
@@ -306,7 +316,7 @@ int HT943::execute() {
                 pc_ = (pc_ & 0xF000) | ((uint32_t)(op & 0xF) << 8) | imm;
                 cycles = 8;
             } else {
-                pc_++;                                      // 0x35, 0x3E: NOP
+                pc_++;                                      // 0x3E: NOP
             }
             break;
     }

@@ -297,6 +297,12 @@ Special editions are not supported in the emulator, refer to the Notes column fo
 | 19  | dpowerdigiviceeu101 | (BrickEmuPy)        | D-Power Digivice (Europe)                                    | 2001.01.01   | SPL61X |  |
 | 20  | dtectordigiviceusv2 | (BrickEmuPy)        | D-Tector (US V2)                                             | 2002.01.01   | GPL191X |  |
 | 21  | tamagotchimini2017 | (BrickEmuPy)        | Tamagotchi Mini (20th Anniversary)                           | 2017.04.08   | GPL191X |  |
+| 22  | gundam3in1 | (BrickEmuPy)        | Gundam Space Combat 3 in 1                                   | 1981.10.01   | T6770S |  |
+| 23  | pengo   | (BrickEmuPy)        | Pengo                                                        | 1983.01.01   | T7741 |  |
+| 24  | powerfishing | (BrickEmuPy)        | Power Fishing                                                | 1984.01.01   | T7741 |  |
+| 25  | gundamgaidenii | (BrickEmuPy)        | SD Gundam Gaiden II: Taose! Psycho Golem                     | 1990.01.01   | T7741 |  |
+| 26  | tamagotchiv3us | (BrickEmuPy)        | Tamagotchi Connection V3 (US)                                | 2006.02.01   | SPLB32 |  |
+| 27  | tamagotchiv3eu | (BrickEmuPy)        | Tamagotchi Connexion V3 (Europe)                             | 2006.04.01   | SPLB32 |  |
 
 ## Epoch
 
@@ -306,6 +312,7 @@ Special editions are not supported in the emulator, refer to the Notes column fo
 | No. | Model   | Filename            | Game Title                                                   | Release Date | CPU | Clone Of |
 |-----|---------|---------------------|--------------------------------------------------------------|--------------|-----|-------|
 | 01  | alienfev | alienfev.zip        | Chibi Pachi: Alien Fever                                     | 1997.01.01   | E0C6S46 |  |
+| 02  | epochmonsterpanic | (BrickEmuPy)        | Monster Panic                                                | 1981.01.01   | D750X |  |
 
 ## Nikko
 
@@ -347,6 +354,9 @@ Special editions are not supported in the emulator, refer to the Notes column fo
 | 03  | ga888   | (BrickEmuPy)        | Block Game & Echo Key                                        | 1996.01.01   | HT943 |  |
 | 04  | keychainpinball | (BrickEmuPy)        | Keychain Pin Ball                                            | 1996.01.01   | HT943 |  |
 | 05  | spaceintrudertk150i | (BrickEmuPy)        | Space Intruder                                               | 1998.01.01   | HT943 |  |
+| 20  | ga878   | (BrickEmuPy)        | GA-878                                                       | 2000.01.01   | KS56CX2X |  |
+| 21  | miconkc32 | (BrickEmuPy)        | Micon KC-32                                                  | 2000.01.01   | KS56CX2X |  |
+| 22  | e332in1 | (BrickEmuPy)        | Brick Game E-33 2 in 1                                       | 1994.01.01   | EM73000 |  |
 
 ## Apollo
 
@@ -355,6 +365,81 @@ Special editions are not supported in the emulator, refer to the Notes column fo
 | 01  | apollo126in1b0202 | (BrickEmuPy)        | 126 in 1 (B0202)                                             | 1995.01.01   | SPL02 |  |
 | 02  | apollo18in1b0302 | (BrickEmuPy)        | 18 in 1 (B0302)                                              | 1995.01.01   | SPL03 |  |
 | 03  | apollo2in1 | (BrickEmuPy)        | 2 in 1                                                       | 1997.01.01   | SPLB20 |  |
+| 04  | apolloprinceprincessen | (BrickEmuPy)        | Prince & Princess (English)                                  | 1997.01.01   | SPLB20 |  |
+| 05  | apolloprinceprincessch | (BrickEmuPy)        | Prince & Princess (Chinese)                                  | 1997.01.01   | SPLB20 | apolloprinceprincessen |
+
+## Nature Land
+
+| No. | Model   | Filename            | Game Title                                                   | Release Date | CPU | Clone Of |
+|-----|---------|---------------------|--------------------------------------------------------------|--------------|-----|-------|
+| 01  | gyaoppi9in1 | (BrickEmuPy)        | Super Gyaoppi 9 in 1                                         | 1997.01.01   | SPLB20 |  |
+
+## Sparkle Crystal
+
+| No. | Model   | Filename            | Game Title                                                   | Release Date | CPU | Clone Of |
+|-----|---------|---------------------|--------------------------------------------------------------|--------------|-----|-------|
+| 01  | elfintwins | (BrickEmuPy)        | Elfin Twins                                                  | 1997.01.01   | SPLB20 |  |
+
+## Unbranded
+
+| No. | Model   | Filename            | Game Title                                                   | Release Date | CPU | Clone Of |
+|-----|---------|---------------------|--------------------------------------------------------------|--------------|-----|-------|
+| 01  | bigcat9in1 | (BrickEmuPy)        | Big Cat 9 in 1                                               | 1998.01.01   | SPLB20 | gyaoppi9in1 |
+
+## Popy
+
+| No. | Model   | Filename            | Game Title                                                   | Release Date | CPU | Clone Of |
+|-----|---------|---------------------|--------------------------------------------------------------|--------------|-----|-------|
+| 01  | animestspacecobra | (BrickEmuPy)        | Space Cobra Professional                                     | 1982.01.01   | T7741 |  |
+| 02  | drslumparalenchabycha | (BrickEmuPy)        | Dr. Slump Arale: Ncha! Bycha                                 | 1982.01.01   | T7741 |  |
+| 03  | dorayakihouse | (BrickEmuPy)        | Dorayaki House                                               | 1983.01.01   | T7741 |  |
+| 04  | isogedoraemon | (BrickEmuPy)        | Isoge! Doraemon                                              | 1983.01.01   | T7741 |  |
+| 05  | parmandaipinch | (BrickEmuPy)        | Parman Dai-Pinch                                             | 1983.01.01   | T7741 |  |
+
+## Gakken
+
+| No. | Model   | Filename            | Game Title                                                   | Release Date | CPU | Clone Of |
+|-----|---------|---------------------|--------------------------------------------------------------|--------------|-----|-------|
+| 01  | gakkensoccer | (BrickEmuPy)        | Soccer                                                       | 1982.01.01   | T7741 |  |
+| 02  | jumpingboy | (BrickEmuPy)        | Jumping Boy                                                  | 1982.01.01   | T7741 |  |
+| 03  | tomjerryprank | (BrickEmuPy)        | Tom & Jerry Prank                                            | 1983.01.01   | T7741 |  |
+
+## Spica
+
+| No. | Model   | Filename            | Game Title                                                   | Release Date | CPU | Clone Of |
+|-----|---------|---------------------|--------------------------------------------------------------|--------------|-----|-------|
+| 01  | spicadartagnan | (BrickEmuPy)        | D'Artagnan                                                   | 1985.01.01   | T7741 |  |
+
+## VGS
+
+| No. | Model   | Filename            | Game Title                                                   | Release Date | CPU | Clone Of |
+|-----|---------|---------------------|--------------------------------------------------------------|--------------|-----|-------|
+| 01  | mickeyvgs | (BrickEmuPy)        | Mickey Deluxe Virtual Game                                   | 1997.01.01   | HTG12N0 |  |
+
+## Cool Tec
+
+| No. | Model   | Filename            | Game Title                                                   | Release Date | CPU | Clone Of |
+|-----|---------|---------------------|--------------------------------------------------------------|--------------|-----|-------|
+| 01  | pocketpuppy | (BrickEmuPy)        | Pocket Puppy                                                 | 1997.01.01   | KS57C21308 |  |
+
+## Hiro
+
+| No. | Model   | Filename            | Game Title                                                   | Release Date | CPU | Clone Of |
+|-----|---------|---------------------|--------------------------------------------------------------|--------------|-----|-------|
+| 01  | kotokunekunetchyo | (BrickEmuPy)        | Kunekunetchyo                                                | 1997.09.01   | KS57C2504 |  |
+| 02  | pocketboyno2 | (BrickEmuPy)        | Dragon Makyuu no Nazo                                        | 1990.01.01   | LC5732 |  |
+
+## Edla
+
+| No. | Model   | Filename            | Game Title                                                   | Release Date | CPU | Clone Of |
+|-----|---------|---------------------|--------------------------------------------------------------|--------------|-----|-------|
+| 01  | edlaspacerescue | (BrickEmuPy)        | Space Rescue (Edla)                                          | 1989.01.01   | LC5732 |  |
+
+## Stadlbauer
+
+| No. | Model   | Filename            | Game Title                                                   | Release Date | CPU | Clone Of |
+|-----|---------|---------------------|--------------------------------------------------------------|--------------|-----|-------|
+| 01  | miniclassicssoccer | (BrickEmuPy)        | Soccer (Mini Classics)                                       | 2004.01.01   | STK55C324 |  |
 
 ## Gametech
 

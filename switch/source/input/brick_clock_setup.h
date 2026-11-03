@@ -27,7 +27,9 @@ class BrickCore;
 // watched instead, for the whole session, without taking the inputs: each
 // time that screen comes up, the setup waits half a second, writes the real
 // time into it and presses "clock.confirm" (again, up to a few times, if
-// the screen is still there). Nothing is pressed at boot.
+// the screen is still there, as on Super Gyaoppi and Big Cat, whose confirm
+// goes through their alarm screen first), then writes the time once more,
+// since a confirm can zero the seconds. Nothing is pressed at boot.
 //
 // Call begin() once per game load (Time Set Mode = Automatic), then each
 // frame: advance() instead of apply_brick_input() while owns_input(),

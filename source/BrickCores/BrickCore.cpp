@@ -2,11 +2,21 @@
 
 #include "GPL191X.h"
 #include "HT943.h"
+#include "HTG12N0.h"
+#include "KS56CX2X.h"
+#include "KS57C21308.h"
+#include "KS57C2504.h"
 #include "M37520.h"
 #include "SPL0X.h"
 #include "SPLB20.h"
+#include "SPLB32.h"
 #include "MSM50XX.h"
 #include "SPL81408.h"
+#include "T7741.h"
+#include "D750X.h"
+#include "EM73000.h"
+#include "LC5732.h"
+#include "STK55C324.h"
 
 #include <cstdlib>
 #include <cstring>
@@ -39,6 +49,15 @@ bool BrickCore::configure(const uint8_t* data, size_t size) {
     bindings_.clear();
     direct_.clear();
     matrix_.clear();
+    connections_.clear();
+    // "connect.<n>" = <input port>;<input mask>;<output port>;<output mask>
+    for (const auto& kv : rom_.options.with_prefix("connect.")) {
+        const std::vector<std::string> f = split(kv.second, ';');
+        if (f.size() == 4) {
+            connections_.push_back({port_id(f[0]), (uint8_t)strtol(f[1].c_str(), nullptr, 0), port_id(f[2]),
+                                    (uint8_t)strtol(f[3].c_str(), nullptr, 0)});
+        }
+    }
     for (const auto& kv : rom_.options.with_prefix("input.")) {
         const std::vector<std::string> f = split(kv.second, ';');
         if (f.size() == 5 && f[0] == "direct") {
@@ -121,9 +140,11 @@ bool BrickCore::set_clock(int hour, int minute, int second) {
         return false;
     }
     int h = hour;
-    if (pm.size() == 3) {
+    if (pm.size() == 3 || rom_.options.num("clock.hour12", 0) != 0) {
         h = hour % 12 ? hour % 12 : 12;
         if (h == 12 && rom_.options.num("clock.hour_zero", 0) != 0) h = 0;
+    }
+    if (pm.size() == 3) {
         const int cell = peek_ram((uint32_t)pm[0]);
         if (cell < 0) return false;
         const bool set = (hour >= 12) == (pm[2] != 0);
@@ -136,13 +157,24 @@ bool BrickCore::set_clock(int hour, int minute, int second) {
              poke_ram((uint32_t)min[0], (uint8_t)minute) && poke_ram((uint32_t)hr[0], (uint8_t)h);
     } else if (bcd) {
         auto to_bcd = [](int v) { return (uint8_t)(((v / 10) << 4) | (v % 10)); };
+        const bool hour_nibble = rom_.options.num("clock.hour_nibble", 0) != 0;
+        const uint8_t hour_cell = hour_nibble
+            ? (uint8_t)((peek_ram((uint32_t)hr[0]) & 0xF0) | (h & 0x0F))
+            : to_bcd(h);
         ok = poke_ram((uint32_t)sec[0], to_bcd(second)) && poke_ram((uint32_t)min[0], to_bcd(minute)) &&
-             poke_ram((uint32_t)hr[0], to_bcd(h));
+             poke_ram((uint32_t)hr[0], hour_cell);
     } else {
-        ok = poke_ram((uint32_t)sec[0], (uint8_t)(second % 10)) && poke_ram((uint32_t)sec[1], (uint8_t)(second / 10)) &&
-             poke_ram((uint32_t)min[0], (uint8_t)(minute % 10)) && poke_ram((uint32_t)min[1], (uint8_t)(minute / 10));
+        const bool fives = rom_.options.num("clock.sec_fives", 0) != 0;
+        const bool nibbles = rom_.options.num("clock.nibbles", 0) != 0;
+        ok = poke_ram((uint32_t)sec[0], (uint8_t)(fives ? (second % 5) * 2 : nibbles ? second & 0xF : second % 10)) &&
+             poke_ram((uint32_t)sec[1], (uint8_t)(fives ? second / 5 : nibbles ? second >> 4 : second / 10)) &&
+             poke_ram((uint32_t)min[0], (uint8_t)(nibbles ? minute & 0xF : minute % 10)) &&
+             poke_ram((uint32_t)min[1], (uint8_t)(nibbles ? minute >> 4 : minute / 10));
         if (hr.size() == 2) {
-            ok = ok && poke_ram((uint32_t)hr[0], (uint8_t)(h % 10)) && poke_ram((uint32_t)hr[1], (uint8_t)(h / 10));
+            long tens = h < 10 ? rom_.options.num("clock.hour_blank", 0) : h / 10;
+            // GA-878 keeps its PM flag in the tens cell.
+            if (pm.size() == 3 && pm[0] == hr[1]) tens |= peek_ram((uint32_t)pm[0]) & pm[1];
+            ok = ok && poke_ram((uint32_t)hr[0], (uint8_t)(h % 10)) && poke_ram((uint32_t)hr[1], (uint8_t)tens);
         } else {
             ok = ok && poke_ram((uint32_t)hr[0], (uint8_t)h);
         }
@@ -184,6 +216,10 @@ void BrickCore::set_button(const std::string& name, bool pressed) {
 }
 
 void BrickCore::port_output(int port, uint8_t value) {
+    // peripherals/direct_connection.py: an output pin wired to an input pin.
+    for (const Connection& c : connections_) {
+        if (c.out_port == port) port_input(c.in_port, c.in_mask, (value & c.out_mask) ? 1 : 0);
+    }
     auto it = port_out_.find(port);
     if (it != port_out_.end() && it->second == value) return;
     port_out_[port] = value;
@@ -280,6 +316,13 @@ BrickCore* make_core() { return new T(); }
 constexpr CoreEntry kCores[] = {
     {"GPL191X", make_core<GPL191X>},
     {"HT943", make_core<HT943>},
+    {"D750X", make_core<D750X>},
+    {"EM73000", make_core<EM73000>},
+    {"HTG12N0", make_core<HTG12N0>},
+    {"KS56CX2X", make_core<KS56CX2X>},
+    {"KS57C21308", make_core<KS57C21308>},
+    {"KS57C2504", make_core<KS57C2504>},
+    {"LC5732", make_core<LC5732>},
     {"M37520", make_core<M37520>},
     {"MSM50XX", make_core<MSM50XX>},
     {"SPL02", make_core<SPL02>},
@@ -287,6 +330,10 @@ constexpr CoreEntry kCores[] = {
     {"SPLB20", make_core<SPLB20>},
     {"SPL61X", make_core<SPL61X>},
     {"SPL81408", make_core<SPL81408>},
+    {"SPLB32", make_core<SPLB32>},
+    {"STK55C324", make_core<STK55C324>},
+    {"T6770S", make_core<T6770S>},
+    {"T7741", make_core<T7741>},
 };
 
 }  // namespace
