@@ -286,6 +286,7 @@ uint8_t E0C6S46::io_r(uint8_t offset) {
 
         // K input ports
         case 0x40: case 0x42:
+            if (offset == 0x40 && sensor_chatter_) s_.port_k[0] ^= 0x08;
             return s_.port_k[offset >> 1 & 1];
         case 0x41:
             return s_.dfk0;

@@ -323,7 +323,7 @@ def clock_lines(clock) -> list:
     if not clock:
         return []
     lines = [f"clock.{k}=" + ",".join(str(int(v)) for v in clock[k])
-             for k in ("sec", "min", "hour", "pm", "unset", "set_screen", "set_screen_lcd", "set_screen_lcd_off") if k in clock]
+             for k in ("sec", "min", "hour", "pm", "date", "unset", "set_screen", "set_screen_lcd", "set_screen_lcd_off") if k in clock]
     for k in ("bcd", "hour_nibble", "hour_zero", "hour12", "hour_blank", "sec_fives", "resync", "weekday", "nibbles",
               "binary", "sec_scale", "unset_zero", "pet"):
         if clock.get(k):
@@ -355,7 +355,9 @@ def import_game(brick_dir: Path, game: dict) -> bool:
     options, blobs = flatten_options(cfg["mask_options"], brick_dir)
     options += clock_lines(game.get("clock"))
     inputs, _ = input_lines(cfg, game.get("keys"))
-    write_container(d / f"{game['set']}.brk", cfg["core"], cfg["clock"], options + inputs, blobs)
+    # "clock_hz" (brick_games.json, optional): the speed when the .brick's is off -
+    # Hitorikko Chicken's clock runs 25/24 fast at the .brick's 500 kHz.
+    write_container(d / f"{game['set']}.brk", cfg["core"], game.get("clock_hz", cfg["clock"]), options + inputs, blobs)
     face = asset_path(brick_dir, cfg["face_path"])
     # "screen_pad" (brick_games.json, optional): margin around the segments as
     # a fraction, clipped to the LCD glass - a large value (1.0) crops to the

@@ -92,6 +92,10 @@ public:
     // For host-side tests: the 16x51 LCD as last driven.
     bool lcd_dot(int com, int seg) const { return s_.lcd[com][seg] != 0; }
     uint16_t debug_pc() const { return s_.pc; }
+    // A tapped case makes the vibration sensor on K03 bounce. TamaOtch (see
+    // 0x8F7 in its ROM) only sees that as K03 changing between two reads a few
+    // instructions apart, so while this is on K03 flips on every read.
+    void set_sensor_chatter(bool on) { sensor_chatter_ = on; }
     uint8_t debug_irqmask(int reg) const { return s_.irqmask[reg]; }
     uint8_t debug_ram(int addr) const { return s_.ram[addr]; }
     void debug_set_ram(int addr, uint8_t v) { s_.ram[addr] = v & 0xf; }
@@ -239,6 +243,7 @@ private:
 
     Model model_;
     int rom_words_;   // 0x1800 (S46) / 0x2000 (S48)
+    bool sensor_chatter_ = false;
     bool tamaotch_icons_ = false;  // see get_segments_state()
     int ram_size_;    // 0x280 / 0x300
     int vram_size_;   // 0x50 / 0x66 per bank

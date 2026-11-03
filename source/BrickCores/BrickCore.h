@@ -118,6 +118,9 @@ public:
     //   clock.sec_fives=1 - sec=<half-seconds 0-9>,<fives 0-11> (Pengo).
     //   clock.weekday=<addr> - a cell for the day of the week, 0 = Sunday,
     //     set by the automatic setup only (set_weekday()).
+    //   clock.date=<month>,<day units>,<day tens> - the calendar, written with
+    //     the time (set_date()): month 1-12 in one cell, the day in two digits
+    //     (Tamagotchi Connection V3, which otherwise stays on January 1).
     //   clock.resync=<seconds> - the clock stands still for that long after
     //     boot (an all-segments test screen, as on the Popy games), so the
     //     automatic setup writes the time once more then.
@@ -152,6 +155,13 @@ public:
     void set_weekday(int weekday) {
         const std::vector<long> cell = rom_.options.list("clock.weekday");
         if (cell.size() == 1) poke_ram((uint32_t)cell[0], (uint8_t)weekday);
+    }
+    void set_date(int month, int day) {
+        const std::vector<long> cell = rom_.options.list("clock.date");
+        if (cell.size() != 3) return;
+        poke_ram((uint32_t)cell[0], (uint8_t)month);
+        poke_ram((uint32_t)cell[1], (uint8_t)(day % 10));
+        poke_ram((uint32_t)cell[2], (uint8_t)(day / 10));
     }
     std::string clock_start_button() const {
         return rom_.options.has("clock.start") ? rom_.options.str("clock.start") : std::string();

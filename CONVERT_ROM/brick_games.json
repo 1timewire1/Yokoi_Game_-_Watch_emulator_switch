@@ -47,6 +47,41 @@
       }
     },
     {
+      "brick": "HitorikkoChicken",
+      "clock_hz": 480000,
+      "screen_pad": 1.0,
+      "screen_pad": 1.0,
+      "set": "hitorikkochicken",
+      "core": "EM73000",
+      "name": "Hitorikko Chicken",
+      "readme": "Hitorikko Chicken, 1997 (EM73362)",
+      "manufacturer": "Unbranded",
+      "date": "1997-01-01",
+      "keys": {},
+      "model": null,
+      "clone_of": null,
+      "notes": "Maker unknown; name, year and CPU (EM73362) come only from the BrickEmuPy README. Day-level date is a placeholder.",
+      "sources": [
+        "https://github.com/azya52/BrickEmuPy/blob/main/README.md"
+      ],
+      "confidence": {
+        "name": "Medium",
+        "manufacturer": "Unknown",
+        "date": "Low",
+        "model": "Unknown",
+        "clone_of": "Unknown"
+      },
+      "clock": {
+        "sec": [21, 20],
+        "min": [19, 18],
+        "hour": [17, 16],
+        "pm": [0, 2, 1],
+        "set_screen": [3, 4, 4],
+        "confirm": "btnC",
+        "pet": 1
+      }
+    },
+    {
       "brick": "E33_2in1",
       "set": "e332in1",
       "core": "EM73000",
@@ -1865,11 +1900,7 @@
         "hour": [
           69
         ],
-        "pm": [
-          70,
-          1,
-          1
-        ],
+        "pm": [70, 1, 1], "date": [255, 253, 254],
         "unset_zero": 1,
         "set_screen": [
           63,
@@ -1917,11 +1948,7 @@
         "hour": [
           69
         ],
-        "pm": [
-          70,
-          1,
-          1
-        ],
+        "pm": [70, 1, 1], "date": [255, 253, 254],
         "unset_zero": 1,
         "set_screen": [
           63,

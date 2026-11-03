@@ -38,6 +38,7 @@ void write_now(BrickCore* core) {
     if (t) {
         core->set_clock(t->tm_hour, t->tm_min, t->tm_sec);
         core->set_weekday(t->tm_wday);
+        core->set_date(t->tm_mon + 1, t->tm_mday);
     }
 }
 

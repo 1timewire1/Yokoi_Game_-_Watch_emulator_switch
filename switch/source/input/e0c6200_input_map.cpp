@@ -90,6 +90,7 @@ void apply_e0c6200_input(E0C6S46* cpu, const std::string& ref) {
         if (ref == "TAMAANG" || ref == "TAMAUMI" || ref == "TAMAMORI" || ref == "TAMAGENJIN" || ref == "TAMAOTCH") {
             apply(cpu, kTamaSensor, held);
         }
+        if (ref == "TAMAOTCH") cpu->set_sensor_chatter((held & HidNpadButton_X) != 0);
         // Digital Monster's reset button is wired to the RESET pin; a
         // two-button chord so it can't be hit by accident mid-battle.
         if (ref.rfind("DIGIMON", 0) == 0) {

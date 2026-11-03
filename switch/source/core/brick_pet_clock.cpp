@@ -56,6 +56,9 @@ const BuiltinClock kBuiltinClocks[] = {
       {"clock.confirm", "btnCenter"},
       {"clock.pet", "1"},
       {nullptr, nullptr}}},
+    // Packs built before the date was found have its clock but not this.
+    {"TAMAGOTCHIV3US", {{"clock.date", "255,253,254"}, {nullptr, nullptr}}},
+    {"TAMAGOTCHIV3EU", {{"clock.date", "255,253,254"}, {nullptr, nullptr}}},
 };
 
 // Pack refs are the game's set name upper-cased ("APOLLO2IN1"); compare

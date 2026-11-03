@@ -445,7 +445,7 @@ need setting by hand; Alien Fever and Stack Challenge have no clock.
 | Y / D-Pad Left | Left button (A - select / cycle) |
 | A / D-Pad Up / D-Pad Down | Middle button (B - confirm) |
 | B / D-Pad Right | Right button (C - cancel) |
-| X | Sensor on K03 (`TAMAANG`, `TAMAUMI`, `TAMAMORI`, `TAMAGENJIN` - BrickEmuPy wires it to tapping the screen; also on `TAMAOTCH`, untested) |
+| X | Sensor on K03 (`TAMAANG`, `TAMAUMI`, `TAMAMORI`, `TAMAGENJIN` - BrickEmuPy wires it to tapping the screen; also on `TAMAOTCH`, whose rehearsal game needs the sensor's bounce, so X held makes it bounce) |
 | L + R (held) | Reset (`DIGIMON*` only - the recessed reset button) |
 
 **Yasashii Tamagotchi** (`TAMAYASA`) - six icon buttons around the screen
@@ -543,6 +543,7 @@ ACL button, where the device has one (holding it holds the chip in reset).
 | GA-878 (KS56CX2X) | Rotate | On/Pause | Mode | Sound | Left/Right/Down = arrows |
 | Micon KC-32 (KS56CX2X) | Rotate | Start/Pause | On/Off | Speed | L = Sound, Down = Speed too |
 | Brick Game E-33 2 in 1 (EM73000) | Rotate | Start | On/Off | Mute | Left/Right/Down = arrows |
+| Hitorikko Chicken (EM73000) | A | B | C | D | |
 | Monster Panic (Epoch, D750X) | Attack | | Mode | Adjust | B = Jump, Left/Right = arrows |
 | Space Rescue (Edla, LC5732) | | Start | Mode | | Left/Right = arrows |
 | Dragon Makyuu no Nazo (Hiro, LC5732) | | Start | Mode | Sound | D-pad = arrows |
@@ -585,7 +586,7 @@ all-segments boot test screen (a Left press) and set again a second in; one
 restored from a save state just gets its time synced. The D-Power Digivice
 and the D-Tector have no clock.
 
-**Pets.** Pocket Pikachu, Apollo 2 in 1, Prince & Princess, Super Gyaoppi,
+**Pets.** Pocket Pikachu, Apollo 2 in 1, Prince & Princess, Super Gyaoppi, Hitorikko Chicken,
 Big Cat, Elfin Twins, Mickey Deluxe, Pocket Puppy, Tamagotchi Connection V3 and
 Tamagotchi Mini 2017 keep their own time: their clock isn't written on load, only set once by the
 **Automatic** setup, and after that it's Pet Time's (`"pet"` in the same

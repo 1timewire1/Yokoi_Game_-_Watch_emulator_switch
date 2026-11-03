@@ -58,7 +58,10 @@ struct Pet {
             return;
         }
         const tm* t = localtime(&when);
-        if (t) brick->set_clock(t->tm_hour, t->tm_min, t->tm_sec);
+        if (t) {
+            brick->set_clock(t->tm_hour, t->tm_min, t->tm_sec);
+            brick->set_date(t->tm_mon + 1, t->tm_mday);
+        }
     }
     int64_t saved_unix_time() const { return e0c ? e0c->saved_unix_time() : brick->saved_unix_time(); }
     void fast_forward(uint64_t ticks) const {
