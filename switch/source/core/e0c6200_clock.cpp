@@ -17,7 +17,7 @@ constexpr E0C6200ClockLayout kLayouts[] = {
     {"DIGIMONV3", Kind::Digimon, 0x01A, 1, 0}, {"DIGIMONES", Kind::Digimon, 0x01A, 1, 0},
     {"DIGIMONV4", Kind::Digimon, 0x01A, 1, 0}, {"TAMAMOT", Kind::Digimon, 0x01A, 1, 0},
     {"TAMAGENJIN", Kind::Digimon, 0x01A, 1, 0}, {"DIGIMONJA", Kind::Digimon, 0x01A, 1, 0},
-    // Unidentified S48 Tamagotchi: Gen. 1-style cells at 0x102, its confirm is
+    // TamaOtch (S48): cells at 0x102, its confirm is
     // only taken at some moments; 0x101 bit 3 is set while the clock runs.
     {"TAMAOTCH", Kind::Tama1Zero, 0x102, 1, 0, 2, 0x101, 0x8, 2},
 };

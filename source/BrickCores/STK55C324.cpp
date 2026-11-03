@@ -222,7 +222,7 @@ void STK55C324::py_nmi() {
     f_PC = f_addr_nmi;
 }
 
-void STK55C324::py_timers_clock(int64_t v_exec_cycles) {
+void STK55C324::py_timers_clock(double v_exec_cycles) {
     f_64Hz_counter -= v_exec_cycles;
     while (((f_64Hz_counter <= 0))) {
         f_64Hz_counter += (f_sub_clock_div * py_div(32768, 64));

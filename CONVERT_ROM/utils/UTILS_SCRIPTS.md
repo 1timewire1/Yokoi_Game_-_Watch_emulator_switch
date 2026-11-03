@@ -11,6 +11,10 @@ Useful sites with large databases on 1980s and 1990s LCD Games:
 
 ## Scripts
 
+### brick_core_gen.py
+
+Purpose: Generates a C++ core for `source/BrickCores/` from a BrickEmuPy core (`cores/<NAME>.py`), by walking the Python AST. What can't be translated mechanically (the display mapping, the sound object, which methods take fractional cycles) is in its `CORE_CONFIG`. Check a generated core with `tmp/allcores/lockstep.py`.
+
 ### extract_games_from_mame_dat.py
 
 Purpose: Generates a Markdown table of handheld LCD systems from the ProgettoSnaps MAME DAT pack.

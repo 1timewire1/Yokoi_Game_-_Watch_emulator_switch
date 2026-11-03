@@ -29,7 +29,7 @@ protected:
     int peek_ram(uint32_t a) const override { return a < f_RAM.size() ? (int)f_RAM[a] : -1; }
 
 private:
-    enum Ports { kPort_CY = 1000, kPort_EA = 1001, kPort_HL = 1002, kPort_IME = 1003, kPort_IORAM = 1004, kPort_MBE = 1005, kPort_MBS = 1006, kPort_MEMORY = 1007, kPort_PC = 1008, kPort_PORT0 = 1009, kPort_PORT1 = 1010, kPort_PORT2 = 1011, kPort_PORT3 = 1012, kPort_PORT4 = 1013, kPort_RAM0 = 1014, kPort_RAM1 = 1015, kPort_RBE = 1016, kPort_RBS = 1017, kPort_SP = 1018, kPort_WX = 1019, kPort_YZ = 1020 };
+    enum Ports { kPort_CY = 1000, kPort_EA = 1001, kPort_HL = 1002, kPort_IME = 1003, kPort_IORAM = 1004, kPort_MBE = 1005, kPort_MBS = 1006, kPort_MEMORY = 1007, kPort_PC = 1008, kPort_PORT0 = 1009, kPort_PORT1 = 1010, kPort_PORT2 = 1011, kPort_PORT3 = 1012, kPort_PORT4 = 1013, kPort_RAM0 = 1014, kPort_RAM1 = 1015, kPort_RBE = 1016, kPort_RBS = 1017, kPort_SP = 1018, kPort_WX = 1019, kPort_YZ = 1020, kPort_RES = 1999 };
     struct OpEntry { int64_t (KS57C2504::*fn)(int64_t); int size; };
     struct IoEntry { int64_t (KS57C2504::*get)(); int64_t (KS57C2504::*set)(int64_t); };
     void init_();
@@ -141,7 +141,7 @@ private:
     int64_t py_set_io_port4(int64_t v_value);
     void pypin_handler(int64_t v_port, int64_t v_mask, int64_t v_level);
     void pyupdate_cpu_clock_div();
-    void py_process_timers(int64_t v_exec_cycles);
+    void py_process_timers(double v_exec_cycles);
     void py_go_vector(int64_t v_addr);
     void py_interrupt(int64_t v_IRQn);
     int64_t py_get_interrupt_vector();
@@ -330,8 +330,8 @@ private:
     static const OpEntry T_execute_11111101_tbl[4];
     static const IoEntry* find_io_tbl(int64_t addr);
     int64_t f_instr_counter = 0;
-    int64_t f_basic_timer_counter = 0;
-    int64_t f_T0_timer_counter = 0;
+    double f_basic_timer_counter = 0;
+    double f_T0_timer_counter = 0;
     double f_watch_timer_counter = 0;
     double f_sub_clock_div = 0;
     double f_cpu_clock_div = 0;

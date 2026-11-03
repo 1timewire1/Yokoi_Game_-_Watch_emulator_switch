@@ -293,7 +293,7 @@ Special editions are not supported in the emulator, refer to the Notes column fo
 | 15  | mamegalaxian | (BrickEmuPy)        | Galaxian                                                     | 1997.01.01   | HT943 |  |
 | 16  | mametamagotch | (BrickEmuPy)        | Mame Game de Hakken!! Tamagotchi                             | 1997.01.01   | HT943 |  |
 | 17  | digimonja | (BrickEmuPy)        | Digital Monster Ver.1 (Japan, Rev. A)                        | 1997.06.26   | E0C6S48 | digimon |
-| 18  | tamaotch | (BrickEmuPy)        | Unknown Tamagotchi (Tamaotch)                                | 1997.01.01   | E0C6S48 |  |
+| 18  | tamaotch | (BrickEmuPy)        | Tamagotchi (TamaOtch)                                        | 1998.04.01   | E0C6S48 |  |
 | 19  | dpowerdigiviceeu101 | (BrickEmuPy)        | D-Power Digivice (Europe)                                    | 2001.01.01   | SPL61X |  |
 | 20  | dtectordigiviceusv2 | (BrickEmuPy)        | D-Tector (US V2)                                             | 2002.01.01   | GPL191X |  |
 | 21  | tamagotchimini2017 | (BrickEmuPy)        | Tamagotchi Mini (20th Anniversary)                           | 2017.04.08   | GPL191X |  |
@@ -302,7 +302,7 @@ Special editions are not supported in the emulator, refer to the Notes column fo
 | 24  | powerfishing | (BrickEmuPy)        | Power Fishing                                                | 1984.01.01   | T7741 |  |
 | 25  | gundamgaidenii | (BrickEmuPy)        | SD Gundam Gaiden II: Taose! Psycho Golem                     | 1990.01.01   | T7741 |  |
 | 26  | tamagotchiv3us | (BrickEmuPy)        | Tamagotchi Connection V3 (US)                                | 2006.02.01   | SPLB32 |  |
-| 27  | tamagotchiv3eu | (BrickEmuPy)        | Tamagotchi Connexion V3 (Europe)                             | 2006.04.01   | SPLB32 |  |
+| 27  | tamagotchiv3eu | (BrickEmuPy)        | Tamagotchi Connexion V3 (Europe)                             | 2006.04.01   | SPLB32 | tamagotchiv3us |
 
 ## Epoch
 

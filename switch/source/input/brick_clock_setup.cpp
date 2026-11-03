@@ -41,9 +41,6 @@ void write_now(BrickCore* core) {
     }
 }
 
-// No write before the press: Pocket Pikachu's intro/set screen goes wrong if
-// its time cells change under it. It confirms its own default time; the
-// real one goes in once the game reports the clock set.
 // The time is in. A fresh boot whose clock stands still for a while gets it
 // again once it runs ("clock.resync"); a restored game is already past that.
 void finish(BrickCore* core) {
@@ -55,6 +52,9 @@ void finish(BrickCore* core) {
     }
 }
 
+// No write before the press: Pocket Pikachu's intro/set screen goes wrong if
+// its time cells change under it. It confirms its own default time; the
+// real one goes in once the game reports the clock set.
 void press_confirm(BrickCore* core) {
     core->set_button(g_button, true);
     g_presses++;

@@ -693,7 +693,7 @@ void KS56CX2X::pyupdate_cpu_clock_div() {
     }
 }
 
-void KS56CX2X::py_process_basic_timer(int64_t v_exec_cycles) {
+void KS56CX2X::py_process_basic_timer(double v_exec_cycles) {
     f_basic_timer_counter -= v_exec_cycles;
     while (((f_basic_timer_counter <= 0))) {
         f_basic_timer_counter += k_BASIC_TIMER_DIV[f_BTM];
@@ -704,7 +704,7 @@ void KS56CX2X::py_process_basic_timer(int64_t v_exec_cycles) {
     }
 }
 
-void KS56CX2X::py_process_t0_timer(int64_t v_exec_cycles) {
+void KS56CX2X::py_process_t0_timer(double v_exec_cycles) {
     if (((((k_TIMER_T0_DIV[f_TM0h] > 0))) && ((f_TM0l & 4)))) {
         f_T0_timer_counter -= v_exec_cycles;
         while (((f_T0_timer_counter <= 0))) {
@@ -718,7 +718,7 @@ void KS56CX2X::py_process_t0_timer(int64_t v_exec_cycles) {
     }
 }
 
-void KS56CX2X::py_process_watch_timer(int64_t v_exec_cycles) {
+void KS56CX2X::py_process_watch_timer(double v_exec_cycles) {
     if ((f_WMl & 4)) {
         f_watch_timer_counter -= v_exec_cycles;
         while (((f_watch_timer_counter <= 0))) {

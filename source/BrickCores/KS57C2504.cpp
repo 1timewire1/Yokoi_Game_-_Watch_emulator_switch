@@ -767,7 +767,7 @@ void KS57C2504::pyupdate_cpu_clock_div() {
     }
 }
 
-void KS57C2504::py_process_timers(int64_t v_exec_cycles) {
+void KS57C2504::py_process_timers(double v_exec_cycles) {
     if ((!((f_SCMOD & 8)))) {
         f_basic_timer_counter -= v_exec_cycles;
         while (((f_basic_timer_counter <= 0))) {

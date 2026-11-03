@@ -80,7 +80,7 @@ BRICK_FACES = {
     "digimones": "DigimonV1ES.svg",
     "digimonv4": "DigimonV4J.svg",
     "digimonja": "DigimonV1J.svg",  # (same file as DigimonV1.svg)
-    # Unidentified: TamagotchiTamaotch.bin has no .brick/face upstream. Its
+    # TamaOtch: TamagotchiTamaotch.bin has no .brick/face upstream. Its
     # LCD fits the standard Tamagotchi segment layout (every segment it
     # lights is in P1/Angel/Morino's identical 520-segment set), so it gets
     # P1's segments and nothing else - see SEGMENTS_ONLY.
@@ -89,6 +89,8 @@ BRICK_FACES = {
 
 # Sets that take only the LCD segments from their face - no inlay
 # Background, overlay or device-body thumbnail, since the face isn't theirs.
+# (TamaOtch's own background and menu icons go into the pack afterwards, with
+# set_tamaotch_background.py.)
 SEGMENTS_ONLY = {"tamaotch"}
 
 # set -> BrickEmuPy ROM, for the sets MAME doesn't have (need --brick)

@@ -402,13 +402,17 @@ Game Background Color to **Black** and Segment Color to **Red**.
 MAME's `hh_e0c6200.cpp` set, on its own core (`source/E0C6200/` - a port of
 MAME's E0C6200 CPU and E0C6S46 peripherals): Bandai's Tamagotchi (Gen. 1
 International/Japan, Gen. 2, Tenshitchi, Mothra, Umi de Hakken!!, Mori de
-Hakken!!, Genjintchi, Yasashii, and an unidentified one listed as "Unknown
-Tamagotchi (Tamaotch)") and Digital Monster (Ver. 1 Japan Rev. A/Rev. B and
+Hakken!!, Genjintchi, Yasashii and TamaOtch) and Digital Monster (Ver. 1 Japan Rev. A/Rev. B and
 Europe, Ver. 2-4), Epoch's Chibi Pachi: Alien Fever, Nikko's Venus Diet
 Monogatari and Tandy's Stack Challenge. Each
 button is wired straight to an MCU input pin, so these use their own input
 path (`switch/source/input/e0c6200_input_map.cpp`) rather than a
 `Virtual_Input` class.
+
+TamaOtch shares Gen. 1's dot matrix, but has its own 8 menu icons, wired to
+other LCD pins (`E0C6S46::get_segments_state()`), and an LCD background from a
+photo of the real unit's glass (both put in the pack by
+`CONVERT_ROM/set_tamaotch_background.py`).
 
 These were built to run 24/7. With Experimental Features on, for the Tamagotchis and Digital Monsters whose
 clock is mapped (all but Yasashii), the **Pet Time** setting decides what
@@ -495,9 +499,11 @@ All of them are Experimental Games, whatever their group. Each core is
 checked instruction-for-instruction against BrickEmuPy's own Python core
 (`CONVERT_ROM/tmp/ht943/run_compare.py`, `CONVERT_ROM/tmp/spl/run_compare.py`,
 `CONVERT_ROM/tmp/review/compare.py`, `CONVERT_ROM/tmp/m37520/run_compare.py`,
-`CONVERT_ROM/tmp/spl0x/run_compare.py`), last against BrickEmuPy as of
-2026-11-01. The MSM50XX, GPL191X, M37520, SPL0X, SPLB20 and T7741/T6770S cores are
-angel_hp's ports; five GPL191X changes they first made for the
+`CONVERT_ROM/tmp/spl0x/run_compare.py`, `CONVERT_ROM/tmp/allcores/lockstep.py`),
+last against BrickEmuPy as of 2026-11-03. Every core from the MSM50XX on is
+angel_hp's port, the D750X, EM73000, KS56CX2X, KS57C21308, KS57C2504, LC5732,
+SPLB32 and STK55C324 ones generated from the Python by
+`CONVERT_ROM/utils/brick_core_gen.py`; five GPL191X changes they first made for the
 D-Power Digivice are now BrickEmuPy's own behaviour for every GPL191X game
 (see `source/BrickCores/GPL191X.h`) - the D-Tector's Step button needs one.
 
@@ -567,7 +573,8 @@ in BrickEmuPy; the game's demo follows. Space Cobra, Soccer and Tom & Jerry's
 clock stands still until then, and Dr. Slump's seconds restart, so **Automatic**
 writes the time again at that point (`"resync"`). Jumping Boy's and Pengo's
 clocks wait for a first Time / Start press, which **Automatic** makes for you;
-their shown time catches up at the next minute.
+their shown time catches up at the next minute. GA-878 and Soccer (Mini
+Classics) also keep showing 12:00 until the next minute comes round.
 
 **Clocks.** The Nelsonic Game Watches and Formel 1 are real-time clocks. Their
 time is written on every load, the way the Game & Watch clocks' is
@@ -595,8 +602,9 @@ the clock, **Paused** leaves it). The automatic setup, per game:
   everything, so lit pixels alone aren't enough). With **Automatic** on, that
   screen is filled in every time it appears; use **Manual** to set it by hand.
 - Prince & Princess: Enter past the title as usual; when its set-time screen
-  comes up (data RAM `$105E` bit 0) the real time goes in and Enter is pressed
-  for you. As on Apollo 2 in 1, with **Automatic** on that screen is filled in
+  comes up the real time goes in and Enter is pressed for you. Data RAM `$105E`
+  bit 0 marks that screen but is on on the PET screen too, so its pixels are
+  checked as well (the same "clock.set_screen_lcd" options as Apollo 2 in 1). As on Apollo 2 in 1, with **Automatic** on that screen is filled in
   every time it appears. The game zeroes the seconds on Enter, so the time is
   written once more afterwards.
 - Super Gyaoppi and Big Cat: pick a pet (the game's B button accepts), and

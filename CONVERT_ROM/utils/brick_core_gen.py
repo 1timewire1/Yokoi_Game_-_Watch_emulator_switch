@@ -565,6 +565,7 @@ CORE_CONFIG = {
     "KS57C2504": {
         **TOGGLE,
         "doc": "Samsung KS57C2504, Kunekunetchyo (Koto Laboratory / Hiro).",
+        "float_args": {"_process_timers": ("exec_cycles",)},  # on the sub clock, a step is a fractional number of cycles
         "display": lambda m: vram_slice(m) + f"""    if (f_LCON & {m.IO_LCON_LCD_ON}) {{
         if (f_LMODl & {m.IO_LMOD_NORMAL}) return (uint8_t)f_RAM[{m.VRAM_OFFSET} + i];
         if (f_LMODl & {m.IO_LMOD_ALL_ON}) return 1;
@@ -578,9 +579,12 @@ def plain_vram(m):
     return vram_slice(m) + f"    return (uint8_t)f_RAM[{m.VRAM_OFFSET} + i];"
 
 
-CORE_CONFIG["KS57C21308"] = {**TOGGLE, "doc": "Samsung KS57C21308, Pocket Puppy.", "display": plain_vram}
+CORE_CONFIG["KS57C21308"] = {**TOGGLE, "doc": "Samsung KS57C21308, Pocket Puppy.", "display": plain_vram,
+                             "float_args": {"_process_timers": ("exec_cycles",)}}  # on the sub clock, a step is a fractional number of cycles
 CORE_CONFIG["KS56CX2X"] = {**TOGGLE, "doc": "Samsung KS56CX2X, the keychain brick games GA-878 and Micon KC-32.",
-                           "display": plain_vram}
+                           "display": plain_vram,
+                           "float_args": {k: ("exec_cycles",) for k in ("_process_basic_timer", "_process_t0_timer",
+                                                                        "_process_watch_timer")}}  # on the sub clock, a step is a fractional number of cycles
 CORE_CONFIG["D750X"] = {
     **TOGGLE,
     "doc": "NEC uPD750x, Epoch Monster Panic.",
@@ -634,6 +638,7 @@ CORE_CONFIG["EM73000"] = {
 CORE_CONFIG["STK55C324"] = {
     "doc": "Sitronix STK55C324 (a 6502), Stadlbauer's Mini Classics Soccer.",
     "alias": {"_IRQ": "_irq"},  # BRK's self._IRQ() would raise in BrickEmuPy
+    "float_args": {"_timers_clock": ("exec_cycles",)},  # on the sub clock, a step is a fractional number of cycles
     "ram": "f_RAM",
     "display": lambda m: f"""    if (i < 0 || i >= {m.LCDRAM_SIZE}) return 0;
     if ((f_CONTROL & {m.SFR_CTRL_LCD_ENBL}) && (f_SLEEP_MODE & {m.SFR_SLEEP_MODE_1}) == 0) return (uint8_t)f_LCDRAM[i];

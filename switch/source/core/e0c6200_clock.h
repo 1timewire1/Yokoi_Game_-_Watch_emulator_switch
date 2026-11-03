@@ -20,7 +20,7 @@ class E0C6S46;
 //   Tama1Zero - hour 0-11 in BCD, units then tens, with bit 3 of the tens set for PM
 //             (12 AM/PM read as 0); the cells boot as all zeros, so "unset"
 //             is all six zero with the game's clock-running flag
-//             (set_flag_addr/mask) clear. The unidentified "Tamaotch".
+//             (set_flag_addr/mask) clear. TamaOtch.
 // The games read these cells as the live time once the clock is running, so
 // writing them (clock_write) changes the time the pet sees, same as using
 // its own set-clock screen.

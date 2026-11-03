@@ -29,7 +29,7 @@ protected:
     int peek_ram(uint32_t a) const override { return a < f_RAM.size() ? (int)f_RAM[a] : -1; }
 
 private:
-    enum Ports { kPort_BC = 1000, kPort_BCE = 1001, kPort_CY = 1002, kPort_DE = 1003, kPort_DEE = 1004, kPort_HL = 1005, kPort_HLE = 1006, kPort_IME = 1007, kPort_IORAM = 1008, kPort_MBE = 1009, kPort_MBS = 1010, kPort_MEMORY = 1011, kPort_PC = 1012, kPort_PORT1 = 1013, kPort_PORT6 = 1014, kPort_RAM0 = 1015, kPort_RAM1 = 1016, kPort_RBE = 1017, kPort_RBS = 1018, kPort_SBS = 1019, kPort_SP = 1020, kPort_XA = 1021, kPort_XAE = 1022 };
+    enum Ports { kPort_BC = 1000, kPort_BCE = 1001, kPort_CY = 1002, kPort_DE = 1003, kPort_DEE = 1004, kPort_HL = 1005, kPort_HLE = 1006, kPort_IME = 1007, kPort_IORAM = 1008, kPort_MBE = 1009, kPort_MBS = 1010, kPort_MEMORY = 1011, kPort_PC = 1012, kPort_PORT1 = 1013, kPort_PORT6 = 1014, kPort_RAM0 = 1015, kPort_RAM1 = 1016, kPort_RBE = 1017, kPort_RBS = 1018, kPort_SBS = 1019, kPort_SP = 1020, kPort_XA = 1021, kPort_XAE = 1022, kPort_RES = 1999 };
     struct OpEntry { int64_t (KS56CX2X::*fn)(int64_t); int size; };
     struct IoEntry { int64_t (KS56CX2X::*get)(); int64_t (KS56CX2X::*set)(int64_t); };
     void init_();
@@ -136,9 +136,9 @@ private:
     int64_t py_set_io_port9(int64_t v_value);
     void pypin_handler(int64_t v_port, int64_t v_mask, int64_t v_level);
     void pyupdate_cpu_clock_div();
-    void py_process_basic_timer(int64_t v_exec_cycles);
-    void py_process_t0_timer(int64_t v_exec_cycles);
-    void py_process_watch_timer(int64_t v_exec_cycles);
+    void py_process_basic_timer(double v_exec_cycles);
+    void py_process_t0_timer(double v_exec_cycles);
+    void py_process_watch_timer(double v_exec_cycles);
     void py_go_vector(int64_t v_addr);
     void py_interrupt(int64_t v_IRQn);
     int64_t py_get_interrupt_vector();
@@ -329,8 +329,8 @@ private:
     static const OpEntry T_execute_10111111[4];
     static const IoEntry* find_io_tbl(int64_t addr);
     int64_t f_instr_counter = 0;
-    int64_t f_basic_timer_counter = 0;
-    int64_t f_T0_timer_counter = 0;
+    double f_basic_timer_counter = 0;
+    double f_T0_timer_counter = 0;
     double f_watch_timer_counter = 0;
     int64_t f_timerWatch_counter = 0;
     double f_sub_clock_div = 0;

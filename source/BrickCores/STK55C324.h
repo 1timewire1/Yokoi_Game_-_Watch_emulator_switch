@@ -68,7 +68,7 @@ private:
     void pypin_handler(int64_t v_port, int64_t v_mask, int64_t v_level);
     void py_irq();
     void py_nmi();
-    void py_timers_clock(int64_t v_exec_cycles);
+    void py_timers_clock(double v_exec_cycles);
     double pyclock();
     int64_t py_get_sfr_dummy();
     void py_set_sfr_dummy(int64_t v_value);
@@ -283,7 +283,7 @@ private:
     std::map<int64_t, std::vector<int64_t>> f_port_input;
     int64_t f_instr_counter = 0;
     double f_64Hz_counter = 0;
-    int64_t f_timer1_counter = 0;
+    double f_timer1_counter = 0;
     double f_fixtime_counter = 0;
     double f_sub_clock_div = 0;
     int64_t f_PC = 0;

@@ -10,7 +10,7 @@ in the base is carried over byte for byte. The output keeps the base's header
 (format/platform/content_version) and is validated before it's written.
 
 Usage:
-  python merge_pack_games.py <base.ykp> <donor.ykp> [<donor.ykp> ...] --out <merged.ykp> [--replace]
+  python merge_pack_games.py <base.ykp> <donor.ykp> [<donor.ykp> ...] --out <merged.ykp> [--replace] [--only REF,REF]
 """
 import argparse
 import struct
@@ -133,6 +133,7 @@ def main() -> int:
     ap.add_argument("donors", type=Path, nargs="+")
     ap.add_argument("--out", type=Path, required=True)
     ap.add_argument("--replace", action="store_true", help="donor games replace base games with the same ref")
+    ap.add_argument("--only", help="comma-separated refs: leave every other donor game alone")
     args = ap.parse_args()
 
     base_buf, base_header, base_files, base_games = load_pack(args.base)
@@ -143,6 +144,8 @@ def main() -> int:
     for donor in args.donors:
         d_buf, _d_header, d_files, d_games = load_pack(donor)
         for g in d_games:
+            if args.only and g["ref"] not in args.only.split(","):
+                continue
             replacing = g["ref"] in have
             if replacing and not args.replace:
                 print(f"  skip {g['ref']} (already in base)")

@@ -892,6 +892,8 @@ constexpr const char* kKnownCloneRefs[] = {
     "KSOCCER_INTL", "SGRINDER_INTL", "SSPEEDWAY_INTL", "SXTREMEBOARD_INTL", "SHOCKEY_RARE",
     "SSPEEDWAY_ESPN", "TSOCCER_ESPN", "SSKATEBOARD_ESPN",
     "SBASKETBALL_ESPN", "ARTENNIS_ESPN", "DIGIMONJA",
+    // BrickEmuPy: Big Cat is Super Gyaoppi's game, the European V3 the US ROM.
+    "BIGCAT9IN1", "TAMAGOTCHIV3EU",
     "TSOCCER", "CFLOWER", "CFLOWER2", "SSKATEBOARD", "SBASKETBALL", "ARTENNIS",
     // KBASEBALL_ESPN ("ESPN25: Michael Vick - Football", 2004-04-30) is the
     // real origin here - Knuckles Baseball itself didn't release until
