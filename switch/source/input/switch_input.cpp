@@ -4,12 +4,15 @@
 
 #include "yokoi_controller_state.h"
 #include "yokoi_input_mapping.h"
+#include "control_remap.h"
 
 namespace {
 PadState s_pad;
 PadState s_pad2;
 uint64_t s_held = 0;
 uint64_t s_down = 0;
+uint64_t s_raw_held = 0;
+uint64_t s_raw_down = 0;
 
 // If `from` is set in `bits`, also sets `to` - used below to fold the stick
 // pseudo-buttons libnx already synthesizes (HidNpadButton_Stick{L,R}*, from
@@ -38,6 +41,7 @@ void switch_input_init() {
     // style set (HidNpadStyleSet_NpadStandard, still including JoyLeft/
     // JoyRight) untouched, so single-Joy-Con solo play keeps working
     // exactly as before this.
+    hidInitializeTouchScreen();  // the on-screen keypad (input/onscreen_keypad.h)
     hidSetNpadJoyAssignmentModeDual(HidNpadIdType_No1);
     hidSetNpadJoyAssignmentModeDual(HidNpadIdType_No2);
 }
@@ -61,8 +65,12 @@ uint64_t switch_input_poll() {
     down = merge_bit(down, HidNpadButton_StickLLeft, HidNpadButton_Left);
     down = merge_bit(down, HidNpadButton_StickLRight, HidNpadButton_Right);
 
-    s_held = held;
-    s_down = down;
+    s_raw_held = held;
+    s_raw_down = down;
+    // Pause menu > Controls: the game's own button map, only while one is
+    // being played (control_remap_set_active(), from main.cpp).
+    s_held = control_remap_apply(held);
+    s_down = control_remap_apply(down);
 
     // Same role mapping as source/virtual_i_o/3ds_input.cpp:
     // L = Time, Plus = Game A, Minus = Game B, dpad/A-B-X-Y = play controls.
@@ -98,6 +106,18 @@ uint64_t switch_input_poll() {
 
 uint64_t switch_input_held() {
     return s_held;
+}
+
+uint64_t switch_input_raw_held() { return s_raw_held; }
+uint64_t switch_input_raw_down() { return s_raw_down; }
+
+uint32_t switch_input_style_set() { return (uint32_t)padGetStyleSet(&s_pad); }
+uint32_t switch_input_attributes() { return (uint32_t)padGetAttributes(&s_pad); }
+
+void switch_input_clear_for_game() {
+    s_held = 0;
+    s_down = 0;
+    yokoi_controller_set_mask(0);
 }
 
 uint32_t switch_input_poll_p2() {

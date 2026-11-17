@@ -21,11 +21,16 @@ class E0C6S46;
 //             (12 AM/PM read as 0); the cells boot as all zeros, so "unset"
 //             is all six zero with the game's clock-running flag
 //             (set_flag_addr/mask) clear. TamaOtch.
+//   NoClock - a pet whose time-of-day cells aren't known (Yasashii
+//             Tamagotchi, which runs from power-on). Pet Time still applies
+//             - catching up and Simulate Time run the game itself, so its
+//             own clock moves with them - but nothing is written to it, and
+//             it counts as always "set".
 // The games read these cells as the live time once the clock is running, so
 // writing them (clock_write) changes the time the pet sees, same as using
 // its own set-clock screen.
 struct E0C6200ClockLayout {
-    enum class Kind { Tama1, Digimon, Tama1Zero };
+    enum class Kind { Tama1, Digimon, Tama1Zero, NoClock };
     const char* ref;
     Kind kind;
     int base;

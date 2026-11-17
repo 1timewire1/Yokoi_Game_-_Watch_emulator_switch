@@ -23,3 +23,7 @@ class E0C6S46;
 //     + = On/Off, - = Pause, R = Sound
 //   Alien Fever: A = Handle, X = Mode, Y = Select, R = Sound
 void apply_e0c6200_input(E0C6S46* cpu, const std::string& ref);
+
+// The loaded game has the K03 tap sensor (Tenshitchi, Umi/Mori de Hakken,
+// Genjintchi, TamaOtch) - see input/motion_steps.h's motion_tap_update().
+bool e0c6200_has_tap_sensor(const std::string& ref);

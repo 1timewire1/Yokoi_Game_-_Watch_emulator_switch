@@ -21,6 +21,15 @@ class M37520 : public BrickCore {
 public:
     M37520() : BrickCore("M37520") {}
 
+    // "Button response" (the Switch pause menu): how many times faster the
+    // CPU runs on the 32768 Hz sub clock right after a button press - 1 =
+    // the real chip. Pocket Pikachu spends nearly all its time there,
+    // drawing at ~4700 instructions a second, so a press takes ~200 ms to
+    // show. Only for kBoostWindowSec after each press (P2 going low): some
+    // of its animations are paced by the CPU itself, so a boost all the
+    // time made Pikachu move faster. The timers always run on real time.
+    static int sub_clock_boost;
+
 protected:
     void reset() override;
     int execute() override { return (int)(execute_scaled() / kTickHz); }
@@ -238,6 +247,8 @@ private:
     void push(uint8_t v) { write_mem(spp_ | sp_, v); sp_ = (uint8_t)(sp_ - 1); }
     uint8_t pull() { sp_ = (uint8_t)(sp_ + 1); return read_mem(spp_ | sp_); }
     void go_vector(int addr);
+    static constexpr double kBoostWindowSec = 0.35;
+    int64_t boost_left_ = 0;  // scaled time the boost still lasts (not saved)
     void interrupt(int addr);
     void interrupt_process();
     void timers_clock(int64_t scaled_cycles);

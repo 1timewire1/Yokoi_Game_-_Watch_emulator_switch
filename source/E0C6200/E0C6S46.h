@@ -53,6 +53,13 @@ public:
     // resistor is fitted (1 MHz fast clock) and what the P ports read back
     // when set to input. Call after init(), before running.
     void configure_for_ref(const std::string& ref);
+    // Digital Monster's link port (P20): one shared wire between two devices,
+    // pulled up, that either one can pull low (switch/source/core/
+    // link_session.h joins two of them). link_drive() is what this device does
+    // to it - 1 lets it go high, 0 pulls it low (P20 set to output, written
+    // 0) - and set_link_level() is the level it then reads.
+    int link_drive() const { return ((s_.p_dir >> 2) & 1) ? (s_.port_p[2] & 1) : 1; }
+    void set_link_level(int level) { p_input_[2] = (uint8_t)((p_input_[2] & ~1) | (level & 1)); }
 
     // K input pins (0-3 = K00-K03, 4-7 = K10-K13) - `level` is the pin level,
     // and these boards' buttons are active-low (pressed = false). Port of

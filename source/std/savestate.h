@@ -36,3 +36,13 @@ void delete_game_state(uint16_t game_index);
 
 // Get save file path for a game
 const char* get_save_path(uint16_t game_index);
+
+// Numbered save slots next to the usual one (Switch: pause menu Save State /
+// Load State). Slot 0 is exactly the functions above ("<ref>.sav"); slot
+// N > 0 is "<ref>_slotN.sav"; slot -1 is "<ref>_undo.sav" (the copy taken
+// before Simulate Time). Same file format as the main save.
+const char* get_save_path_slot(uint16_t game_index, int slot);
+bool save_game_state_slot(SM5XX* cpu, uint16_t game_index, int slot);
+bool load_game_state_slot(SM5XX* cpu, uint16_t game_index, int slot);
+bool save_state_slot_exists(uint16_t game_index, int slot);
+void delete_game_state_slot(uint16_t game_index, int slot);

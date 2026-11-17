@@ -66,7 +66,32 @@ struct GW_rom {
     static constexpr uint8_t MANUFACTURER_EDLA = 28;
     static constexpr uint8_t MANUFACTURER_STADLBAUER = 29;
     static constexpr uint8_t MANUFACTURER_UNBRANDED = 30;
-    static constexpr uint8_t MANUFACTURER_COUNT = 31;
+    // Makers of the MAME hh_hmcs40 VFD tabletops (source/BrickCores/HMCS40.*)
+    // and Hitorikko Chicken's own brand.
+    static constexpr uint8_t MANUFACTURER_COLECO = 31;
+    static constexpr uint8_t MANUFACTURER_ENTEX = 32;
+    static constexpr uint8_t MANUFACTURER_TOMY = 33;
+    static constexpr uint8_t MANUFACTURER_HITORIKKO = 34;
+    static constexpr uint8_t MANUFACTURER_PARKER_BROTHERS = 35;
+    static constexpr uint8_t MANUFACTURER_BAMBINO = 36;
+    // Milton Bradley Microvision cartridges (source/BrickCores/TMS1100.*).
+    static constexpr uint8_t MANUFACTURER_MICROVISION = 37;
+    // Epoch Game Pocket Computer cartridges (source/BrickCores/GamePocket.*).
+    // Shown as a folder inside Epoch in the maker views (switch_menu.cpp).
+    static constexpr uint8_t MANUFACTURER_EPOCH_GPC = 38;
+    // Hartung (maker) and its Game Master cartridges (source/BrickCores/GameMaster.*),
+    // shown as a folder inside Hartung.
+    static constexpr uint8_t MANUFACTURER_HARTUNG_GM = 40;
+    // Tiger Game.com cartridges (source/BrickCores/GameCom.*), a folder inside Tiger.
+    static constexpr uint8_t MANUFACTURER_TIGER_GC = 41;
+    // Milton Bradley: only a maker tile, holding the Microvision folder.
+    static constexpr uint8_t MANUFACTURER_MILTON_BRADLEY = 42;
+    // Tiger R-Zone cartridges (refs "RZ..."), a folder inside Tiger.
+    static constexpr uint8_t MANUFACTURER_TIGER_RZ = 43;
+    // Entex Adventure Vision cartridges (refs "EAV...", source/BrickCores/AdvVision.*),
+    // a folder inside Entex.
+    static constexpr uint8_t MANUFACTURER_ENTEX_AV = 44;
+    static constexpr uint8_t MANUFACTURER_COUNT = 45;
 
     // Whether this game runs on LCDonald_fake_cpu (source/LCDonald/): its
     // ROM is the 4-byte dummy FF FF FE <game id> (see GW_ROM_RGDS/lcd_*.cpp).

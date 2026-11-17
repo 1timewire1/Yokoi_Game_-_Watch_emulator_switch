@@ -7,7 +7,7 @@ namespace {
 using Kind = E0C6200ClockLayout::Kind;
 
 // B (K01) opens the set screen, C (K00) confirms, on every set verified so
-// far. Yasashii Tamagotchi and Venus Diet are left out until solved; Alien
+// far. Venus Diet is left out until solved (Yasashii Tamagotchi: NoClock below, for now); Alien
 // Fever's counter is uptime, and Stack Challenge has no clock.
 constexpr E0C6200ClockLayout kLayouts[] = {
     {"TAMA", Kind::Tama1, 0x010, 1, 0},        {"TAMAG2", Kind::Tama1, 0x010, 1, 0},
@@ -20,6 +20,12 @@ constexpr E0C6200ClockLayout kLayouts[] = {
     // TamaOtch (S48): cells at 0x102, its confirm is
     // only taken at some moments; 0x101 bit 3 is set while the clock runs.
     {"TAMAOTCH", Kind::Tama1Zero, 0x102, 1, 0, 2, 0x101, 0x8, 2},
+    // Yasashii Tamagotchi (S48): its clock runs from power-on (BCD seconds
+    // at 0x010/0x011) and Select opens a date/time screen, but where it keeps
+    // the time of day isn't mapped yet - so for now it's NoClock: Pet Time
+    // catches it up and Simulate Time works (the game's own clock moves with
+    // the time it lives), only the automatic set / Clock Sync can't write it.
+    {"TAMAYASA", Kind::NoClock, 0x010, -1, -1},
 };
 
 }  // namespace
@@ -32,6 +38,7 @@ const E0C6200ClockLayout* e0c6200_clock_layout(const std::string& ref) {
 }
 
 bool e0c6200_clock_is_set(const E0C6S46* cpu, const E0C6200ClockLayout& l) {
+    if (l.kind == Kind::NoClock) return true;
     if (l.kind == Kind::Tama1) {
         return (cpu->ram_nibble(l.base + 5) << 4 | cpu->ram_nibble(l.base + 4)) < 24;
     }
@@ -46,6 +53,7 @@ bool e0c6200_clock_is_set(const E0C6S46* cpu, const E0C6200ClockLayout& l) {
 }
 
 void e0c6200_clock_write(E0C6S46* cpu, const E0C6200ClockLayout& l, time_t when) {
+    if (l.kind == Kind::NoClock) return;  // nothing to set
     const tm* t = localtime(&when);
     if (!t) return;
     const int h = t->tm_hour, m = t->tm_min, s = t->tm_sec;

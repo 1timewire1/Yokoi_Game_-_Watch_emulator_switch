@@ -19,6 +19,10 @@ void switch_menu_shutdown();
 
 bool switch_menu_is_active();
 
+// True while the settings screen (game list's or mid-game) is up - main.cpp
+// uses it to pick which menu beep a button gets (audio/menu_sound.h).
+bool switch_menu_settings_open();
+
 // Pauses and returns to the menu without unloading the current game. No-op
 // if already in the menu. Reached via the in-game settings screen's "Return
 // to Main Menu" row now, rather than directly from the L+R+Plus combo - see
@@ -40,3 +44,8 @@ void switch_menu_open_ingame_settings();
 void switch_menu_update(uint64_t kDown, uint64_t kHeld);
 
 void switch_menu_render(int viewport_w, int viewport_h);
+
+// The colour of the frame round a game in the one-at-a-time list: its
+// maker's (Settings > Menu > Maker Colors) or the theme's accent. The local
+// link frames the device you hear with it.
+void switch_menu_frame_color(uint16_t game_index, float& r, float& g, float& b);

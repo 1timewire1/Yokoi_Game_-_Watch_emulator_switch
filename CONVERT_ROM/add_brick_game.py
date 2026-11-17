@@ -12,6 +12,7 @@ Steps (all from CONVERT_ROM/, Inkscape required - see external_apps_template.py)
 
 Usage:
   python add_brick_game.py <BrickEmuPy dir> <base.ykp> <out.ykp> [--brick ZeldaNelsonic] [--replace]
+                           [--export-dpi 300] [--scale 3]
 """
 import argparse
 import json
@@ -32,6 +33,13 @@ def main():
     ap.add_argument("out_pack", type=Path)
     ap.add_argument("--brick", default="ZeldaNelsonic", help=".brick name (brick_games.json 'brick')")
     ap.add_argument("--replace", action="store_true", help="replace the game if the base pack already has it")
+    ap.add_argument("--export-dpi", type=int, default=None,
+                    help="Inkscape export DPI for the segments (rgds default 100). Raise it with --scale "
+                         "to get a sharper screen: the pack stores this game's art at the logical screen "
+                         "size, and the Switch stretches that to the panel.")
+    ap.add_argument("--scale", type=int, default=None,
+                    help="multiply the logical screen size (rgds default 1 = 640x480-class). 3 gives a "
+                         "screen tall enough for the Switch's own panel with no stretching.")
     a = ap.parse_args()
 
     meta = json.loads(bi.META.read_text(encoding="utf-8"))
@@ -81,6 +89,10 @@ def main():
                "--out-gw-all", str(work / "GW_ALL_rgds.h"),
                "--out-gw-rom-dir", str(work / "GW_ROM_RGDS"),
                "--out-gfx", str(work / "gfx2x") + "/"]
+        if a.export_dpi:
+            cmd += ["--export-dpi", str(a.export_dpi)]
+        if a.scale:
+            cmd += ["--scale", str(a.scale)]
         print(">", " ".join(cmd))
         subprocess.run(cmd, cwd=HERE, check=True)
 

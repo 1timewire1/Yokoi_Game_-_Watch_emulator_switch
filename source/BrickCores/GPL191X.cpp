@@ -109,7 +109,7 @@ int GPL191X::port_id(const std::string& name) const {
 
 int64_t GPL191X::port_read(int port) const {
     return ((~PDIR_[port] & (port_in_[port][1] | (pullup_[port] & ~port_in_[port][0]))) |
-            (PDIR_[port] & PLATCH_[port])) & 0xFF;
+            (PDIR_[port] & PLATCH_[port] & ~wire_low_[port])) & 0xFF;
 }
 
 void GPL191X::emit_port(int port) {
@@ -262,6 +262,18 @@ void GPL191X::update_audio_div() {
             snd_stop(ch);
         }
     }
+}
+
+int GPL191X::step_pulses() const {
+    // Counter mode, source A = CD0 (0x00), source B = VDD: TM0 counts each
+    // CD0 rising edge and the game reloads it with its preload (0xFFFD: a
+    // step every 3 pulses).
+    if ((TIMER_CTRL_ & kTimerCtrlTm0CounterMode) && (TIMER_CTRL_ & kCnt0SrcAMask) == 0 &&
+        (TIMER_CTRL_ & kCnt0SrcBMask) == kCnt0SrcBVdd) {
+        const int64_t need = 0x10000 - TM0_;
+        if (need >= 1 && need <= 8) return (int)need;
+    }
+    return 1;
 }
 
 void GPL191X::update_timers_div() {

@@ -34,6 +34,10 @@ class GPL191X : public BrickCore {
 public:
     explicit GPL191X(const char* name = "GPL191X") : BrickCore(name) {}
 
+    // TM0 counting CD0 pulses (the pedometer): the pulses still needed to
+    // overflow it, which is when the game counts a step.
+    int step_pulses() const override;
+
 protected:
     void reset() override;
     int execute() override { return (int)clock_step(); }
@@ -41,6 +45,20 @@ protected:
     uint8_t display_byte(int index) const override;
     int port_id(const std::string& name) const override;
     void port_input(int port, uint8_t mask, int level) override;
+    // The D-Tector / D-Power keep their link pin an output, high while
+    // listening, and read the wire through it: another device pulling the
+    // line low reads low even on an output pin (wire_low_).
+    void wire_pin_level(int port, uint8_t mask, int level) override {
+        if (port < kAB || port > kEF) return;
+        if (level == 0) wire_low_[port] |= mask;
+        else wire_low_[port] &= ~(int64_t)mask;
+        port_input(port, mask, level);
+    }
+    // An output pin drives its latch; an input pin lets the line go (1).
+    int pin_drive(int port, uint8_t mask) const override {
+        if (port < kAB || port > kEF) return 1;
+        return (PDIR_[port] & mask) ? ((PLATCH_[port] & mask) ? 1 : 0) : 1;
+    }
     void serialize(BrickStateIO& io) override;
     // RAM 0x40-0x37F (CPU RAM + display RAM) by CPU address - for the clock
     // writes / checks (BrickCore::set_clock(), "clock.*" options).
@@ -101,6 +119,7 @@ public:  // (public for the verification harness)
     int64_t WAKEUP_CTRL_ = 0, WAKEUPREQ_ = 0, ENTER_SLEEP_ = 0, TIME_BASE_ = 0, TIMER_CTRL_ = 0;
     int64_t CLK_CPU_CTRL_ = 0, CLK32K_ENABLE_ = 0x80;
     int64_t PDIR_[3] = {0, 0, 0}, PLATCH_[3] = {0, 0, 0};
+    int64_t wire_low_[3] = {0, 0, 0};  // pins a linked device holds low (wire_pin_level())
     int64_t INT_CTRL_ = 0, INT_CLEAR_ = 0, IREQ_ = 0, NMI_CTRL_ = 0;
     int64_t AUDIO_CTRL_[2] = {0, 0}, AUDIO_DATA_[2] = {0, 0};
     int64_t LCD_CTRL_ = 0;

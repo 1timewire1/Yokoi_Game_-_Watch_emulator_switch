@@ -14,3 +14,12 @@ const std::string& storage_root();
 
 // Joins storage_root() and a relative path using '/'.
 std::string storage_path(const char* relative);
+
+// Optional sub-folders of the storage root for configuration files and for
+// logs (Switch: "yokoi_config" / "yokoi_logs"). Unset (the default, every
+// other platform) they are the storage root itself, so config_path() /
+// log_path() are then exactly storage_path().
+void set_config_subdir(const std::string& subdir);
+void set_log_subdir(const std::string& subdir);
+std::string config_path(const char* relative);
+std::string log_path(const char* relative);

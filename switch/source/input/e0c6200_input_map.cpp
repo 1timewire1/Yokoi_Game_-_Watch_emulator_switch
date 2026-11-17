@@ -3,6 +3,7 @@
 #include <switch.h>
 
 #include "switch_input.h"
+#include "motion_steps.h"
 #include "E0C6200/E0C6S46.h"
 
 namespace {
@@ -73,7 +74,9 @@ void apply(E0C6S46* cpu, const PinMap (&map)[N], uint64_t held) {
 
 void apply_e0c6200_input(E0C6S46* cpu, const std::string& ref) {
     if (!cpu) return;
-    const uint64_t held = switch_input_held();  // Already has left-stick folded into D-Pad bits.
+    // A knock on the controller / a touch on the screen works the tap
+    // sensor like X (Settings > Controller Features > Tap Sensor).
+    const uint64_t held = switch_input_held() | (motion_tap_active() ? (uint64_t)HidNpadButton_X : 0);
 
     if (ref == "STACKCH") {
         apply(cpu, kStackChallenge, held);
@@ -91,10 +94,14 @@ void apply_e0c6200_input(E0C6S46* cpu, const std::string& ref) {
             apply(cpu, kTamaSensor, held);
         }
         if (ref == "TAMAOTCH") cpu->set_sensor_chatter((held & HidNpadButton_X) != 0);
-        // Digital Monster's reset button is wired to the RESET pin; a
-        // two-button chord so it can't be hit by accident mid-battle.
+        // Digital Monster's reset button is wired to the RESET pin: Minus by
+        // default (unused otherwise), movable in pause menu > Controls.
         if (ref.rfind("DIGIMON", 0) == 0) {
-            cpu->set_reset_line((held & HidNpadButton_L) && (held & HidNpadButton_R));
+            cpu->set_reset_line((held & HidNpadButton_Minus) != 0);
         }
     }
+}
+
+bool e0c6200_has_tap_sensor(const std::string& ref) {
+    return ref == "TAMAANG" || ref == "TAMAUMI" || ref == "TAMAMORI" || ref == "TAMAGENJIN" || ref == "TAMAOTCH";
 }

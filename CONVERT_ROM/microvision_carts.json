@@ -1,0 +1,410 @@
+{
+ "_about": "Microvision cartridges, from MAME hash/microvision.xml (CC0-1.0). clock_osc = oscillator Hz (TMS1100 instruction rate = clock_osc/6); pla = output PLA type 0/1; paddle = paddle circuit on the PCB; butmask = keys the cartridge leaves out (12 bits, set = not used). Carts are identified by the ROM sha1. overlay = the cartridge overlay art (CONVERT_ROM/microvision_overlays, from MAME layout default.lay): its size in layout units (the PNG is scaled to it) and the 16x16 screen rectangle in it.",
+ "carts": [
+  {
+   "set": "alienrdr",
+   "title": "Alien Raiders",
+   "year": 1981,
+   "publisher": "Milton Bradley",
+   "cpu": "TMS1100",
+   "clock_osc": 500000,
+   "pla": 1,
+   "paddle": 1,
+   "butmask": 2730,
+   "rom": "m34009-n1",
+   "sha1": "515040a3bf6386590c025e12a9512c98efdd7e1e",
+   "overlay": {
+    "file": "alienraiders_overlay.png",
+    "size": [
+     1280,
+     1325
+    ],
+    "screen": [
+     195,
+     197,
+     895,
+     895
+    ]
+   }
+  },
+  {
+   "set": "baseball",
+   "title": "Baseball",
+   "year": 1980,
+   "publisher": "Milton Bradley",
+   "cpu": "TMS1100",
+   "clock_osc": 500000,
+   "pla": 0,
+   "paddle": 1,
+   "butmask": 2730,
+   "rom": "mp3479-n1nll_4063",
+   "sha1": "c1b52a081c7fe6a51c5cfe41a4d446f1f8cfe24e",
+   "overlay": {
+    "file": "baseball_overlay.png",
+    "size": [
+     1280,
+     1371
+    ],
+    "screen": [
+     160,
+     160,
+     955,
+     955
+    ]
+   }
+  },
+  {
+   "set": "blckbstr",
+   "title": "Block Buster",
+   "year": 1979,
+   "publisher": "Milton Bradley",
+   "cpu": "TMS1100",
+   "clock_osc": 500000,
+   "pla": 0,
+   "paddle": 1,
+   "butmask": 2987,
+   "rom": "mp3450a",
+   "sha1": "30203278d7f2b0817e59bdf7e451be2d64a90f5a",
+   "overlay": {
+    "file": "blockbuster_overlay.png",
+    "size": [
+     1280,
+     1357
+    ],
+    "screen": [
+     184,
+     187,
+     935,
+     935
+    ]
+   }
+  },
+  {
+   "set": "bowling",
+   "title": "Bowling",
+   "year": 1979,
+   "publisher": "Milton Bradley",
+   "cpu": "TMS1100",
+   "clock_osc": 500000,
+   "pla": 1,
+   "paddle": 0,
+   "butmask": 1959,
+   "rom": "mp3475nll_4972",
+   "sha1": "93ffb75b82d1f48f451e0e1158d5a8d1cd465fe5",
+   "overlay": {
+    "file": "bowling_overlay.png",
+    "size": [
+     1280,
+     1325
+    ],
+    "screen": [
+     195,
+     197,
+     895,
+     895
+    ]
+   }
+  },
+  {
+   "set": "connect4",
+   "title": "Connect Four (TMS1100 version)",
+   "year": 1979,
+   "publisher": "Milton Bradley",
+   "cpu": "TMS1100",
+   "clock_osc": 500000,
+   "pla": 1,
+   "paddle": 1,
+   "butmask": 2730,
+   "rom": "mp3481",
+   "sha1": "e93d848784205ab49234ad26718e04d267b776ed",
+   "overlay": {
+    "file": "connectfour_overlay.png",
+    "size": [
+     1280,
+     1371
+    ],
+    "screen": [
+     178,
+     218,
+     923,
+     955
+    ]
+   }
+  },
+  {
+   "set": "connect4o",
+   "title": "Connect Four (8021 version)",
+   "year": 1979,
+   "publisher": "Milton Bradley",
+   "cpu": "I8021",
+   "clock_osc": 3000000,
+   "pla": null,
+   "paddle": 1,
+   "butmask": 2730,
+   "rom": "4971",
+   "sha1": "971f9117dc809f7b9796134208b47ea34990ae71",
+   "cloneof": "connect4",
+   "overlay": {
+    "file": "connectfour_overlay.png",
+    "size": [
+     1280,
+     1371
+    ],
+    "screen": [
+     178,
+     218,
+     923,
+     955
+    ]
+   }
+  },
+  {
+   "set": "cosmichu",
+   "title": "Cosmic hunter",
+   "year": 1981,
+   "publisher": "Milton Bradley",
+   "cpu": "TMS1100",
+   "clock_osc": 500000,
+   "pla": 1,
+   "paddle": 0,
+   "butmask": 1285,
+   "rom": "m34017-n1",
+   "sha1": "a8dabd296aefc46849db2b7d2d8e0de7c77b5b38",
+   "overlay": {
+    "file": "cosmichunter_overlay.png",
+    "size": [
+     1280,
+     1359
+    ],
+    "screen": [
+     178,
+     200,
+     945,
+     977
+    ]
+   }
+  },
+  {
+   "set": "mindbstr",
+   "title": "Mindbuster",
+   "year": 1979,
+   "publisher": "Milton Bradley",
+   "cpu": "TMS1100",
+   "clock_osc": 550000,
+   "pla": 0,
+   "paddle": 0,
+   "butmask": 0,
+   "rom": "mp3457nll_4976",
+   "sha1": "9e53bd7e9b718ced3bffbdd50cf9ea1547183ea3",
+   "overlay": {
+    "file": "mindbuster_overlay.png",
+    "size": [
+     1280,
+     1365
+    ],
+    "screen": [
+     180,
+     210,
+     915,
+     915
+    ]
+   }
+  },
+  {
+   "set": "phsrstrk",
+   "title": "Star Trek: Phaser Strike",
+   "year": 1979,
+   "publisher": "Milton Bradley",
+   "cpu": "TMS1100",
+   "clock_osc": 550000,
+   "pla": 0,
+   "paddle": 0,
+   "butmask": 1301,
+   "rom": "mp3454",
+   "sha1": "e477d49fc835649164cff5ed158ee31dcf244efc",
+   "overlay": {
+    "file": "startrek_overlay.png",
+    "size": [
+     1280,
+     1357
+    ],
+    "screen": [
+     175,
+     187,
+     935,
+     935
+    ]
+   }
+  },
+  {
+   "set": "pinball",
+   "title": "Pinball",
+   "year": 1979,
+   "publisher": "Milton Bradley",
+   "cpu": "TMS1100",
+   "clock_osc": 550000,
+   "pla": 0,
+   "paddle": 1,
+   "butmask": 2987,
+   "rom": "mp3455nll_4974",
+   "sha1": "7ba8460369e1bb0708b0ef076342774059fd03d2",
+   "overlay": {
+    "file": "pinball_overlay.png",
+    "size": [
+     1280,
+     1395
+    ],
+    "screen": [
+     180,
+     210,
+     935,
+     930
+    ]
+   }
+  },
+  {
+   "set": "seaduel",
+   "title": "Sea Duel",
+   "year": 1980,
+   "publisher": "Milton Bradley",
+   "cpu": "TMS1100",
+   "clock_osc": 350000,
+   "pla": 1,
+   "paddle": 0,
+   "butmask": 0,
+   "rom": "mp3496-n1_4064",
+   "sha1": "1f95ecf3b1ec6a17db92e1ae903be269aa0b47d8",
+   "overlay": {
+    "file": "seaduel_overlay.png",
+    "size": [
+     1280,
+     1343
+    ],
+    "screen": [
+     195,
+     197,
+     895,
+     895
+    ]
+   }
+  },
+  {
+   "set": "sprblock",
+   "title": "Super Blockbuster",
+   "year": 1982,
+   "publisher": "Milton Bradley",
+   "cpu": "TMS1100",
+   "clock_osc": 500000,
+   "pla": 1,
+   "paddle": 1,
+   "butmask": 3067,
+   "rom": "m34047-n2ll_4241",
+   "sha1": "1b758369849cc7dea3918774244f747895607377",
+   "overlay": {
+    "file": "superblockbuster_overlay.png",
+    "size": [
+     1280,
+     1360
+    ],
+    "screen": [
+     184,
+     187,
+     935,
+     935
+    ]
+   }
+  },
+  {
+   "set": "vegasslt",
+   "title": "Vegas Slots",
+   "year": 1979,
+   "publisher": "Milton Bradley",
+   "cpu": "TMS1100",
+   "clock_osc": 500000,
+   "pla": 1,
+   "paddle": 0,
+   "butmask": 1365,
+   "rom": "mp3474nll_4975",
+   "sha1": "d49522dbe265e71b86488b5533d01bc9050811c9",
+   "overlay": {
+    "file": "vegasslots_overlay.png",
+    "size": [
+     1280,
+     1377
+    ],
+    "screen": [
+     195,
+     197,
+     895,
+     895
+    ]
+   }
+  },
+  {
+   "set": "microbrd",
+   "title": "MicroBird",
+   "year": 2018,
+   "publisher": "azya",
+   "cpu": "I8021",
+   "clock_osc": 3000000,
+   "pla": null,
+   "paddle": 0,
+   "butmask": null,
+   "rom": "microbrd.bin",
+   "sha1": "6e3d2f47c836c43e8a3e74fffe30a64964e8df8c"
+  },
+  {
+   "set": "tetris",
+   "title": "Tetris (TMS1100 version)",
+   "year": 2019,
+   "publisher": "azya",
+   "cpu": "TMS1100",
+   "clock_osc": 500000,
+   "pla": 1,
+   "paddle": 0,
+   "butmask": null,
+   "rom": "tetris.bin",
+   "sha1": "a1318228235189c9dcdc567a4b71bc82301ee5b4"
+  },
+  {
+   "set": "tetriso",
+   "title": "Tetris (8021 version)",
+   "year": 2018,
+   "publisher": "azya",
+   "cpu": "I8021",
+   "clock_osc": 3000000,
+   "pla": null,
+   "paddle": 0,
+   "butmask": null,
+   "rom": "tetriso.bin",
+   "sha1": "0ce4fd165e12585ca70b86333262576ec2edc880",
+   "cloneof": "tetris"
+  },
+  {
+   "set": "bomber",
+   "title": "Bomber",
+   "year": 2014,
+   "publisher": "Paul Robson",
+   "cpu": "TMS1100",
+   "clock_osc": null,
+   "pla": null,
+   "paddle": null,
+   "butmask": null,
+   "rom": "bomber.bin",
+   "sha1": "3c31c24b58b1d6ac1c7313b690ec796cc5010cb7"
+  },
+  {
+   "set": "invaders",
+   "title": "Space Invaders",
+   "year": 2014,
+   "publisher": "Paul Robson",
+   "cpu": "TMS1100",
+   "clock_osc": null,
+   "pla": null,
+   "paddle": null,
+   "butmask": null,
+   "rom": "invaders.bin",
+   "sha1": "c979d7004fc205ee050045f13e2d6f2c31e2083e"
+  }
+ ]
+}

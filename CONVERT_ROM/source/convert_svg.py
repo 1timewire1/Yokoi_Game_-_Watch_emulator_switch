@@ -121,6 +121,12 @@ def extract_group_segs(svg_path_list, output_dir, INKSCAPE_PATH, export_dpi: int
                         new_svg.attrib[attr] = root.attrib[attr]
                 clone = etree.Element(element.tag, nsmap=element.nsmap)
                 clone.attrib.update(element.attrib)
+                # Paint the segs layer passes down (BrickEmuPy faces:
+                # fill="none") - lost here, a stroke-only shape would export
+                # filled solid.
+                for attr in ("fill", "stroke", "stroke-width"):
+                    if attr in segs_group.attrib and attr not in clone.attrib:
+                        clone.attrib[attr] = segs_group.attrib[attr]
                 for child in element:
                     clone.append(child)
                 new_svg.append(clone)

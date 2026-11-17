@@ -23,7 +23,7 @@ std::string key_of(const std::string& ref, const char* mode) {
 void load_if_needed() {
     if (g_loaded) return;
     g_loaded = true;
-    const std::string path = storage_path("yokoi_highscores.txt");
+    const std::string path = config_path("yokoi_highscores.txt");
     FILE* file = fopen(path.c_str(), "r");
     if (!file) return;
     char line[160];
@@ -58,7 +58,7 @@ bool high_score_note(const std::string& ref, const char* mode, uint32_t score) {
 
 void high_score_flush() {
     if (!g_dirty || g_debug_mode) return;
-    const std::string path = storage_path("yokoi_highscores.txt");
+    const std::string path = config_path("yokoi_highscores.txt");
     FILE* file = fopen(path.c_str(), "w");
     if (!file) {
         YOKOI_LOG("high_scores: couldn't write '%s'", path.c_str());
@@ -69,4 +69,23 @@ void high_score_flush() {
     }
     fclose(file);
     g_dirty = false;
+}
+
+void high_score_clear(const std::string& ref) {
+    load_if_needed();
+    const std::string prefix = ref + ".";
+    for (auto it = g_scores.begin(); it != g_scores.end();) {
+        if (it->first.compare(0, prefix.size(), prefix) == 0) {
+            it = g_scores.erase(it);
+            g_dirty = true;
+        } else {
+            ++it;
+        }
+    }
+}
+
+void high_score_clear_all() {
+    load_if_needed();
+    if (!g_scores.empty()) g_dirty = true;
+    g_scores.clear();
 }

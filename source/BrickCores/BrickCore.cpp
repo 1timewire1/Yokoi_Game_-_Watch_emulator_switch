@@ -17,6 +17,14 @@
 #include "EM73000.h"
 #include "LC5732.h"
 #include "STK55C324.h"
+#include "HMCS40.h"
+#include "MELPS4.h"
+#include "TMS1100.h"
+#include "GamePocket.h"
+#include "GameMaster.h"
+#include "GameCom.h"
+#include "AdvVision.h"
+#include "Tamago.h"
 
 #include <cstdlib>
 #include <cstring>
@@ -104,7 +112,7 @@ void BrickCore::update_sound() {
     // One tick = 1/kTickHz s = clock_hz / kTickHz cycles (debt kept scaled
     // by kTickHz so nothing is lost to rounding).
     if (!reset_held_) {
-        cycle_debt_ += rom_.clock_hz;
+        cycle_debt_ += (int64_t)rom_.clock_hz * speed_pct_ / 100;
         while (cycle_debt_ > 0) cycle_debt_ -= execute_scaled();
     }
     if (tone_step_ > 0) {
@@ -186,7 +194,7 @@ bool BrickCore::set_clock(int hour, int minute, int second) {
 void BrickCore::fast_forward(uint64_t ticks) {
     if (reset_held_) return;
     // Same cycle accounting as update_sound(), a whole slice at once.
-    cycle_debt_ += (int64_t)rom_.clock_hz * (int64_t)ticks;
+    cycle_debt_ += (int64_t)rom_.clock_hz * speed_pct_ / 100 * (int64_t)ticks;
     while (cycle_debt_ > 0) cycle_debt_ -= execute_scaled();
     segments_state_are_update = true;
 }
@@ -224,6 +232,13 @@ void BrickCore::port_output(int port, uint8_t value) {
     if (it != port_out_.end() && it->second == value) return;
     port_out_[port] = value;
     if (!matrix_.empty()) update_matrix();
+}
+
+bool BrickCore::matrix_line_driven(const std::string& name) const {
+    auto it = matrix_.find(name);
+    if (it == matrix_.end()) return false;
+    auto out = port_out_.find(it->second.out_port);
+    return out != port_out_.end() && (out->second & it->second.out_mask) != 0;
 }
 
 void BrickCore::update_matrix() {
@@ -318,6 +333,12 @@ constexpr CoreEntry kCores[] = {
     {"HT943", make_core<HT943>},
     {"D750X", make_core<D750X>},
     {"EM73000", make_core<EM73000>},
+    {"HMCS40", make_core<HMCS40>},  // not BrickEmuPy: MAME hh_hmcs40 VFD games (CONVERT_ROM/prepare_hmcs40.py)
+    {"MELPS4", make_core<MELPS4>},  // not BrickEmuPy: MAME hh_melps4 VFD games (Coleco Frogger, same script)
+    {"TMS1100", make_core<TMS1100>},  // not BrickEmuPy: Milton Bradley Microvision cartridges
+    {"UPD78C06", make_core<GamePocket>},  // not BrickEmuPy: Epoch Game Pocket Computer (after MAME)
+    {"UPD78C11", make_core<GameMaster>},  // not BrickEmuPy: Hartung Game Master (after MAME)
+    {"SM8521", make_core<GameCom>},       // not BrickEmuPy: Tiger Game.com (after MAME)
     {"HTG12N0", make_core<HTG12N0>},
     {"KS56CX2X", make_core<KS56CX2X>},
     {"KS57C21308", make_core<KS57C21308>},
@@ -334,6 +355,8 @@ constexpr CoreEntry kCores[] = {
     {"STK55C324", make_core<STK55C324>},
     {"T6770S", make_core<T6770S>},
     {"T7741", make_core<T7741>},
+    {"I8048", make_core<AdvVision>},      // not BrickEmuPy: Entex Adventure Vision (after MAME)
+    {"TAMAGO", make_core<Tamago>},        // not BrickEmuPy: Tamagotchi Tama-Go / Friends (the user's tamago port)
 };
 
 }  // namespace

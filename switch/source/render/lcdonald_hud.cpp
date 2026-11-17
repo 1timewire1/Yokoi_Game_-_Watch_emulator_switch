@@ -3,10 +3,12 @@
 #include <algorithm>
 #include <string>
 #include <utility>
+#include <vector>
 
 #include "LCDonald/LCDonald_fake_cpu.h"
 #include "core/switch_settings.h"
 #include "switch_ui.h"
+#include "switch_i18n.h"
 
 namespace {
 
@@ -104,8 +106,9 @@ float draw_counter(float right, float y0, float base_h, int value) {
 // Top-right readout: the running Endless score (big), and below it the best
 // Endless score so far ("HI", smaller) when there is one. Either line can be
 // absent: no score outside an Endless run, no HI before the first record.
-void draw_scores(int logical_w, bool show_score, int score, uint32_t best) {
-    const bool show_best = best > 0;
+// `bests`: label ("HI", "HI Normal"...) + record, one line each.
+void draw_scores(int logical_w, bool show_score, int score, const std::vector<std::pair<std::string, uint32_t>>& bests) {
+    const bool show_best = !bests.empty();
     if (!show_score && !show_best) return;
 
     const float pad = 10.0f;
@@ -113,13 +116,16 @@ void draw_scores(int logical_w, bool show_score, int score, uint32_t best) {
     const float top = 18.0f;
     const float score_h = 54.0f, best_h = 26.0f, gap = 12.0f;
     const float hi_size = 20.0f, hi_gap = 8.0f;
-    const float hi_w = switch_ui_text_width("HI", hi_size, true);
+    float hi_w = 0.0f;
+    for (const auto& b : bests) hi_w = std::max(hi_w, switch_ui_text_width(b.first, hi_size, true));
+    const float n_best = (float)bests.size();
     // Plate width from the wider of the two lines (score digits shrink past
     // three, so ~4.5 digit-advances at the base height bounds it).
     const float score_w = score_h * (kDigitWidth * 3.0f + kThickness * kAdvanceExtra * 2.0f + kShear);
     const float best_w = best_h * (kDigitWidth * 3.0f + kThickness * kAdvanceExtra * 2.0f + kShear) + hi_gap + hi_w;
     const float plate_w = std::max(show_score ? score_w : 0.0f, show_best ? best_w : 0.0f);
-    const float plate_h = (show_score ? score_h : 0.0f) + (show_score && show_best ? gap : 0.0f) + (show_best ? best_h : 0.0f);
+    const float plate_h = (show_score ? score_h : 0.0f) + (show_score && show_best ? gap : 0.0f) +
+                          (show_best ? best_h * n_best + gap * (n_best - 1.0f) : 0.0f);
 
     // Faint dark plate so the digits stay legible if a wide LCD's art ever
     // reaches into the margin.
@@ -130,9 +136,11 @@ void draw_scores(int logical_w, bool show_score, int score, uint32_t best) {
         draw_counter(right, y, score_h, score);
         y += score_h + gap;
     }
-    if (show_best) {
-        const float w = draw_counter(right, y, best_h, (int)best);
-        switch_ui_draw_text(right - w - hi_gap - hi_w, y + (best_h - hi_size) * 0.5f, hi_size, 1.0f, 1.0f, 1.0f, 0.85f, "HI", true);
+    for (const auto& b : bests) {
+        const float w = draw_counter(right, y, best_h, (int)b.second);
+        const float lw = switch_ui_text_width(b.first, hi_size, true);
+        switch_ui_draw_text(right - w - hi_gap - lw, y + (best_h - hi_size) * 0.5f, hi_size, 1.0f, 1.0f, 1.0f, 0.85f, b.first, true);
+        y += best_h + gap;
     }
 }
 
@@ -161,7 +169,7 @@ void draw_start_hint(int logical_w, int logical_h) {
 
 }  // namespace
 
-void lcdonald_hud_render(int viewport_w, int viewport_h, LCDonald_fake_cpu* cpu, uint32_t endless_best) {
+void lcdonald_hud_render(int viewport_w, int viewport_h, LCDonald_fake_cpu* cpu, uint32_t hi_normal, uint32_t hi_endless) {
     if (!cpu || !cpu->program()) return;
 
     // Same rotation-aware logical space switch_menu_render() lays out in:
@@ -171,11 +179,21 @@ void lcdonald_hud_render(int viewport_w, int viewport_h, LCDonald_fake_cpu* cpu,
         std::swap(logical_w, logical_h);
     }
 
+    switch_ui_set_rotation((int)g_screen_rotation);  // drawn over the game
     switch_ui_begin_frame(logical_w, logical_h);
-    // The HI line also shows on the stopped/start screen, so the record is
-    // visible before picking a mode; during a Normal run neither line shows.
-    const bool endless = cpu->is_endless();
-    draw_scores(logical_w, endless, cpu->endless_score(), (endless || cpu->is_stopped()) ? endless_best : 0);
+    // The score of the run (Normal or Endless) once one has started. Below
+    // it the record (0 = none / hidden by the settings - core/score_tracker.h):
+    // during a run the one of its mode ("HI"); on the start screen both
+    // modes' ("HI Normal", "HI Endless"), since either may be picked next.
+    std::vector<std::pair<std::string, uint32_t>> bests;
+    if (cpu->is_stopped()) {
+        if (hi_normal) bests.push_back({switch_tr("HI") + " " + switch_tr("Normal"), hi_normal});
+        if (hi_endless) bests.push_back({switch_tr("HI") + " " + switch_tr("Endless"), hi_endless});
+    } else {
+        const uint32_t hi = cpu->is_endless() ? hi_endless : hi_normal;
+        if (hi) bests.push_back({"HI", hi});
+    }
+    draw_scores(logical_w, cpu->started(), cpu->endless_score(), bests);
     if (cpu->is_stopped()) {
         draw_start_hint(logical_w, logical_h);
     }

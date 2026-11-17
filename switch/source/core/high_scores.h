@@ -20,3 +20,8 @@ bool high_score_note(const std::string& ref, const char* mode, uint32_t score);
 
 // Writes the file if anything changed since the last flush.
 void high_score_flush();
+
+// Forgets every record of `ref` (all its modes) / of every game. Written on
+// the next high_score_flush().
+void high_score_clear(const std::string& ref);
+void high_score_clear_all();

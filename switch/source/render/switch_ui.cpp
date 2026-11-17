@@ -1,5 +1,6 @@
 #include "switch_ui.h"
 
+#include <algorithm>
 #include <cstdio>
 #include <unordered_map>
 #include <utility>
@@ -12,6 +13,8 @@
 #include FT_SYNTHESIS_H
 
 #include "switch_gl.h"
+#include "switch_fonts.h"
+#include "switch_i18n.h"
 
 #include "std/debug_log.h"
 
@@ -35,11 +38,49 @@ int g_viewport_w = 1280;
 int g_viewport_h = 720;
 
 FT_Library g_ft_library = nullptr;
-FT_Face g_ft_face = nullptr;
+FT_Face g_ft_face = nullptr;         // the system shared font (always loaded)
+FT_Face g_ft_face_custom = nullptr;  // the chosen bundled font, if any (switch_ui_set_font)
+int g_font_id = 0;                   // 0 = system, i = kSwitchFonts[i - 1]
 // Nintendo's "extended" shared font - contains only button/icon glyphs (A/B/
 // X/Y/L/R/dpad/+/-/...), no actual text. Same font Hekate-Toolbox uses for
 // its own control hints (their gui.hpp calls it "fontIcons").
 FT_Face g_ft_face_icons = nullptr;
+
+// Which face draws `c`: the chosen bundled font when it has the glyph,
+// else the system font (accents, symbols a small font may lack).
+FT_Face text_face_for(uint32_t c, int& font_id) {
+    if (g_ft_face_custom && FT_Get_Char_Index(g_ft_face_custom, c) != 0) {
+        font_id = g_font_id;
+        return g_ft_face_custom;
+    }
+    font_id = 0;
+    return g_ft_face;
+}
+
+// The face whose metrics place the line (ascender) - the chosen one.
+// Next code point of UTF-8 `s` at `i` (advanced past it). A byte that
+// doesn't start a valid sequence is taken as Latin-1, as before.
+uint32_t utf8_next(const std::string& s, size_t& i) {
+    const unsigned char c0 = (unsigned char)s[i];
+    const int n = c0 < 0x80 ? 0 : (c0 >> 5) == 6 ? 1 : (c0 >> 4) == 14 ? 2 : (c0 >> 3) == 30 ? 3 : -1;
+    if (n <= 0 || i + (size_t)n >= s.size()) {
+        i++;
+        return c0;
+    }
+    uint32_t cp = c0 & (0x3Fu >> n);
+    for (int k = 1; k <= n; ++k) {
+        const unsigned char cc = (unsigned char)s[i + k];
+        if ((cc & 0xC0) != 0x80) {
+            i++;
+            return c0;
+        }
+        cp = (cp << 6) | (cc & 0x3Fu);
+    }
+    i += (size_t)n + 1;
+    return cp;
+}
+
+FT_Face line_face() { return g_ft_face_custom ? g_ft_face_custom : g_ft_face; }
 
 struct GlyphEntry {
     GLuint tex = 0;
@@ -134,8 +175,9 @@ void draw_quad(GLuint tex, const std::vector<RenderVertex>& verts) {
 
 // codepoint needs 21 bits (Unicode max U+10FFFF); pixel_size gets a
 // generous 18 bits above that; is_icon_face/bold are single flag bits on top.
-uint64_t glyph_key(bool is_icon_face, bool bold, uint32_t codepoint, int pixel_size) {
-    return ((uint64_t)(is_icon_face ? 1u : 0u) << 40)
+uint64_t glyph_key(bool is_icon_face, bool bold, uint32_t codepoint, int pixel_size, int font_id = 0) {
+    return ((uint64_t)(uint32_t)(font_id & 0xFF) << 41)
+         | ((uint64_t)(is_icon_face ? 1u : 0u) << 40)
          | ((uint64_t)(bold ? 1u : 0u) << 39)
          | ((uint64_t)(uint32_t)pixel_size << 21)
          | (uint64_t)(codepoint & 0x1FFFFFu);
@@ -146,12 +188,13 @@ uint64_t glyph_key(bool is_icon_face, bool bold, uint32_t codepoint, int pixel_s
 // shared system font only has one real weight). Returns nullptr only if that
 // face isn't available; a glyph with no visible bitmap (e.g. space) still
 // returns a valid entry with tex=0 and a real advance.
-const GlyphEntry* get_or_rasterize_glyph(FT_Face face, bool is_icon_face, uint32_t codepoint, int pixel_size, bool bold = false) {
+const GlyphEntry* get_or_rasterize_glyph(FT_Face face, bool is_icon_face, uint32_t codepoint, int pixel_size, bool bold = false,
+                                         int font_id = 0) {
     if (!face) {
         return nullptr;
     }
 
-    const uint64_t key = glyph_key(is_icon_face, bold, codepoint, pixel_size);
+    const uint64_t key = glyph_key(is_icon_face, bold, codepoint, pixel_size, font_id);
     auto it = g_glyph_cache.find(key);
     if (it != g_glyph_cache.end()) {
         return &it->second;
@@ -261,6 +304,10 @@ void switch_ui_shutdown() {
     }
     g_glyph_cache.clear();
 
+    if (g_ft_face_custom) {
+        FT_Done_Face(g_ft_face_custom);
+        g_ft_face_custom = nullptr;
+    }
     if (g_ft_face) {
         FT_Done_Face(g_ft_face);
         g_ft_face = nullptr;
@@ -288,6 +335,9 @@ void switch_ui_shutdown() {
 // matches whatever orientation the menu is currently laying itself out in.
 // The physical glViewport() call stays on the true (always-landscape) size -
 // that's the caller's job, not this function's.
+int g_ui_rotation = 0;
+void switch_ui_set_rotation(int rotation) { g_ui_rotation = rotation; }
+
 void switch_ui_begin_frame(int viewport_w, int viewport_h) {
     g_viewport_w = viewport_w;
     g_viewport_h = viewport_h;
@@ -311,9 +361,9 @@ void switch_ui_begin_frame(int viewport_w, int viewport_h) {
         // switch_screen.cpp for why they're flipped from the naive rotation-
         // matrix math. Keep both in sync if this ever needs revisiting.
         float rotCos = 1.0f, rotSin = 0.0f;
-        if (g_screen_rotation == ScreenRotation::Deg90) {
+        if (g_ui_rotation == (int)ScreenRotation::Deg90) {
             rotCos = 0.0f; rotSin = -1.0f;
-        } else if (g_screen_rotation == ScreenRotation::Deg270) {
+        } else if (g_ui_rotation == (int)ScreenRotation::Deg270) {
             rotCos = 0.0f; rotSin = 1.0f;
         }
         glUniform2f(g_gl.uRotCosSin, rotCos, rotSin);
@@ -371,22 +421,50 @@ void switch_ui_draw_texture_plain(uint32_t gl_tex, float x, float y, float w, fl
     draw_quad((GLuint)gl_tex, verts);
 }
 
+void switch_ui_draw_texture_uv(uint32_t gl_tex, float x, float y, float w, float h, float u0, float v0, float u1, float v1,
+                               float alpha, bool nearest) {
+    if (g_gl.program == 0 || gl_tex == 0) return;
+    glUniform4f(g_gl.uMul, 1.0f, 1.0f, 1.0f, alpha);
+    std::vector<RenderVertex> verts;
+    append_quad_px(verts, x, y, w, h, u0, v0, u1, v1);
+    if (nearest) {
+        glBindTexture(GL_TEXTURE_2D, (GLuint)gl_tex);
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+    }
+    draw_quad((GLuint)gl_tex, verts);
+    if (nearest) {
+        glBindTexture(GL_TEXTURE_2D, (GLuint)gl_tex);
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+    }
+    glUniform4f(g_gl.uMul, 1.0f, 1.0f, 1.0f, 1.0f);
+}
+
 void switch_ui_draw_text(float x, float y, float pixel_size, float r, float g, float b, float a, const std::string& text, bool bold) {
     if (g_gl.program == 0 || !g_ft_face || pixel_size <= 0.0f) return;
 
     const int px = (int)(pixel_size + 0.5f);
-    FT_Set_Pixel_Sizes(g_ft_face, 0, (FT_UInt)px);
+    FT_Face lf = line_face();
+    FT_Set_Pixel_Sizes(lf, 0, (FT_UInt)px);
     // `y` is the top of the line; approximate the baseline from the face's
     // own ascender metric at this pixel size so different pixel sizes still
-    // line up sensibly when top-aligned.
-    const float baseline_y = y + (float)(g_ft_face->size->metrics.ascender >> 6);
+    // line up sensibly when top-aligned. Capped at the pixel size: some
+    // fonts' ascender leaves a lot of room for accents, which would push
+    // the text down out of its row.
+    const float baseline_y = y + std::min((float)(lf->size->metrics.ascender >> 6), (float)px * 0.95f);
 
     if (g_gl.uAlphaOnly >= 0) glUniform1f(g_gl.uAlphaOnly, 1.0f);
     glUniform4f(g_gl.uMul, r, g, b, a);
 
     float cursor_x = x;
-    for (unsigned char c : text) {
-        const GlyphEntry* ge = get_or_rasterize_glyph(g_ft_face, false, (uint32_t)c, px, bold);
+    // Translated (switch_i18n.h), then decoded as UTF-8 (accents, ñ, ¿).
+    const std::string& tr_text = switch_tr(text);
+    for (size_t tr_pos = 0; tr_pos < tr_text.size();) {
+        const uint32_t c = utf8_next(tr_text, tr_pos);
+        int fid = 0;
+        FT_Face f = text_face_for((uint32_t)c, fid);
+        const GlyphEntry* ge = get_or_rasterize_glyph(f, false, (uint32_t)c, px, bold, fid);
         if (!ge) {
             cursor_x += px * 0.5f;
             continue;
@@ -412,8 +490,13 @@ float switch_ui_text_width(const std::string& text, float pixel_size, bool bold)
     const int px = (int)(pixel_size + 0.5f);
 
     float width = 0.0f;
-    for (unsigned char c : text) {
-        const GlyphEntry* ge = get_or_rasterize_glyph(g_ft_face, false, (uint32_t)c, px, bold);
+    // Translated (switch_i18n.h), then decoded as UTF-8 (accents, ñ, ¿).
+    const std::string& tr_text = switch_tr(text);
+    for (size_t tr_pos = 0; tr_pos < tr_text.size();) {
+        const uint32_t c = utf8_next(tr_text, tr_pos);
+        int fid = 0;
+        FT_Face f = text_face_for((uint32_t)c, fid);
+        const GlyphEntry* ge = get_or_rasterize_glyph(f, false, (uint32_t)c, px, bold, fid);
         width += ge ? (float)ge->advance : (float)px * 0.5f;
     }
     return width;
@@ -449,4 +532,32 @@ float switch_ui_button_icon_width(float pixel_size, SwitchButtonIcon icon) {
     const int px = (int)(pixel_size + 0.5f);
     const GlyphEntry* ge = get_or_rasterize_glyph(g_ft_face_icons, true, icon_codepoint(icon), px);
     return ge ? (float)ge->advance : (float)px;
+}
+
+int switch_ui_font_count() { return kSwitchFontCount + 1; }
+
+const char* switch_ui_font_name(int index) {
+    if (index <= 0 || index > kSwitchFontCount) return "System";
+    return kSwitchFonts[index - 1].name;
+}
+
+void switch_ui_set_font(int index) {
+    if (index < 0 || index > kSwitchFontCount) index = 0;
+    if (index == g_font_id && (index == 0 || g_ft_face_custom)) return;
+    if (g_ft_face_custom) {
+        FT_Done_Face(g_ft_face_custom);
+        g_ft_face_custom = nullptr;
+    }
+    g_font_id = 0;
+    if (index > 0 && g_ft_library) {
+        const SwitchFontData& fd = kSwitchFonts[index - 1];
+        if (FT_New_Memory_Face(g_ft_library, (const FT_Byte*)fd.data, (FT_Long)fd.size, 0, &g_ft_face_custom)) {
+            YOKOI_LOG("switch_ui_set_font: FT_New_Memory_Face failed for %s", fd.name);
+            g_ft_face_custom = nullptr;
+        } else {
+            g_font_id = index;
+        }
+    }
+    // Glyphs are cached per font id, so the old font's stay valid (and a
+    // switch back is instant) - nothing to flush.
 }

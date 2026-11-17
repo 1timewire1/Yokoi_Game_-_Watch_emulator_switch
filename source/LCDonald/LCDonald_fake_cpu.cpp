@@ -301,8 +301,9 @@ void LCDonald_fake_cpu::execute_curr_opcode() {
         changed = true;
     }
 
-    const int scored = program_->take_score_events();
-    if (endless_) endless_score_ += scored;
+    // Counted in both modes (Normal too, though LCDonald's own app only
+    // showed it in Endless) - the Switch HUD and high scores use both.
+    endless_score_ += program_->take_score_events();
 
     if (changed) refresh_visible_cache();
 }
@@ -337,6 +338,7 @@ void LCDonald_fake_cpu::start_game(bool endless) {
     if (!program_) return;
     program_->start(endless);
     endless_ = endless;
+    started_ = true;
     endless_score_ = 0;
     program_->take_score_events();  // drop anything left over from a previous run
     buffered_inputs_.clear();

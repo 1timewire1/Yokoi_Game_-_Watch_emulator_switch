@@ -8,6 +8,7 @@
 #include <vector>
 
 #include "switch_sound.h"
+#include "input/switch_rumble.h"
 #include "std/debug_log.h"
 #include "std/gw_pack.h"
 #include "LCDonald/LCDonald_fake_cpu.h"
@@ -256,6 +257,10 @@ bool play_cached(const CachedSample& sample, const char* pack_name) {
         wb.end_sample_offset = (int32_t)sample.frame_count;
         wb.is_looping = false;
 
+        // Settings > Sound > Volume / Mute.
+        const float vol = switch_sound_volume();
+        audrvVoiceSetMixFactor(drv, voice_id, vol, 0, 0);
+        audrvVoiceSetMixFactor(drv, voice_id, vol, 1, 1);
         const bool queued = audrvVoiceAddWaveBuf(drv, voice_id, &wb);
         audrvVoiceStart(drv, voice_id);
         audrvUpdate(drv);
@@ -264,6 +269,7 @@ bool play_cached(const CachedSample& sample, const char* pack_name) {
             YOKOI_LOG("lcdonald_sound: driver rejected %s on voice %d (state=%d)", pack_name, voice_id, (int)wb.state);
         }
         if (queued) {
+            rumble_sample_played();
             g_next_voice = (idx + 1) % kNumSampleVoices;
             return true;
         }

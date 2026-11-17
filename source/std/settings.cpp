@@ -1,3 +1,4 @@
+#include <cstddef>
 #include "settings.h"
 #include "load_file.h"
 #include "platform_paths.h"
@@ -10,11 +11,11 @@
 AppSettings g_settings;
 
 static std::string settings_file_path() {
-    return storage_path("yokoi_gw_settings.dat");
+    return config_path("yokoi_gw_settings.dat");
 }
 
 static std::string last_games_by_mfr_file_path() {
-    return storage_path("yokoi_gw_last_game_by_mfr.dat");
+    return config_path("yokoi_gw_last_game_by_mfr.dat");
 }
 
 static constexpr size_t kLastGameRefMax = 16;
@@ -79,6 +80,12 @@ static bool try_load_last_games_by_mfr(LastGamesByManufacturer& out) {
             out.last_game_ref_by_mfr[GW_rom::MANUFACTURER_TRONICA][kLastGameRefMax - 1] = '\0';
             ok = true;
         }
+    } else if ((size_t)size > offsetof(LastGamesByManufacturer, last_game_ref_by_mfr) &&
+               (size_t)size < sizeof(LastGamesByManufacturer) &&
+               ((size_t)size - offsetof(LastGamesByManufacturer, last_game_ref_by_mfr)) % kLastGameRefMax == 0) {
+        // Written by a build with fewer manufacturers: same layout, shorter
+        // table - the new manufacturers just start with no last game.
+        ok = (fread(&out, (size_t)size, 1, file) == 1);
     }
 
     fclose(file);

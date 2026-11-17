@@ -1,4 +1,5 @@
 #include "switch_game_loader.h"
+#include "link_session.h"
 
 #include <cstdio>
 #include <ctime>
@@ -25,6 +26,7 @@
 #include "switch_segments_state.h"
 #include "switch_settings.h"
 #include "high_scores.h"
+#include "score_tracker.h"
 #include "input/uchitari_clock_setup.h"
 #include "input/vesarif_clock_setup.h"
 #include "input/auto_confirm_press.h"
@@ -33,6 +35,7 @@
 #include "brick_pet_clock.h"
 #include "BrickCores/BrickCore.h"
 #include "pet_time.h"
+#include "save_slots.h"
 
 namespace {
 
@@ -145,6 +148,9 @@ constexpr ConfirmButton kAutoConfirmButtons[] = {
 
 void switch_load_game_by_index_and_init(uint16_t idx) {
     YOKOI_LOG("switch_load_game_by_index_and_init: idx=%u begin", (unsigned)idx);
+    // A new game (or a restart) ends a local link - a no-op while the link
+    // itself is loading its second game through here.
+    link_session_stop();
 
     g_game_index = idx;
     g_game = load_game(idx);
@@ -195,6 +201,7 @@ void switch_load_game_by_index_and_init(uint16_t idx) {
         lcdonald_sound_reset();
     }
     g_cpu->load_rom_melody(g_game->melody, g_game->size_melody);
+    score_tracker_game_loaded(g_game->ref);  // which digits are its score, if any
     g_cpu->load_rom_time_addresses(g_game->ref);
 
     g_cpu->time_set(false);
@@ -302,6 +309,7 @@ void switch_load_game_by_index_and_init(uint16_t idx) {
 }
 
 void switch_unload_current_game() {
+    link_session_stop();  // saves and drops the second device first
     if (!g_cpu) {
         return;
     }
@@ -315,7 +323,9 @@ void switch_unload_current_game() {
     } else {
         YOKOI_LOG("switch_unload_current_game: saving state for idx=%u ref='%s'",
                   (unsigned)g_game_index, g_game ? g_game->ref.c_str() : "?");
-        save_game_state(g_cpu.get(), g_game_index);
+        if (save_game_state(g_cpu.get(), g_game_index)) {
+            save_slot_write_thumbnail(g_game_index, 0);  // the card picture for "Auto save"
+        }
         high_score_flush();
         if (g_game) {
             g_last_game_played_ref = g_game->ref;

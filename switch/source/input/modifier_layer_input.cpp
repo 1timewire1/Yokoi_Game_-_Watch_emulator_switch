@@ -24,19 +24,24 @@ void read_slot_state(uint64_t held, bool out[12]) {
 
 } // namespace
 
+int modifier_layer_held() {
+    const uint64_t held = switch_input_held();
+    const bool l = (held & HidNpadButton_L) != 0;
+    const bool r = (held & HidNpadButton_R) != 0;
+    return (l && !r) ? 1 : (r && !l) ? 2 : 0;
+}
+
 void apply_modifier_layer_input(SM5XX* cpu, const ModLayerTarget table[36]) {
     if (!cpu) return;
 
     const uint64_t held = switch_input_held();
-    const bool zl = (held & HidNpadButton_ZL) != 0;
-    const bool zr = (held & HidNpadButton_ZR) != 0;
-    const int layer = (zl && !zr) ? 1 : (zr && !zl) ? 2 : 0;
+    const int layer = modifier_layer_held();
 
     bool slot_state[12];
     read_slot_state(held, slot_state);
 
     // Force every OTHER layer's targets low first, so switching layers
-    // mid-hold (e.g. releasing ZL while still holding D-Up) can't leave a
+    // mid-hold (e.g. releasing L while still holding D-Up) can't leave a
     // button from the no-longer-active layer stuck held forever.
     for (int l = 0; l < 3; l++) {
         if (l == layer) continue;
@@ -70,9 +75,7 @@ void apply_calculator_modifier_input(SM5XX* cpu, const ModLayerTarget table[24])
     if (!cpu) return;
 
     const uint64_t held = switch_input_held();
-    const bool zl = (held & HidNpadButton_ZL) != 0;
-    const bool zr = (held & HidNpadButton_ZR) != 0;
-    const int active_layer = (zl && !zr) ? 1 : (zr && !zl) ? 2 : 0; // 0 = neither - normal input owns everything
+    const int active_layer = modifier_layer_held(); // 0 = neither - normal input owns everything
 
     bool slot_state[12];
     read_slot_state(held, slot_state);

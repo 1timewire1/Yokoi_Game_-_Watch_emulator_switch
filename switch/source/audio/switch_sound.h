@@ -50,6 +50,11 @@ class Virtual_Sound {
         // last saw to know its own state needs recreating too.
         uint32_t reinit_generation() const { return reinit_generation_; }
 
+        // For vibration (input/switch_rumble.h): share of buzzer ticks that
+        // were on since the last call, and the tone's pitch in Hz (rising
+        // edges per second, 0 when silent). Resets the counters.
+        void take_activity(float& activity, float& pitch_hz);
+
     private:
         void free_buffers();
         void full_reinit();
@@ -95,6 +100,27 @@ class Virtual_Sound {
         float hp_prev_in = 0.0f;
         float hp_state = 0.0f;
 
+        // Sound Style state (see push_output_sample()/update_sound()).
+        struct Biquad {
+            float b0 = 0, b1 = 0, b2 = 0, a1 = 0, a2 = 0;
+            float x1 = 0, x2 = 0, y1 = 0, y2 = 0;
+            float run(float x) {
+                const float y = b0 * x + b1 * x1 + b2 * x2 - a1 * y1 - a2 * y2;
+                x2 = x1; x1 = x; y2 = y1; y1 = y;
+                return y;
+            }
+            void clear() { x1 = x2 = y1 = y2 = 0; }
+        };
+        Biquad piezo_bp, piezo_hp, radio_hp, radio_lp;
+        float flute_int = 0.0f, flute_hp_prev = 0.0f, flute_hp = 0.0f;
+        float radio_env = 0.0f;
+        uint32_t radio_noise = 22222u;
+        bool oct_prev = false, oct_ff = false;
+        uint32_t oct_silent = 0;
+        uint8_t style_seen = 0xFF;
+        uint32_t act_on = 0, act_total = 0, act_edges = 0;
+        bool act_prev = false;
+
         // Self-heal state (audren session sometimes dies after sleep/resume).
         int stuck_frames = 0;
         int retry_cooldown = 0;
@@ -103,6 +129,10 @@ class Virtual_Sound {
 };
 
 extern Virtual_Sound g_sound;
+
+// Current output level for every voice, 0..1: Settings > Sound > Volume, or
+// 0 while Mute is on.
+float switch_sound_volume();
 
 // Configures g_sound for the currently loaded game (frequency/divide_freq
 // come from the CPU instance). Equivalent to yokoi_audio_reconfigure_from_cpu.

@@ -3,7 +3,7 @@
 
 class SM5XX;
 
-// A 3-layer (base / ZL-held / ZR-held) x 12-slot input scheme for games
+// A 3-layer (base / L-held / R-held) x 12-slot input scheme for games
 // with more distinct physical buttons (~20-26) than the standard 12-input
 // layout (D-pad x4, A/B/X/Y, L/R, +/-) can cover on its own - see NUMMUNCH
 // and UCHITARI in main.cpp, both calculator-style keypads that don't fit
@@ -14,21 +14,22 @@ class SM5XX;
 //
 // Slot order within a layer, matching switch_input.h's button set:
 // D-Up, D-Down, D-Left, D-Right, A, B, X, Y, L, R, +, -.
-// ZL+ZR held together is the existing pause-menu combo (see main.cpp) and
-// is deliberately treated as "no modifier" here (falls back to the base
-// layer) so it doesn't leave a stray input held while the pause menu is
-// open - it never reaches this function while the menu is actually up
-// anyway, since main.cpp's gameplay branch is skipped whenever the menu is
-// active.
+// The modifiers are L and R (ZL/ZR were, until ZL+ZR became reserved for
+// the in-game menu), so the L and R slots are never targets in these
+// tables - 10 slots per layer. L+R held together is treated as "no
+// modifier" (the base layer).
 struct ModLayerTarget {
     int8_t group; // cpu->input_set() group; -1 = this slot is unused on this layer
     int8_t line;  // cpu->input_set() line
 };
 
-// table[layer*12 + slot], layer 0 = base, 1 = ZL held, 2 = ZR held.
-// Reads the current physical button/ZL/ZR state itself (via
+// table[layer*12 + slot], layer 0 = base, 1 = L held, 2 = R held.
+// Reads the current physical button/L/R state itself (via
 // switch_input_held()) - callers just pass the CPU and the game's table.
 void apply_modifier_layer_input(SM5XX* cpu, const ModLayerTarget table[36]);
+
+// 1 = L alone held, 2 = R alone held, 0 = neither (or both).
+int modifier_layer_held();
 
 // Additive variant for games that already have a normal Virtual_Input
 // control scheme that must keep working unmodified (unlike NUMMUNCH/
@@ -43,10 +44,10 @@ void apply_modifier_layer_input(SM5XX* cpu, const ModLayerTarget table[36]);
 // gated behind Experimental Features (see g_experimental_features_enabled) rather
 // than always on - main.cpp checks that before calling this at all.
 //
-// table[(layer-1)*12 + slot], layer 1 = ZL held, 2 = ZR held - no base
+// table[(layer-1)*12 + slot], layer 1 = L held, 2 = R held - no base
 // layer slot 0 here, since the caller's normal Virtual_Input-driven call
 // already owns the unmodified controls; this only ever touches the
 // (group, line) targets listed in the table, clearing them when neither
-// ZL nor ZR is held rather than leaving a calculator key stuck once the
+// L nor R is held rather than leaving a calculator key stuck once the
 // modifier is released.
 void apply_calculator_modifier_input(SM5XX* cpu, const ModLayerTarget table[24]);

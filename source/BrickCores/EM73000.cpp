@@ -45,7 +45,9 @@ void EM73000::reset() {
 void EM73000::init_() {
     f_P0_pullup_mask = options().num("port_pullup.P0", 0);
     f_P7_pullup_mask = options().num("port_pullup.P7", 0);
-    f_P8_pullup_mask = 15;
+    // BrickEmuPy 71a7481 ("improvement of EM73 emulation"): P8's pull-up
+    // defaults to 0xF but a .brick can now set it too.
+    f_P8_pullup_mask = options().num("port_pullup.P8", 15);
     f_P0_wakeup_mask = options().num("port_wakeup.P0", 0);
     f_P8_wakeup_mask = options().num("port_wakeup.P8", 0);
     f_instr_counter = 0;
@@ -169,6 +171,7 @@ void EM73000::py_reset() {
     f_timerB_counter = 0;
     f_time_base_counter = 0;
     f_ram_bank = 0;
+    f_rti_stack = false;
 }
 
 void EM73000::pyreset() {
@@ -252,6 +255,7 @@ int64_t EM73000::py_set_io_P23(int64_t v_value) {
 }
 
 int64_t EM73000::py_set_io_P24(int64_t v_value) {
+    snd_set_freq_div((((v_value << 4) | f_P23) + 1));
     f_P24 = v_value;
     return 0;
 }
@@ -279,7 +283,7 @@ int64_t EM73000::py_set_io_P29(int64_t v_value) {
 }
 
 int64_t EM73000::py_set_io_P30(int64_t v_value) {
-    snd_set_basic_freq_div((4 << ((v_value & 12) >> 2)));
+    snd_set_basic_freq_div((1 << ((v_value & 12) >> 2)));
     snd_set_mode((v_value & 3));
     f_P30 = v_value;
     return 0;
@@ -339,6 +343,8 @@ void EM73000::py_pin_release(int64_t v_port, int64_t v_pin) {
                 if (((((f_P8_wakeup_mask & v_prev_P8) & v_pin_mask)) && ((~((f_P8 & v_pin_mask)))))) {
                     f_P16 &= (~(4));
                 }
+            } else if (v_port == kPort_RES) {
+                py_reset();  // BrickEmuPy 71a7481: releasing RES resets the chip
             }
         }
     }
@@ -389,6 +395,7 @@ void EM73000::py_interrupt() {
             f_SF = 1;
             f_EI = 0;
             f_IL &= (~((32 >> v_id)));
+            f_rti_stack = true;  // RTI restores the flags only after an interrupt
             return;
         }
     }
@@ -413,7 +420,7 @@ int64_t EM73000::pyclock() {
 void EM73000::py_write_ram(int64_t v_i, int64_t v_value) {
     v_i &= 255;
     if (((v_i < 244))) {
-        f_RAM[(f_ram_bank + v_i)] = v_value;
+        if (f_ram_bank + v_i < 384) f_RAM[(f_ram_bank + v_i)] = v_value;
     } else {
         if (((v_i == 244))) {
             f_TIMERA = ((f_TIMERA & 4080) | v_value);
@@ -445,7 +452,7 @@ void EM73000::py_write_ram(int64_t v_i, int64_t v_value) {
                                             if (((v_i == 255))) {
                                                 f_SP = v_value;
                                             } else {
-                                                f_RAM[(f_ram_bank + v_i)] = v_value;
+                                                if (f_ram_bank + v_i < 384) f_RAM[(f_ram_bank + v_i)] = v_value;
                                             }
                                         }
                                     }
@@ -462,7 +469,7 @@ void EM73000::py_write_ram(int64_t v_i, int64_t v_value) {
 int64_t EM73000::py_read_ram(int64_t v_i) {
     v_i &= 255;
     if (((v_i < 244))) {
-        return f_RAM[(f_ram_bank + v_i)];
+        return (f_ram_bank + v_i < 384) ? f_RAM[(f_ram_bank + v_i)] : 0;
     } else {
         if (((v_i == 244))) {
             return (f_TIMERA & 15);
@@ -504,8 +511,7 @@ int64_t EM73000::py_read_ram(int64_t v_i) {
             }
         }
     }
-    return f_RAM[(f_ram_bank + v_i)];
-    return 0;
+    return (f_ram_bank + v_i < 384) ? f_RAM[(f_ram_bank + v_i)] : 0;
 }
 
 int64_t EM73000::py_sbr_a(int64_t v_opcode) {
@@ -522,7 +528,7 @@ int64_t EM73000::py_lcall_a(int64_t v_opcode) {
     int64_t v_pc = 0, v_sp = 0;
     v_pc = (f_PC + 2);
     v_sp = (192 + (f_SP << 2));
-    f_RAM[v_sp] = (v_pc >> 12);
+    f_RAM[v_sp] = ((v_pc >> 12) & 1);
     f_RAM[(v_sp + 1)] = ((v_pc >> 8) & 15);
     f_RAM[(v_sp + 2)] = ((v_pc >> 4) & 15);
     f_RAM[(v_sp + 3)] = (v_pc & 15);
@@ -600,9 +606,12 @@ int64_t EM73000::py_rti(int64_t v_opcode) {
     f_SP = ((f_SP + 1) & 15);
     v_sp = (192 + (f_SP << 2));
     f_PC = (((((f_RAM[v_sp] & 1) << 12) | (f_RAM[(v_sp + 1)] << 8)) | (f_RAM[(v_sp + 2)] << 4)) | f_RAM[(v_sp + 3)]);
-    f_CF = (((f_RAM[v_sp] & 8) > 0));
-    f_ZF = (((f_RAM[v_sp] & 4) > 0));
-    f_SF = (((f_RAM[v_sp] & 2) > 0));
+    if (f_rti_stack) {
+        f_rti_stack = false;
+        f_CF = (((f_RAM[v_sp] & 8) > 0));
+        f_ZF = (((f_RAM[v_sp] & 4) > 0));
+        f_SF = (((f_RAM[v_sp] & 2) > 0));
+    }
     f_EI = 1;
     return 16;
     return 0;
@@ -1431,7 +1440,7 @@ int64_t EM73000::py_scall_a(int64_t v_opcode) {
     int64_t v_n = 0, v_pc = 0, v_sp = 0;
     v_pc = (f_PC + 1);
     v_sp = (192 + (f_SP << 2));
-    f_RAM[v_sp] = (v_pc >> 12);
+    f_RAM[v_sp] = ((v_pc >> 12) & 1);
     f_RAM[(v_sp + 1)] = ((v_pc >> 8) & 15);
     f_RAM[(v_sp + 2)] = ((v_pc >> 4) & 15);
     f_RAM[(v_sp + 3)] = (v_pc & 15);

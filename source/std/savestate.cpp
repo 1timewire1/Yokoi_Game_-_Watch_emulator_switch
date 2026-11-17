@@ -20,12 +20,22 @@ static CPUType get_cpu_type(SM5XX* cpu) {
 
 // Get save file path for a game
 const char* get_save_path(uint16_t game_index) {
+    return get_save_path_slot(game_index, 0);
+}
+
+const char* get_save_path_slot(uint16_t game_index, int slot) {
     static char path[256];
     // Use game ref for the savestate filename (stable across pack reorder).
     const GW_rom* game = load_game(game_index);
     if(game) {
         std::string dir = savestate_dir();
-        snprintf(path, sizeof(path), "%s/%s.sav", dir.c_str(), game->ref.c_str());
+        if (slot == 0) {
+            snprintf(path, sizeof(path), "%s/%s.sav", dir.c_str(), game->ref.c_str());
+        } else if (slot < 0) {
+            snprintf(path, sizeof(path), "%s/%s_undo.sav", dir.c_str(), game->ref.c_str());
+        } else {
+            snprintf(path, sizeof(path), "%s/%s_slot%d.sav", dir.c_str(), game->ref.c_str(), slot);
+        }
     } else {
         // No game loaded/resolved for this index.
         path[0] = '\0';
@@ -41,7 +51,11 @@ static void ensure_save_directory() {
 
 // Check if a save state file exists for a game
 bool save_state_exists(uint16_t game_index) {
-    const char* path = get_save_path(game_index);
+    return save_state_slot_exists(game_index, 0);
+}
+
+bool save_state_slot_exists(uint16_t game_index, int slot) {
+    const char* path = get_save_path_slot(game_index, slot);
     if(path[0] == '\0') return false;
     FILE* file = fopen(path, "rb");
     if(!file) return false;
@@ -51,11 +65,15 @@ bool save_state_exists(uint16_t game_index) {
 
 // Save game state to file
 bool save_game_state(SM5XX* cpu, uint16_t game_index) {
+    return save_game_state_slot(cpu, game_index, 0);
+}
+
+bool save_game_state_slot(SM5XX* cpu, uint16_t game_index, int slot) {
     if(!cpu) return false;
     
     ensure_save_directory();
     
-    const char* path = get_save_path(game_index);
+    const char* path = get_save_path_slot(game_index, slot);
     if(path[0] == '\0') return false;
     FILE* file = fopen(path, "wb");
     if(!file) return false;
@@ -90,9 +108,13 @@ bool save_game_state(SM5XX* cpu, uint16_t game_index) {
 
 // Load game state from file
 bool load_game_state(SM5XX* cpu, uint16_t game_index) {
+    return load_game_state_slot(cpu, game_index, 0);
+}
+
+bool load_game_state_slot(SM5XX* cpu, uint16_t game_index, int slot) {
     if(!cpu) return false;
     
-    const char* path = get_save_path(game_index);
+    const char* path = get_save_path_slot(game_index, slot);
     if(path[0] == '\0') return false;
     FILE* file = fopen(path, "rb");
     if(!file) return false;
@@ -134,7 +156,11 @@ bool load_game_state(SM5XX* cpu, uint16_t game_index) {
 
 // Delete game state file
 void delete_game_state(uint16_t game_index) {
-    const char* path = get_save_path(game_index);
+    delete_game_state_slot(game_index, 0);
+}
+
+void delete_game_state_slot(uint16_t game_index, int slot) {
+    const char* path = get_save_path_slot(game_index, slot);
     if(path[0] == '\0') return;
     remove(path);
 }

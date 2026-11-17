@@ -49,9 +49,12 @@ private:
         return ((int64_t)1 << bits) - 1;
     }
     int64_t snd_basic_div_ = 0, snd_div_ = 0, snd_mode_ = 0;
+    // Set by an interrupt, so RTI restores CF/ZF/SF only then (BrickEmuPy
+    // 71a7481). Not in save states, so older EM73000 saves still load.
+    bool f_rti_stack = false;
     void snd_update() {
         if (snd_mode_ != 0 && snd_div_ > 1 && snd_basic_div_ > 0)
-            set_tone((double)clock_hz() / snd_basic_div_ / snd_div_ / 2, snd_mode_ != 1);
+            set_tone(240000.0 / snd_basic_div_ / snd_div_ / 2, snd_mode_ != 1);  // BASIC_FREQ (BrickEmuPy 71a7481)
         else set_tone(0);
     }
     void snd_set_basic_freq_div(int64_t v) { snd_basic_div_ = v; }

@@ -19,6 +19,18 @@
 void switch_ui_init();
 void switch_ui_shutdown();
 
+// Menu font: 0 = the Switch's system font, 1.. = the bundled fonts
+// (switch_fonts.cpp). Characters a bundled font lacks fall back to the
+// system font. Safe to call any time after switch_ui_init().
+int switch_ui_font_count();
+const char* switch_ui_font_name(int index);
+void switch_ui_set_font(int index);
+
+// Which way the next frames are turned (0 = none, 1 = 90, 2 = 270 - the
+// ScreenRotation values): the menus use the menu rotation, overlays drawn
+// over gameplay the game's. Call before switch_ui_begin_frame().
+void switch_ui_set_rotation(int rotation);
+
 // Call once per frame before any switch_ui_draw_* calls.
 void switch_ui_begin_frame(int viewport_w, int viewport_h);
 
@@ -46,6 +58,13 @@ void switch_ui_draw_texture(uint32_t gl_tex, float x, float y, float w, float h,
 // pipeline's X-mirror correction, so it's the right one for a generic UI
 // texture (e.g. a header icon) that was never run through that pipeline.
 void switch_ui_draw_texture_plain(uint32_t gl_tex, float x, float y, float w, float h);
+
+// For textures rendered by this same pipeline (off-screen framebuffers -
+// render/switch_transition.cpp): u0,v0-u1,v1 are the source rect as
+// fractions of the texture, top-left origin, with NO V-flip (unlike the
+// stb_image textures above). `alpha` fades it; `nearest` = blocky scaling.
+void switch_ui_draw_texture_uv(uint32_t gl_tex, float x, float y, float w, float h, float u0, float v0, float u1, float v1,
+                               float alpha, bool nearest);
 
 // Draws `text` in pixel space, (x,y) = top-left of the line. `pixel_size` is
 // the requested glyph height in pixels (glyphs are individually cached per

@@ -1,3 +1,4 @@
+#include "core/score_tracker.h"
 #include "yokoi_input_mapping.h"
 
 // NOTE: virtual_input.h defines a non-inline function `get_input_config(...)` in the header.
@@ -67,8 +68,13 @@ void yokoi_input_apply_controller_mask(
     // Match 3DS mapping from source/main.cpp::input_get()
     // Setup buttons.
     input->set_input(PART_SETUP, BUTTON_TIME, l1, player);
-    input->set_input(PART_SETUP, BUTTON_GAMEA, start || (gamea_pulse_frames.load() > 0), player);
-    input->set_input(PART_SETUP, BUTTON_GAMEB, select || (gameb_pulse_frames.load() > 0), player);
+    const bool game_a = start || (gamea_pulse_frames.load() > 0);
+    const bool game_b = select || (gameb_pulse_frames.load() > 0);
+    input->set_input(PART_SETUP, BUTTON_GAMEA, game_a, player);
+    input->set_input(PART_SETUP, BUTTON_GAMEB, game_b, player);
+    // The mode a score counts for (core/score_tracker.h).
+    if (game_a) score_tracker_set_mode(0);
+    else if (game_b) score_tracker_set_mode(1);
 
     // Left controls.
     if (input->left_configuration == CONF_1_BUTTON_ACTION) {

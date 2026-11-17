@@ -17,6 +17,22 @@ uint64_t switch_input_poll();
 // most recent switch_input_poll() call.
 uint64_t switch_input_held();
 
+// The same two masks before pause menu > Controls' per-game remapping
+// (input/control_remap.h) - what was physically pressed. The pause combo is
+// checked on these.
+uint64_t switch_input_raw_held();
+uint64_t switch_input_raw_down();
+
+// Clears this frame's buttons for the game (held/down masks and the CTL_*
+// mask) - the on-screen keypad has the controller (input/onscreen_keypad.h).
+// The raw masks above are left as they were.
+void switch_input_clear_for_game();
+
+// Player 1 pad's HidNpadStyleTag_* set and HidNpadAttribute_* flags (which
+// controller is in use - input/motion_steps.cpp picks its sensor by them).
+uint32_t switch_input_style_set();
+uint32_t switch_input_attributes();
+
 // Player 2 - fully automatic, no setting (a second controller being
 // connected *is* two-player mode, checked live every frame - see
 // standard_controls.md's BX_301/AK_302/HK_303 row). Only the three "Vs."

@@ -116,7 +116,11 @@ public:
     // is_endless() stays true after an Endless run ends so the final score
     // remains on screen until the next start_game() call replaces it.
     bool is_endless() const { return endless_; }
+    // The running score of the current (or last) run, Normal or Endless.
     int endless_score() const { return endless_score_; }
+    // A run has been started since the game was loaded (or one is running /
+    // has a score, e.g. restored from a save state) - the score is shown.
+    bool started() const { return started_ || endless_score_ > 0 || (program_ && !program_->is_stopped()); }
 
     LCDonald_program* program() { return program_.get(); }
 
@@ -181,6 +185,7 @@ private:
 
     bool endless_ = false;
     int endless_score_ = 0;
+    bool started_ = false;
     bool hidden_group_shown_ = false;
     // The dummy ROM's game id (see load_rom()) - kept so a failed state load
     // can rebuild a fresh program for the same game.

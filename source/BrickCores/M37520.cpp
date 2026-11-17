@@ -157,6 +157,7 @@ void M37520::port_input(int port, uint8_t mask, int level) {
     if (prev == port_read(port)) return;
     if (port == 2 && level == 0) {
         ireq2_ |= kIreq2KeyOn;
+        boost_left_ = (int64_t)(kBoostWindowSec * clock_hz()) * kTickHz;
     } else if (port == 4) {
         if ((mask & 0x1) && level >= 0 && ((intedge_ & kIntEdgeInt0) != 0) == (level != 0)) ireq1_ |= kIreq1Int0;
         else if ((mask & 0x2) && level >= 0 && ((intedge_ & kIntEdgeInt1) != 0) == (level != 0)) ireq1_ |= kIreq1Int1;
@@ -411,8 +412,14 @@ void M37520::set_ps(uint8_t p) {
     cf_ = p & 0x01;
 }
 
+int M37520::sub_clock_boost = 1;
+
 int64_t M37520::execute_scaled() {
     int64_t exec = cpu_div_;  // taken before the instruction: it may change CPUM
+    if (boost_left_ > 0) {
+        if ((cpum_ & kCpumClkLow) && sub_clock_boost > 1) exec /= sub_clock_boost;
+        boost_left_ -= exec;
+    }
     if (nstop_) {
         if (nwait_) {
             const uint8_t b = rom_byte((int64_t)pc_ - rom_offset_);

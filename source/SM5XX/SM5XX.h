@@ -141,6 +141,10 @@ public :
     virtual bool screen_is_on() = 0;
 
     virtual bool get_active_sound(){ return false; };
+    // Cores with a DAC (Tiger Game.com) give a level instead of a pin:
+    // 0..1, sampled once per sound tick (switch_sound.cpp).
+    virtual bool has_analog_sound(){ return false; }
+    virtual float get_sound_level(){ return 0.0f; }
 
     // Save/Load state for save states
     virtual bool save_state(FILE* file) = 0;

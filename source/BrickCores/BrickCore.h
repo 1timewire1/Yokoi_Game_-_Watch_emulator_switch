@@ -92,6 +92,11 @@ public:
         std::string switch_keys;  // e.g. "LEFT", "A", "PLUS+MINUS"
     };
     const std::vector<Binding>& bindings() const { return bindings_; }
+    // Whether the game is driving the output pin a matrix-wired button reads
+    // through - i.e. it is "listening" to that button right now (the
+    // D-Tector's Wave sensor, for the Switch IR camera: input/ir_sensor.h).
+    bool matrix_line_driven(const std::string& name) const;
+    bool has_matrix_input(const std::string& name) const { return matrix_.count(name) != 0; }
     void set_button(const std::string& name, bool pressed);
 
     // Real-time clock games (Nelsonic Game Watches, Formel 1): writes the
@@ -156,7 +161,7 @@ public:
         const std::vector<long> cell = rom_.options.list("clock.weekday");
         if (cell.size() == 1) poke_ram((uint32_t)cell[0], (uint8_t)weekday);
     }
-    void set_date(int month, int day) {
+    virtual void set_date(int month, int day) {
         const std::vector<long> cell = rom_.options.list("clock.date");
         if (cell.size() != 3) return;
         poke_ram((uint32_t)cell[0], (uint8_t)month);
@@ -209,9 +214,51 @@ public:
     // Runs `ticks` 1/kTickHz s of emulated time as fast as possible - no
     // sound, no display refresh until the end (Pet Time's catch-up, like
     // E0C6S46::fast_forward()).
-    void fast_forward(uint64_t ticks);
+    virtual void fast_forward(uint64_t ticks);
+    // Runs the core at p % of its clock (an optional setting: Game.com
+    // +20 %, Game Master x2). Emulated time itself speeds up with it.
+    void set_speed_percent(int p) { speed_pct_ = p > 0 ? p : 100; }
     // Lets go of every bound button (nobody holds anything while away).
     void release_all_buttons();
+
+    // How many pulses one press of a step-sensor button has to send for
+    // the game to count one step (switch/source/input/brick_input_map.cpp
+    // sends the extra ones as quick press/release pairs). 1 everywhere but
+    // the D-Tector (GPL191X), whose pedometer feeds a hardware counter that
+    // the game sets to count a step only every 3 pulses - the real sensor's
+    // contact bounces - so one press there counted one step in three.
+    virtual int step_pulses() const { return 1; }
+
+    // Local link between two devices (switch/source/core/link_session.h),
+    // for the cores with an infrared port (Tamagotchi Connection V3 on the
+    // SPLB32 - BrickEmuPy's peripherals/CON_V3_IR.py). link_take_tx(): did
+    // the transmitter pin toggle (an IR carrier) since the last call;
+    // link_set_rx(): whether the receiver sees a carrier. No-ops elsewhere.
+    virtual bool link_take_tx() { return false; }
+    virtual void link_set_rx(bool) {}
+    // Cores that join a second console themselves rather than through a
+    // pin (Tamagotchi Tama-Go / Friends, Tamago.h): link_pair() wires this
+    // one to `other` (false if they can't talk), link_unpair() undoes it.
+    virtual bool link_pair(BrickCore*) { return false; }
+    virtual void link_unpair() {}
+
+    // Two-prong wire link, the Digital Monster's (D-Tector and D-Power on the
+    // GPL191X): one pin, pulled up, that each device drives low or lets go.
+    // wire_link_config(): which pin (.brick port name, mask); without it the
+    // other two do nothing. wire_link_drive(): 0 while this device pulls it
+    // low. wire_link_set(): the line's level as the pin reads it (-1 = left
+    // unconnected again).
+    void wire_link_config(const std::string& port, uint8_t mask) {
+        wl_port_ = port_id(port);
+        wl_mask_ = mask;
+        wl_level_ = -2;
+    }
+    int wire_link_drive() const { return wl_port_ < 0 ? 1 : pin_drive(wl_port_, wl_mask_); }
+    void wire_link_set(int level) {
+        if (wl_port_ < 0 || level == wl_level_) return;
+        wl_level_ = level;
+        wire_pin_level(wl_port_, wl_mask_, level);
+    }
 
     // Every segment lit (the first 32 display bytes all 0xFF) - the
     // all-segments test screen some games boot to.
@@ -240,6 +287,14 @@ protected:
     // does 1 << mask).
     virtual void port_input(int port, uint8_t mask, int level) = 0;
     virtual void serialize(BrickStateIO& io) = 0;           // all mutable core state
+    // The wire's level on that pin. Default: as an input (port_input()).
+    virtual void wire_pin_level(int port, uint8_t mask, int level) { port_input(port, mask, level); }
+    // What the core drives on that pin: 0 low, 1 high or not driven (input).
+    virtual int pin_drive(int port, uint8_t mask) const {
+        (void)port;
+        (void)mask;
+        return 1;
+    }
     // Called by the core when it drives an output port, so matrix-wired
     // buttons (input pin <- output pin while pressed) follow it.
     void port_output(int port, uint8_t value);
@@ -271,6 +326,10 @@ protected:
     uint32_t clock_hz() const { return rom_.clock_hz; }
 
 private:
+    int wl_port_ = -1;       // wire link pin (wire_link_config())
+    uint8_t wl_mask_ = 0;
+    int wl_level_ = -2;      // last level set, -2 = none yet
+
     // A clock.unset / clock.set_screen test: <addr>,<value>[,<mask>].
     bool ram_matches(const std::vector<long>& t) const {
         if (t.size() != 2 && t.size() != 3) return false;
@@ -305,6 +364,7 @@ private:
     bool reset_held_ = false;
 
     int64_t cycle_debt_ = 0;     // in cycles * kTickHz
+    int speed_pct_ = 100;        // set_speed_percent()
     uint32_t ticks_to_refresh_ = 0;
     bool speaker_ = false;
     double tone_step_ = 0;       // tone periods per tick, 0 = no tone

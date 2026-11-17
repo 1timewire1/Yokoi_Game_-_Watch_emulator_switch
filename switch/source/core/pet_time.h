@@ -27,3 +27,23 @@ void pet_time_on_game_loaded();
 void pet_time_on_state_loaded();
 bool pet_time_frame(uint64_t kDown);
 void pet_time_render(int viewport_w, int viewport_h);
+
+// Pause menu extras (switch_menu.cpp):
+// - The running game is a pet Pet Time handles, with its clock set - only
+//   then are Simulate Time / Undo Simulate offered.
+bool pet_time_current_is_pet();
+// - Simulate Time: the pet lives `seconds` right now, fast-forwarded like a
+//   catch-up (same overlay/display setting, B stops early; the Real Time cap
+//   doesn't apply). Afterwards the clock is put back to the real time,
+//   except under Paused (or Experimental Features off), where it stays
+//   that far ahead - like winding a real one's clock forward.
+void pet_time_simulate(int64_t seconds);
+// - After Undo Simulate restored the pre-simulation copy: clock back to
+//   the real time (same rule as above), nothing caught up.
+void pet_time_after_undo();
+// - Loading an older slot: how long ago the loaded state was saved (0 if
+//   not a pet / unknown), whether Pet Time would catch that up (Real Time),
+//   and the "load as is" choice - only the clock is set.
+int64_t pet_time_state_age();
+bool pet_time_would_catch_up();
+void pet_time_sync_clock();

@@ -1104,7 +1104,7 @@ time) — no other action buttons on either unit.
 physical buttons - roughly double what the usual 12-input layout (D-pad x4,
 A/B/X/Y, L/R, +/-) covers. Rather than leave them unported, both use a new
 3-layer scheme instead of the normal `Virtual_Input`/`PART_*` path: holding
-**ZL** or **ZR** re-purposes the same 12 inputs as a second and third set of
+**L** or **R** re-purposes the other 10 inputs as a second and third set of
 buttons (36 total), selected every frame in `main.cpp` and applied via
 `apply_modifier_layer_input()` (see
 [`source/input/modifier_layer_input.h`](source/input/modifier_layer_input.h)).
@@ -1113,17 +1113,16 @@ control table entry above - they're wired directly by (group, line) in
 `main.cpp`'s `kNummunchLayout`/`kUchitariLayout` tables instead, matching
 MAME's own `hh_sm510.cpp` input ports 1:1. Not ideal control-wise (some
 buttons need two key-presses to reach), but enough to actually play and
-test both on real hardware, which was the point - `ZL`+`ZR` held together
-is still the existing pause-menu combo, treated as "no modifier" (falls
-back to the base layer) if it's ever read here rather than caught by the
-pause check first.
+test both on real hardware, which was the point. (The modifiers were ZL/ZR
+at first; they moved to L/R since `ZL`+`ZR` is reserved for the in-game
+menu. L+R held together is treated as "no modifier" - the base layer.)
 
 Both layers follow the same shape on each game: the base layer (no
-modifier) covers primary functions/navigation, holding **ZL** always maps
-to digits 0-9 in the same D-pad/face-button/L/R positions, and holding
-**ZR** always maps to the four math operators.
+modifier) covers primary functions/navigation, holding **L** always maps
+to digits 0-9 in the same D-pad/face-button/+/− positions, and holding
+**R** always maps to the four math operators.
 
-The same ZL/ZR trick was later reused *additively* - layered on top of a
+The same L/R trick was later reused *additively* - layered on top of a
 game's existing, unmodified controls rather than replacing them - to
 expose a real but previously-unmapped calculator keypad on three ordinary
 (non-Experimental) library games: `MG_8`/`TG_18`/`SA_12`. Gated behind
@@ -1140,20 +1139,18 @@ On/Off/Calc.Clear/`=`, Game/Count/Quiz mode buttons, four "Choose" icon
 buttons (+/-/×/÷), a 0-9 numeric keypad, and a second +/-/×/÷ operator row
 on the keypad itself.
 
-| Switch input | Base (no modifier) | Hold ZL | Hold ZR |
+| Switch input | Base (no modifier) | Hold L | Hold R |
 |---|---|---|---|
 | D-Pad Up | Game | 1 | + |
 | D-Pad Down | Quiz | 2 | − |
 | D-Pad Left | Left | 3 | × |
 | D-Pad Right | Right | 4 | ÷ |
-| A | Count | 5 | — |
-| B | = | 6 | — |
+| A | Count | 5 | Choose × |
+| B | = | 6 | Choose ÷ |
 | X | Calc. / Clear | 7 | — |
 | Y | OFF | 8 | — |
-| L | Choose + | 9 | — |
-| R | Choose − | 0 | — |
-| + | Choose × | — | — |
-| − | Choose ÷ | — | — |
+| + | Choose + | 9 | — |
+| − | Choose − | 0 | — |
 
 ## Uchitel' arifmetiki (`uchitari`)
 
@@ -1166,7 +1163,7 @@ wired to the same line on real hardware (per MAME's own `PORT_CONDITION`
 setup), same for `Alarm`/`Exam Level` - each pair below intentionally
 shares a Switch input rather than that being a mapping mistake.
 
-| Switch input | Base (no modifier) | Hold ZL | Hold ZR |
+| Switch input | Base (no modifier) | Hold L | Hold R |
 |---|---|---|---|
 | D-Pad Up | Evaluate Entry | 1 | + |
 | D-Pad Down | Start Exam | 2 | − |
@@ -1176,8 +1173,8 @@ shares a Switch input rather than that being a mapping mistake.
 | B | Clear entry / Correction | 6 | — |
 | X | Alarm (shares Exam Level's line) | 7 | — |
 | Y | Exam Level (shares Alarm's line) | 8 | — |
-| L | Evaluate Division Entries | 9 | — |
-| R | — | 0 | — |
+| + | Evaluate Division Entries | 9 | — |
+| − | — | 0 | — |
 
 ---
 

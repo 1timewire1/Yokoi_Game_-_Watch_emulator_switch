@@ -189,11 +189,12 @@ a full calculator keypad - digits, `+ - × ÷`, `=`, a decimal point, `%`,
 `ALM`, and `C` - that was never wired into this codebase's normal
 `Virtual_Input` scheme, since none of it fits the usual D-pad/action-button
 shape these tables describe. Rather than leave it inaccessible, it's now
-layered on top of the normal controls above via the same **hold ZL/hold
-ZR** modifier trick built for `nummunch`/`uchitari` (see
+layered on top of the normal controls above via the same **hold L/hold
+R** modifier trick (ZL/ZR originally; ZL+ZR is the in-game menu) built for `nummunch`/`uchitari` (see
 [`experimental_controls.md`](experimental_controls.md#sixth-batch--modifier-key-calculator-keypads-2-games)),
 just additive here instead of replacing anything - the table above still
-works exactly as documented at all times.
+works exactly as documented whenever neither L nor R is held (while one is,
+the normal controls are released so a keypad key doesn't also press them).
 
 This is gated behind the **Experimental Features** setting and does
 nothing at all when it's off, unlike everything else in this file: unlike
@@ -205,7 +206,7 @@ looks like here instead. See `apply_calculator_modifier_input()` in
 [`source/input/modifier_layer_input.h`](source/input/modifier_layer_input.h)
 for the implementation.
 
-| Switch input | Hold ZL | Hold ZR |
+| Switch input | Hold L | Hold R |
 |---|---|---|
 | D-Pad Up | 1 | . |
 | D-Pad Down | 2 | = |
@@ -215,8 +216,8 @@ for the implementation.
 | B | 6 | ÷ |
 | X | 7 | ALM |
 | Y | 8 | % |
-| L | 9 | C |
-| R | 0 | — |
+| + | 9 | — |
+| − | 0 | C |
 
 ---
 
@@ -446,7 +447,7 @@ need setting by hand; Alien Fever and Stack Challenge have no clock.
 | A / D-Pad Up / D-Pad Down | Middle button (B - confirm) |
 | B / D-Pad Right | Right button (C - cancel) |
 | X | Sensor on K03 (`TAMAANG`, `TAMAUMI`, `TAMAMORI`, `TAMAGENJIN` - BrickEmuPy wires it to tapping the screen; also on `TAMAOTCH`, whose rehearsal game needs the sensor's bounce, so X held makes it bounce) |
-| L + R (held) | Reset (`DIGIMON*` only - the recessed reset button) |
+| Minus | Reset (`DIGIMON*` only - the recessed reset button; movable in pause menu > Controls, where the Digimon rows read A - Select / B - Decide / Confirm / C - Cancel / Reset Button) |
 
 **Yasashii Tamagotchi** (`TAMAYASA`) - six icon buttons around the screen
 plus Select / Cancel, mapped by position:
@@ -526,9 +527,9 @@ ACL button, where the device has one (holding it holds the chip in reset).
 | The Legend of Zelda Game Watch (Nelsonic, MSM50XX) | Set | | Mode | Set | B = Mode too |
 | Super Mario Bros. Game Watch (Nelsonic, MSM50XX) | | | Mode | Set | |
 | Formel 1 (Hartung, MSM50XX) | | Game 1/2 | | Set | Left/Right steer |
-| D-Power Digivice (Bandai, SPL61X) | Card | | | | X = Step, repeating (10 a second) while held; +/- Reset |
-| D-Tector (Bandai, GPL191X) | B (middle) | | | Sensor | Left/Y = A, Up/Down = B too, Right/B = C; X = Step, repeating; L = Wave |
-| Pocket Pikachu (Nintendo, M37520) | A | Start | Select | | B = B, D-pad = its arrows, X = step sensor ("reflector"), repeating; +/- Reset |
+| D-Power Digivice (Bandai, SPL61X) | Card | | | | X = Step, repeating (about 4 a second, a walking pace) while held, with its pedometer's own sound (recorded from a real unit) on each step; +/- Reset |
+| D-Tector (Bandai, GPL191X) | B (middle) | | | Sensor | Left/Y = A, Up/Down = B too, Right/B = C; X = Step, repeating, with its pedometer's own sound (recorded from a real unit) on each step; L = Wave |
+| Pocket Pikachu (Nintendo, M37520) | A | Start | Select | | B = B, D-pad = its arrows, X = step sensor ("reflector"), repeating, with its pedometer's own sound (recorded from a real unit) on each step; +/- Reset |
 | Apollo 126 in 1 (B0202, SPL02) / 18 in 1 (B0302, SPL03) | Rotate | Start / pause | On / off | Mute | D-pad = left / right / down; +/- Reset |
 | Apollo 2 in 1 (SPLB20) | Enter | | | | Y = Mode, B = Exit, X = Rev |
 | Prince & Princess (Apollo, SPLB20) | Enter | | Mode | | B = Mode too, Left/Right = their arrows |
@@ -558,6 +559,46 @@ ACL button, where the device has one (holding it holds the chip in reset).
 | Pengo, Gundam Space Combat 3 in 1, SD Gundam Gaiden II (Bandai) | Start | Start | | | Gundam 3 in 1: R = Time; +/- Reset or ACL |
 | Power Fishing (Bandai, T7741) | Throw | Start | | Rotate CW | L = Rotate CCW, Up/Down too; +/- Reset |
 | D'Artagnan (Spica, T7741) | Jump | Start | | | Up = Jump too |
+| Packri Monster (Bandai, HMCS40) | Start | Start | | | D-pad = joystick |
+| Donkey Kong (Coleco, HMCS40) | Jump | | | | B = Jump too, D-pad = joystick |
+| Galaxian 2 (Entex, HMCS40) | Fire | | | | B = Fire too, Left/Right = joystick |
+| Tron (Tomy, HMCS40) | Fire | | | | B = Fire too, D-pad = joystick |
+| Dig Dug (Gakken, HMCS40) | Fire | | Select | | B = Fire too, X = Select too, D-pad = joystick |
+| Super Cobra (Gakken, HMCS40) | Missile | | | | X = Missile too, B/Y = Bomb, D-pad = joystick |
+| Burger Time (Bandai, HMCS40) | Pepper/Start | Pepper/Start | Attack/Select | | B = Attack/Select too, D-pad = joystick |
+| Ms. Pac-Man (Coleco, HMCS40) | P2 Right | | | | D-pad = P1 joystick; P2 joystick on X/A/B/Y (Up/Right/Down/Left). At the title, P1 Left = Ms. Pac-Man, Down = Head-to-Head, Up = demo |
+| Stargate (Entex, HMCS40 + COP411) | Fire | | | | B = Thrust, X = Smart Bomb, Y = Inviso, Left/Right = Change Direction, Up/Down = joystick, L = slower, R = faster (speed knob) |
+| Frisky Tom (Bandai, HMCS40) | Attack | Start | | | B = Attack too, X = Start too, D-pad = joystick |
+| Zaxxon (Bandai, HMCS40) | Fire | Fire | Select | | B = Fire too, X = Select too, D-pad = joystick |
+| Zackman (Bandai, HMCS40) | Start/Fire | Start/Fire | | | B = Start/Fire too, D-pad = joystick |
+| Pengo (Bandai, HMCS40) | Start/Attack | Start/Attack | | | B = Start/Attack too, D-pad = joystick |
+| Alien Attack (Coleco, HMCS40) | Fire | | | | B = Move, D-pad = joystick |
+| Q*Bert (Parker Brothers, HMCS40) | Down-right | | | | Diagonal stick: Left/Y = up-left, Up/X = up-right, Right/A = down-right, Down/B = down-left |
+| Pac-Man (rev. 1 and rev. 2) (Coleco, HMCS40) | P2 Right | | | | D-pad = P1 joystick; P2 joystick on X/A/B/Y (Up/Right/Down/Left). At power-on, P1 Right = Pac-Man, Left = Head-to-Head, Up = Eat & Run, Down = demo |
+| Crazy Kong (Gakken, HMCS40) | Jump | | | | B = Jump too, D-pad = joystick |
+| Dokodemo Dorayaki Doraemon (Bandai, HMCS40) | Start/Attack | Start/Attack | | | B = Start/Attack too, D-pad = joystick |
+| Kingman (Tomy, HMCS40) | Start/Jump | Start/Jump | | | B = Start/Jump too, D-pad = joystick |
+| Heiankyo Alien (Gakken, HMCS40) | Dig | | | | B = Bury, D-pad = joystick |
+| Machine Man (Bandai, HMCS40) | Start/Attack | Start/Attack | | | B = Start/Attack too, Left/Right = L/R |
+| Dribble Away Basketball (Bambino, HMCS40 HD38750) | Dribble High | Start | Display | | Y = Dribble Low, X = Dribble Medium, Up/B = Shoot, Left/Right = move |
+| Invaders (VTech, HMCS40 HD38750) | Fire | | | | B = Fire too, Left/Right = move |
+| Turtles (Entex, HMCS40 HD38820 + COP411 sound) | Fire (free a turtle) | | | | B / Plus = Fire too, D-pad = move, L = slower, R = faster (speed knob) |
+| Knock-Em Out Boxing (Bambino, HMCS40 HD38750) | Medium punch | Start / reset | | | X = high punch, B = low punch, Up = back, Left/Right = normal, Down = duck (1-player mode) |
+| Pair Match (Bandai, HMCS40 HD38820 x2: main + sound) | Button | Button too | | | D-pad = the 16-way stick (diagonals by holding two directions), B = button too, L = SKILL switch 1 -> 2 -> 3 -> 1 (1 player) |
+
+**HMCS40 VFD games.** Packri Monster, Coleco Donkey Kong, Entex Galaxian 2, Tomy
+Tron, Gakken Dig Dug, Gakken Super Cobra, Bandai Burger Time, Coleco Ms. Pac-Man, Entex Stargate, Bandai Frisky Tom / Zaxxon /
+Zackman / Pengo, Coleco Alien Attack / Pac-Man (rev. 1) and Parker Brothers Q*Bert, Gakken Crazy Kong /
+Heiankyo Alien, Bandai Doraemon / Machine Man, Tomy Kingman, Bambino Dribble Away
+Basketball, Knock-Em Out Boxing, VTech Invaders, Entex Turtles and Bandai Pair Match run on the Hitachi HMCS40 core ported from MAME (not BrickEmuPy), with MAME's
+screen art in its own phosphor colours on a black glass. Where MAME's layout adds bezel art (Crazy Kong's side ladders,
+Packri Monster's maze walls, Basketball's hoops and green filter) it is painted
+into the background (CONVERT_ROM/hmcs40_layouts/). **+ and − together** turns the unit off and on
+(none of them has a reset button; Alien Attack, for one, only starts a new game
+from power-on). Galaxian 2 and Stargate are set to
+difficulty 1, one player; Stargate's sound comes from its second chip, a COP411
+(source/BrickCores/Cop411.*, also from MAME). Their demo/attract plays first; Start/Fire then
+begins a game once its jingle ends.
 
 Several of these power off by halting the chip; the screen is blank until
 the power/on button wakes them, as on the real thing.

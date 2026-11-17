@@ -74,7 +74,7 @@ void init() {
 #endif
 
     if (g_file) return;
-    g_file = std::fopen(storage_path("yokoi_log.txt").c_str(), "ab");
+    g_file = std::fopen(log_path("yokoi_log.txt").c_str(), "ab");
     if (!g_file) return;
     write_banner();
 }

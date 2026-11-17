@@ -209,6 +209,12 @@ def segments_svg(root, rect, scheme: str, members=None) -> tuple:
     layer.set("id", "layer_segs")
     layer.set(f"{{{INK_NS}}}label", "segs")
     layer.set(f"{{{INK_NS}}}groupmode", "layer")
+    # The face's root paints (BrickEmuPy faces say fill="none" there) are
+    # inherited by every segment - without them an unfilled shape, like the
+    # E-23/E-33 dot's stroked outer square, came out filled solid.
+    for attr in ("fill", "stroke", "stroke-width"):
+        if root.get(attr) is not None:
+            layer.set(attr, root.get(attr))
 
     seen = set()
     for el, byte, bit in segment_elements(root):
