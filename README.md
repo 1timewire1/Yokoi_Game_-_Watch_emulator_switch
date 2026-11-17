@@ -118,13 +118,16 @@ For ROM pack / asset generation, see [CONVERT_ROM/README.md](/CONVERT_ROM/README
 
 
 # License
-Public Domain / Free to use  
-No attribution required :)
+Yokoi's own code is Public Domain / free to use - no attribution required :)
+
+Bundled third-party code keeps its own license - see [THIRD_PARTY_LICENSES.md](THIRD_PARTY_LICENSES.md). In particular, the McDonald's and Burger Bard games (`source/LCDonald/`) are ported from LCDonald, which is GPLv3, so builds that include them - the Switch `.nro` - are distributed under the [GNU GPL v3](licenses/GPL-3.0.txt) as a whole, with their source here. Ship `THIRD_PARTY_LICENSES.md` and `licenses/GPL-3.0.txt` with every binary release.
 
 # Credits
 Original Project Code by RetroValou and aminch
 Code inspired by MAME, Game & Watch FPGA projects (Adam Gastineau), and official Sharp documentation.  
 ROMs and artwork are based on MAME ROMs.  
-The cores in `source/BrickCores/`, and those games' configurations and face art, come from [BrickEmuPy](https://github.com/azya52/BrickEmuPy) by azya52 (CC0), which also supplied the Tamagotchi and Digital Monster faces and board speeds. Most of those cores were ported to C++ by angel_hp.  
+The BrickEmuPy games' cores in `source/BrickCores/`, their configurations and face art come from [BrickEmuPy](https://github.com/azya52/BrickEmuPy) by azya52 (CC0), which also supplied the Tamagotchi and Digital Monster faces and board speeds. Most of those cores were ported to C++ by angel_hp, who also brought over MAME's tabletop VFD games, the Microvision, Game Pocket Computer, Game Master, Game.com and Adventure Vision.  
+Several cores are ported from MAME (BSD-3-Clause) - see [THIRD_PARTY_LICENSES.md](THIRD_PARTY_LICENSES.md) for every bundled component and its license.  
 The McDonald's and Burger Bard games are ported from [LCDonald](https://tvc-16.science/lcdonald.html).  
+The Tamagotchi TamaTown Tama-Go and Tamagotchi Friends core (`source/BrickCores/tamago_*`) is a port of [nullableVoidPtr/tamago](https://github.com/nullableVoidPtr/tamago), used with its author's permission.  
 Thanks to everyone who contributed to MAME, Adam Gastineau, azya52, and all those who worked on Game & Watch ROMs and artwork!

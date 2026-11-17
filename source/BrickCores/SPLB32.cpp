@@ -159,7 +159,7 @@ void SPLB32::serialize(BrickStateIO& io) {
 }
 
 void SPLB32::eeprom_port(int64_t port, int64_t value) {
-    // (hand-added) the IR LED's carrier for link_take_tx() - see SPLB32.h
+    // The IR LED's carrier, for link_take_tx().
     if (port == kPort_PC && (value & 4) != ir_prev_) {
         ir_prev_ = value & 4;
         ir_toggled_ = true;

@@ -48,6 +48,15 @@ games_path_*.py
 # add_brick_game.py's backup of the (untracked) games_path_rgds.py.
 games_path_*.py.*
 
+# Local inputs for prepare_hmcs40.py / prepare_microvision.py: device photos
+# and MAME artwork overlays, with their own rights - kept out like the ROMs.
+CONVERT_ROM/hmcs40_consoles/
+CONVERT_ROM/microvision_consoles/
+CONVERT_ROM/microvision_overlays/
+# Scratch output
+CONVERT_ROM/salida/
+/high_scores.txt
+
 # Per-machine tool configuration (copy from CONVERT_ROM/external_apps_template.py)
 CONVERT_ROM/external_apps.py
 

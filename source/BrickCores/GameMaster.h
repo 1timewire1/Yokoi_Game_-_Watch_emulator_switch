@@ -7,7 +7,7 @@
 class upd7810_device;
 
 // Hartung Game Master (1990, also sold as Impel / Systema 2000 / Videojet /
-// Prodis PDJ-10...): NEC uPD78C11 at 12 MHz (4 KB internal ROM - the boot
+// Prodis PDJ-10...): NEC uPD78C11 on a 12 MHz XTAL (4 KB internal ROM - the boot
 // code, 256 bytes internal RAM), 2 KB external RAM, cartridge ROM at
 // 0x8000, a 61x64 LCD on two Epson SED1520 drivers (top and bottom half),
 // a 1-bit speaker. Written for Yokoi from the hardware as MAME's
@@ -15,7 +15,8 @@ class upd7810_device;
 // core (upd7810.cpp/h - license:BSD-3-Clause, Juergen Buchmueller).
 //
 // Container (".brk", CONVERT_ROM/build_gamemaster_pack.py): core
-// "UPD78C11", clock = 4000000 (12 MHz XTAL, 3 clocks per CPU cycle).
+// "UPD78C11", clock = 2000000 (MAME: the 12 MHz XTAL / 2 into the CPU, 3 clocks per
+// CPU cycle; Settings > Game Master Speed can double it).
 // Blobs: "rom" the 4 KB internal ROM (d78c11agf_e19.u1), "cart" the
 // cartridge. Inputs: pseudo-port "JOY", mask = the bit (MAME's JOY row,
 // active low on port A), level 1 = pressed. Segments: (x, y, 0), x 0-60,

@@ -620,14 +620,20 @@ CORE_CONFIG["LC5732"] = {
 """],
 }
 CORE_CONFIG["EM73000"] = {
-    "doc": "EMC EM73000, Brick Game E-33 2 in 1.",
+    "doc": "EMC EM73000, Brick Game E-33 2 in 1, the Hitorikko pets and Mini Pets 8 in 1.",
     "ram": "f_RAM",
+    # BrickEmuPy 71a7481: per-port pull-up / wake-up tables, a .brick's values
+    # over these defaults ({**{...}, **mask['port_pullup']} in the Python).
+    "init": {"_pullup": [f'    f_pullup[kPort_{p}] = options().num("port_pullup.{p}", {d});' for p, d in (("P0", 0), ("P7", 0), ("P8", 15))],
+             "_wakeup": [f'    f_wakeup[kPort_{p}] = options().num("port_wakeup.{p}", 0);' for p in ("P0", "P8")]},
+    # 71a7481's RTI flag: not saved, as before it existed, so older EM73000 saves still load.
+    "no_save": ("_rti_stack",),
     "display": lambda m: f"""    if ((f_P16 & {m.P16_SE}) || i < 0 || i >= {m.RAM_SIZE}) return 0;
     return (uint8_t)f_RAM[i];""",
     "decl": ["    int64_t snd_basic_div_ = 0, snd_div_ = 0, snd_mode_ = 0;",
              "    void snd_update() {",
              "        if (snd_mode_ != 0 && snd_div_ > 1 && snd_basic_div_ > 0)",
-             "            set_tone((double)clock_hz() / snd_basic_div_ / snd_div_ / 2, snd_mode_ != 1);",
+             "            set_tone(240000.0 / snd_basic_div_ / snd_div_ / 2, snd_mode_ != 1);  // EM73000sound.py BASIC_FREQ",
              "        else set_tone(0);",
              "    }",
              "    void snd_set_basic_freq_div(int64_t v) { snd_basic_div_ = v; }",
@@ -694,11 +700,30 @@ CORE_CONFIG["SPLB32"] = {
              "    // peripherals/HT24LC08.py. The .eeprom file's job is done by save states.",
              "    void eeprom_port(int64_t port, int64_t value);",
              "    std::vector<uint8_t> ee_mem_ = std::vector<uint8_t>(1024, 0);",
-             "    int64_t ee_state_ = 0, ee_bits_ = 0, ee_addr_ = 0, ee_scl_ = 1, ee_sda_ = 1, ee_ack_ = 0, ee_rx_ = 0, ee_tx_ = 0;"],
+             "    int64_t ee_state_ = 0, ee_bits_ = 0, ee_addr_ = 0, ee_scl_ = 1, ee_sda_ = 1, ee_ack_ = 0, ee_rx_ = 0, ee_tx_ = 0;",
+             "public:",
+             "    // Tamagotchi Connection V3 infrared (BrickEmuPy's CON_V3_IR: LED on",
+             "    // PC bit 2, receiver on PB bit 2, low while it sees a carrier) - for",
+             "    // switch/source/core/link_session.h.",
+             "    bool link_take_tx() override { const bool t = ir_toggled_; ir_toggled_ = false; return t; }",
+             "    void link_set_rx(bool carrier) override {",
+             "        if (carrier == ir_rx_carrier_) return;",
+             "        ir_rx_carrier_ = carrier;",
+             "        port_input(kPort_PB, 4, carrier ? 0 : 1);",
+             "    }",
+             "private:",
+             "    int64_t ir_prev_ = 0;",
+             "    bool ir_toggled_ = false;",
+             "    bool ir_rx_carrier_ = true;  // so the first link_set_rx(false) drives the pin high"],
     "post_ser": ["    io.bytes(snd_envelope_, sizeof(snd_envelope_));", "    io.bytes(snd_state_, sizeof(snd_state_));",
                  "    ser_vec(io, ee_mem_);", "    io.pod(ee_state_);", "    io.pod(ee_bits_);", "    io.pod(ee_addr_);",
                  "    io.pod(ee_scl_);", "    io.pod(ee_sda_);", "    io.pod(ee_ack_);", "    io.pod(ee_rx_);", "    io.pod(ee_tx_);"],
     "impl": ["""void SPLB32::eeprom_port(int64_t port, int64_t value) {
+    // The IR LED's carrier, for link_take_tx().
+    if (port == kPort_PC && (value & 4) != ir_prev_) {
+        ir_prev_ = value & 4;
+        ir_toggled_ = true;
+    }
     enum { Idle, AddrByte, WordAddr, WriteData, ReadData };
     if (port != kPort_PD) return;
     const int64_t kSda = 2, kScl = 1, kHwAddr = 160, kHwMask = 0xF8, kSize = 1024, kPage = 256, kWritePage = 16;
@@ -791,6 +816,8 @@ def emit(g, out_dir: Path):
         else:
             mem.append(f"    {base} f{k} = 0;")
             ser.append(f"    io.pod(f{k});")
+        if k in g.cfg.get("no_save", ()):
+            ser.pop()  # kept out of save states, so ones made before it existed still load
     # tables
     tdecl, tdefs = [], []
     for k, v in g.tables.items():

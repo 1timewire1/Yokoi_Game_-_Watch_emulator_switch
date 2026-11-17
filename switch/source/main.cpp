@@ -261,10 +261,6 @@ constexpr ModLayerTarget kSpaceAdventureCalcLayout[24] = {
 
 } // namespace
 
-// SD layout (sdmc:/switch/yokoi/): the .nro and the pack at the top, saves
-// in yokoi_gw_saves/, settings/favorites/recent/high scores in
-// yokoi_config/, the log in yokoi_logs/. Files an older version left at
-// the top are moved into place once, on start.
 // Menu key repeat: holding a direction in any menu (game list, carousel,
 // settings, save slots...) repeats it - first after 0.35 s, then every
 // 80 ms, and every 40 ms once it's been held for 1.5 s. Returns the
@@ -291,6 +287,10 @@ uint64_t menu_key_repeat(uint64_t kDown, uint64_t kHeld) {
     return held;
 }
 
+// SD layout (sdmc:/switch/yokoi/): the .nro and the pack at the top, saves
+// in yokoi_gw_saves/, settings/favorites/recent/high scores in
+// yokoi_config/, the log in yokoi_logs/. Files an older version left at
+// the top are moved into place once, on start.
 void organize_storage() {
     set_config_subdir("yokoi_config");
     set_log_subdir("yokoi_logs");

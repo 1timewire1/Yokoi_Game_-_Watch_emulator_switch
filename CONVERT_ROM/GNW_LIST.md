@@ -367,6 +367,7 @@ Special editions are not supported in the emulator, refer to the Notes column fo
 | 03  | apollo2in1 | (BrickEmuPy)        | 2 in 1                                                       | 1997.01.01   | SPLB20 |  |
 | 04  | apolloprinceprincessen | (BrickEmuPy)        | Prince & Princess (English)                                  | 1997.01.01   | SPLB20 |  |
 | 05  | apolloprinceprincessch | (BrickEmuPy)        | Prince & Princess (Chinese)                                  | 1997.01.01   | SPLB20 | apolloprinceprincessen |
+| 06  | bigcat9in1 | (BrickEmuPy)        | Big Cat 9 in 1                                               | 1998.01.01   | SPLB20 | gyaoppi9in1 |
 
 ## Nature Land
 
@@ -384,8 +385,14 @@ Special editions are not supported in the emulator, refer to the Notes column fo
 
 | No. | Model   | Filename            | Game Title                                                   | Release Date | CPU | Clone Of |
 |-----|---------|---------------------|--------------------------------------------------------------|--------------|-----|-------|
-| 01  | bigcat9in1 | (BrickEmuPy)        | Big Cat 9 in 1                                               | 1998.01.01   | SPLB20 | gyaoppi9in1 |
-| 02  | hitorikkochicken | (BrickEmuPy)        | Hitorikko Chicken                                            | 1997.01.01   | EM73000 |  |
+| 01  | minipets8in1 | (BrickEmuPy)        | Mini Pets 8 in 1                                             | 1997.01.01   | EM73000 |  |
+
+## Hitorikko
+
+| No. | Model   | Filename            | Game Title                                                   | Release Date | CPU | Clone Of |
+|-----|---------|---------------------|--------------------------------------------------------------|--------------|-----|-------|
+| 01  | hitorikkochicken | (BrickEmuPy)        | Hitorikko Chicken                                            | 1997.01.01   | EM73000 |  |
+| 02  | hitorikkodinosaur | (BrickEmuPy)        | Hitorikko Dinosaur                                           | 1997.01.01   | EM73000 |  |
 
 ## Popy
 
@@ -453,6 +460,159 @@ Special editions are not supported in the emulator, refer to the Notes column fo
 | No. | Model   | Filename            | Game Title                                                   | Release Date | CPU | Clone Of |
 |-----|---------|---------------------|--------------------------------------------------------------|--------------|-----|-------|
 | 01  | puyolin | (BrickEmuPy)        | Puyolin                                                      | 1997.07.25   | HT943 |  |
+
+## Tabletop VFD games (MAME hh_hmcs40 / hh_melps4)
+
+<!-- Bandai, Coleco, Entex, Gakken, Tomy, Parker Brothers, Bambino and VTech tabletop VFD games, from MAME's
+     ROM + SVG sets (CONVERT_ROM/prepare_hmcs40.py) on cores ported from MAME (BSD-3-Clause):
+     source/BrickCores/HMCS40.*, MELPS4.*, Cop411.*. Each game sits in its maker's folder in the app.
+     Documentation only (the Filename column isn't a .zip). -->
+
+| No. | Model   | Filename            | Game Title                                                   | Release Date | CPU | Clone Of |
+|-----|---------|---------------------|--------------------------------------------------------------|--------------|-----|-------|
+| 01  | packmon | (MAME)              | Packri Monster                                               | 1981.01.01   | HMCS40 |  |
+| 02  | cdkong | (MAME)              | Donkey Kong (Coleco)                                         | 1982.01.01   | HMCS40 |  |
+| 03  | egalaxn2 | (MAME)              | Galaxian 2 (Entex)                                           | 1981.01.01   | HMCS40 |  |
+| 04  | tmtron | (MAME)              | Tron (Tomy)                                                  | 1981.01.01   | HMCS40 |  |
+| 05  | gdigdug | (MAME)              | Dig Dug (Gakken)                                             | 1983.01.01   | HMCS40 |  |
+| 06  | gscobra | (MAME)              | Super Cobra (Gakken, green Version)                          | 1982.01.01   | HMCS40 |  |
+| 07  | bbtime | (MAME)              | Burger Time (Bandai)                                         | 1982.01.01   | HMCS40 |  |
+| 08  | cmspacmn | (MAME)              | Ms. Pac-Man (Coleco)                                         | 1982.01.01   | HMCS40 |  |
+| 09  | estargte | (MAME)              | Stargate (Entex)                                             | 1982.01.01   | HMCS40 |  |
+| 10  | bfriskyt | (MAME)              | Frisky Tom (Bandai)                                          | 1982.01.01   | HMCS40 |  |
+| 11  | bzaxxon | (MAME)              | Zaxxon (Bandai)                                              | 1982.01.01   | HMCS40 |  |
+| 12  | zackman | (MAME)              | Zackman (Bandai)                                             | 1983.01.01   | HMCS40 |  |
+| 13  | bpengo | (MAME)              | Pengo (Bandai)                                               | 1983.01.01   | HMCS40 |  |
+| 14  | alnattck | (MAME)              | Alien Attack (Coleco)                                        | 1981.01.01   | HMCS40 |  |
+| 15  | pbqbert | (MAME)              | Q*Bert (Parker Brothers)                                     | 1983.01.01   | HMCS40 |  |
+| 16  | cpacmanr1 | (MAME)              | Pac-Man (rev. 1) (Coleco)                                    | 1981.01.01   | HMCS40 |  |
+| 17  | cpacman | (MAME)              | Pac-Man (rev. 2) (Coleco)                                    | 1981.01.01   | HMCS40 |  |
+| 18  | gckong | (MAME)              | Crazy Kong (Gakken)                                          | 1982.01.01   | HMCS40 |  |
+| 19  | bdoramon | (MAME)              | Dokodemo Dorayaki Doraemon (Bandai)                          | 1982.01.01   | HMCS40 |  |
+| 20  | kingman | (MAME)              | Kingman (Tomy)                                               | 1982.01.01   | HMCS40 |  |
+| 21  | ghalien | (MAME)              | Heiankyo Alien (Gakken)                                      | 1980.01.01   | HMCS40 |  |
+| 22  | machiman | (MAME)              | Machine Man (Bandai)                                         | 1984.01.01   | HMCS40 |  |
+| 23  | bambball | (MAME)              | Dribble Away Basketball (Bambino)                            | 1979.01.01   | HMCS40 |  |
+| 24  | vinvader | (MAME)              | Invaders (VTech)                                             | 1980.01.01   | HMCS40 |  |
+| 25  | eturtles | (MAME)              | Turtles (Entex)                                              | 1982.01.01   | HMCS40 |  |
+| 26  | bmboxing | (MAME)              | Knock-Em Out Boxing (Bambino)                                | 1979.01.01   | HMCS40 |  |
+| 27  | pairmtch | (MAME)              | Pair Match (Bandai)                                          | 1981.01.01   | HMCS40 |  |
+| 28  | cfrogger | (MAME)              | Frogger (Coleco)                                             | 1982.01.01   | MELPS4 |  |
+| 29  | epacman2 | (MAME)              | Pac Man 2 (Entex, cyan Pac-Man)                              | 1981.01.01   | HMCS40 |  |
+| 30  | epacman2r | (MAME)              | Pac Man 2 (Entex, red Pac-Man)                               | 1981.01.01   | HMCS40 |  |
+| 31  | einvader2 | (MAME)              | Super Space Invader 2 (Entex, black version)                 | 1981.01.01   | HMCS40 |  |
+
+## Milton Bradley Microvision
+
+<!-- Cartridges on source/BrickCores/TMS1100.* (CONVERT_ROM/prepare_microvision.py) - see switch/microvision.md.
+     Documentation only (the Filename column isn't a .zip). -->
+
+| No. | Model   | Filename            | Game Title                                                   | Release Date | CPU | Clone Of |
+|-----|---------|---------------------|--------------------------------------------------------------|--------------|-----|-------|
+| 01  | mvconnect4 | (cartridge)         | Connect Four                                                 | 1979.01.01   | TMS1100 |  |
+| 02  | mvseaduel | (cartridge)         | Sea Duel                                                     | 1980.01.01   | TMS1100 |  |
+| 03  | mvbowling | (cartridge)         | Bowling                                                      | 1979.01.01   | TMS1100 |  |
+| 04  | mvbaseball | (cartridge)         | Baseball                                                     | 1980.01.01   | TMS1100 |  |
+| 05  | mvpinball | (cartridge)         | Pinball                                                      | 1979.01.01   | TMS1100 |  |
+| 06  | mvvegasslt | (cartridge)         | Vegas Slots                                                  | 1979.01.01   | TMS1100 |  |
+| 07  | mvalienrdr | (cartridge)         | Alien Raiders                                                | 1981.01.01   | TMS1100 |  |
+| 08  | mvblckbstr | (cartridge)         | Block Buster                                                 | 1979.01.01   | TMS1100 |  |
+| 09  | mvcosmichu | (cartridge)         | Cosmic Hunter                                                | 1981.01.01   | TMS1100 |  |
+| 10  | mvmindbstr | (cartridge)         | Mindbuster                                                   | 1979.01.01   | TMS1100 |  |
+| 11  | mvphsrstrk | (cartridge)         | Star Trek: Phaser Strike                                     | 1979.01.01   | TMS1100 |  |
+| 12  | mvsprblock | (cartridge)         | Super Blockbuster                                            | 1982.01.01   | TMS1100 |  |
+
+## Epoch Game Pocket Computer
+
+<!-- source/BrickCores/GamePocket.* (MAME's uPD7810 core), CONVERT_ROM/build_gamepock_pack*.py.
+     Documentation only (the Filename column isn't a .zip). -->
+
+| No. | Model   | Filename            | Game Title                                                   | Release Date | CPU | Clone Of |
+|-----|---------|---------------------|--------------------------------------------------------------|--------------|-----|-------|
+| 01  | gpcbios | (cartridge)         | Puzzle & Graphics                                            | 1984.01.01   | uPD78C06 |  |
+| 02  | gpcastrobom | (cartridge)         | Astro Bomber                                                 | 1984.01.01   | uPD78C06 |  |
+| 03  | gpcblockmaz | (cartridge)         | Block Maze                                                   | 1984.01.01   | uPD78C06 |  |
+| 04  | gpcpokemahj | (cartridge)         | Pokekon Mahjongg                                             | 1984.01.01   | uPD78C06 |  |
+| 05  | gpcpokereve | (cartridge)         | Pokekon Reversi                                              | 1984.01.01   | uPD78C06 |  |
+| 06  | gpcsokoban | (cartridge)         | Sokoban: Store Keepers                                       | 1985.01.01   | uPD78C06 |  |
+
+## Hartung Game Master
+
+<!-- source/BrickCores/GameMaster.*, CONVERT_ROM/build_gamemaster_pack.py.
+     Documentation only (the Filename column isn't a .zip). -->
+
+| No. | Model   | Filename            | Game Title                                                   | Release Date | CPU | Clone Of |
+|-----|---------|---------------------|--------------------------------------------------------------|--------------|-----|-------|
+| 01  | hgmbublboy | (cartridge)         | Bubble Boy                                                   | 1990.01.01   | uPD78C11 |  |
+| 02  | hgmcarracing | (cartridge)         | Car Racing (Super F-1)                                       | 1990.01.01   | uPD78C11 |  |
+| 03  | hgmcgalaxy | (cartridge)         | Continental Galaxy                                           | 1990.01.01   | uPD78C11 |  |
+| 04  | hgmdungeon | (cartridge)         | Dungeon Adventure                                            | 1990.01.01   | uPD78C11 |  |
+| 05  | hgmfallbloc | (cartridge)         | Falling Block                                                | 1990.01.01   | uPD78C11 |  |
+| 06  | hgmfinitezn | (cartridge)         | Finite Zone                                                  | 1990.01.01   | uPD78C11 |  |
+| 07  | hgmgobang | (cartridge)         | Go Bang                                                      | 1990.01.01   | uPD78C11 |  |
+| 08  | hgmhspace | (cartridge)         | Hyper Space                                                  | 1990.01.01   | uPD78C11 |  |
+| 09  | hgmkungfu | (cartridge)         | Kung Fu                                                      | 1990.01.01   | uPD78C11 |  |
+| 10  | hgmmoveit | (cartridge)         | Move It                                                      | 1992.01.01   | uPD78C11 |  |
+| 11  | hgmpinball | (cartridge)         | Pin Ball                                                     | 1990.01.01   | uPD78C11 |  |
+| 12  | hgmscastle | (cartridge)         | Space Castle                                                 | 1990.01.01   | uPD78C11 |  |
+| 13  | hgmsoccer | (cartridge)         | Soccer (3 on 3)                                              | 1990.01.01   | uPD78C11 |  |
+| 14  | hgmspaceinv | (cartridge)         | Space Invader                                                | 1992.01.01   | uPD78C11 |  |
+| 15  | hgmswarrior | (cartridge)         | Space Warrior                                                | 1990.01.01   | uPD78C11 |  |
+| 16  | hgmtankwar | (cartridge)         | Tank War                                                     | 1990.01.01   | uPD78C11 |  |
+| 17  | hgmtennis | (cartridge)         | Tennis                                                       | 1990.01.01   | uPD78C11 |  |
+| 18  | hgmuchamp | (cartridge)         | Urban Champion                                               | 1990.01.01   | uPD78C11 |  |
+
+## Tiger Game.com
+
+<!-- source/BrickCores/GameCom.* (MAME's SM8500 core), CONVERT_ROM/build_gamecom_pack.py.
+     Documentation only (the Filename column isn't a .zip). -->
+
+| No. | Model   | Filename            | Game Title                                                   | Release Date | CPU | Clone Of |
+|-----|---------|---------------------|--------------------------------------------------------------|--------------|-----|-------|
+| 01  | tgcbatmanr | (cartridge)         | Batman and Robin                                             | 1997.01.01   | SM8521 |  |
+| 02  | tgcsotn | (cartridge)         | Castlevania: Symphony of the Night (Prototype)               | 1997.01.01   | SM8521 |  |
+| 03  | tgccentiped | (cartridge)         | Centipede                                                    | 1999.01.01   | SM8521 |  |
+| 04  | tgcdukenuke | (cartridge)         | Duke Nukem 3D                                                | 1997.01.01   | SM8521 |  |
+| 05  | tgcfightmix | (cartridge)         | Fighters Megamix                                             | 1998.01.01   | SM8521 |  |
+| 06  | tgcfrogger | (cartridge)         | Frogger                                                      | 1999.01.01   | SM8521 |  |
+| 07  | tgchenry | (cartridge)         | Henry                                                        | 1997.01.01   | SM8521 |  |
+| 08  | tgcindy500 | (cartridge)         | Indy 500                                                     | 1997.01.01   | SM8521 |  |
+| 09  | tgcjeopardy | (cartridge)         | Jeopardy!                                                    | 1998.01.01   | SM8521 |  |
+| 10  | tgclightout | (cartridge)         | Lights Out                                                   | 1997.01.01   | SM8521 |  |
+| 11  | tgclostwrld | (cartridge)         | The Lost World: Jurassic Park                                | 1997.01.01   | SM8521 |  |
+| 12  | tgcmonopoly | (cartridge)         | Monopoly                                                     | 1999.01.01   | SM8521 |  |
+| 13  | tgcmktrilgy | (cartridge)         | Mortal Kombat Trilogy                                        | 1997.01.01   | SM8521 |  |
+| 14  | tgcquizwiz | (cartridge)         | Quiz Wiz: Cyber Trivia                                       | 1997.01.01   | SM8521 |  |
+| 15  | tgcre2 | (cartridge)         | Resident Evil 2                                              | 1998.01.01   | SM8521 |  |
+| 16  | tgcscrabble | (cartridge)         | Scrabble                                                     | 1999.01.01   | SM8521 |  |
+| 17  | tgcsonicjam | (cartridge)         | Sonic Jam                                                    | 1998.01.01   | SM8521 |  |
+| 18  | tgctcasino | (cartridge)         | Tiger Casino                                                 | 1998.01.01   | SM8521 |  |
+| 19  | tgcweblink | (cartridge)         | Tiger Web Link                                               | 1997.01.01   | SM8521 |  |
+| 20  | tgcwheelfor | (cartridge)         | Wheel of Fortune                                             | 1997.01.01   | SM8521 |  |
+| 21  | tgcwheelfo2 | (cartridge)         | Wheel of Fortune 2                                           | 1998.01.01   | SM8521 |  |
+| 22  | tgcarcadecl | (cartridge)         | Williams Arcade Classics                                     | 1997.01.01   | SM8521 |  |
+
+## Entex Adventure Vision
+
+<!-- source/BrickCores/AdvVision.* (MAME's MCS-48 core), CONVERT_ROM/build_advision_pack.py.
+     Documentation only (the Filename column isn't a .zip). -->
+
+| No. | Model   | Filename            | Game Title                                                   | Release Date | CPU | Clone Of |
+|-----|---------|---------------------|--------------------------------------------------------------|--------------|-----|-------|
+| 01  | eavdefender | (cartridge)         | Defender                                                     | 1982.01.01   | 8048 |  |
+| 02  | eavspcforce | (cartridge)         | Space Force                                                  | 1982.01.01   | 8048 |  |
+| 03  | eavscobra | (cartridge)         | Super Cobra                                                  | 1982.01.01   | 8048 |  |
+| 04  | eavturtles | (cartridge)         | Turtles                                                      | 1982.01.01   | 8048 |  |
+
+## Tamagotchi Tama-Go / Friends
+
+<!-- source/BrickCores/Tamago.*, CONVERT_ROM/build_tamago_pack.py.
+     Documentation only (the Filename column isn't a .zip). -->
+
+| No. | Model   | Filename            | Game Title                                                   | Release Date | CPU | Clone Of |
+|-----|---------|---------------------|--------------------------------------------------------------|--------------|-----|-------|
+| 01  | tmgtamago | (console ROM)       | TamaTown Tama-Go                                             | 2010.08.01   | 6502 (GP) |  |
+| 02  | tmgfriendseu | (console ROM)       | Tamagotchi Friends (Europe)                                  | 2013.12.26   | 6502 (GP) |  |
 
 ## McDonald's (LCDonald)
 

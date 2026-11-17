@@ -77,6 +77,87 @@ Opened with **Plus** from the game list, or with **ZL+ZR** during gameplay (see 
 
 Console Art, Load State Behavior, Log File, Experimental Games, and Experimental Features are only shown from the game-list entry point - see "In-game settings" below for why the in-game one only has the display rows.
 
+**Settings added in the November 2026 update** (angel_hp) - the menu's own help text for each, from
+`switch_menu.cpp`. Three earlier rows were renamed: Rotation is now **Game Rotation**, Background Color is now **Game Background Color**, Single Screen Game Console Art is now **Display Single Screen Console Art**. Settings, favorites, recents and high scores now live in `sdmc:/switch/yokoi/yokoi_config/` and the log in
+`yokoi_logs/`; files an older version left in `sdmc:/switch/yokoi/` are moved there once, on start.
+
+| Setting | What it does (the menu's own help text) |
+|---|---|
+| Menu Style | How the game list starts: Classic shows a grid of makers; List puts the makers in a column, with the chosen one's games beside it. |
+| Maker Order | Order of the makers: A-Z, the ones with most games first, or by era (the year of each maker's oldest game). |
+| Maker Colors | Gives each maker its own colour: a stripe on the maker tiles, a band on the carousel cards, the frame in the one-at-a-time list. It follows the theme. |
+| High Scores | Keeps the best score of the games that show one (Game & Watch style so far), for Game A and Game B. Off: no records, nothing on screen. |
+| Record On Screen | The record of the mode you play, top right, the whole game, and the banner when you beat it. |
+| Show Records in List | The game's records under its name in the game list. |
+| Clear All Records | Deletes the records of every game. Press A twice. |
+| High Scores | This game's best scores. Press A twice to delete them. |
+| Achievement Alerts | No banner. The achievements are still kept; see them in the pause menu. |
+| Alert Colour | Colour of the "New high score!" and achievement alerts: Golden, or the colours of the menu theme (Settings > Themes). |
+| Achievements | 25, 50, 100, 200 and 500 points (x10 on the VFD tabletop games) and beating your record. They are deleted with the game's high scores. |
+| Menu Theme | The colours of the menus (background, tiles, highlight). The cards below preview each theme. |
+| Menu Font | The letters used in the menus. System is the Switch's own font. |
+| LCD Ghosting | Segments fade out slowly instead of switching off at once, like the slow response of a real LCD. Off is the original sharp look. |
+| Anti-Flicker Filter | On for Game & Watch style games (and Big Cat 9 in 1), off for virtual pets and watches (Tamagotchi, Digimon, Pikachu...): it would erase moving dots. |
+| Pixel Style | How this screen's dots are drawn: Classic as the game's own art, Filled as solid squares with a gap, Solid as joined blocks. |
+| Screen Filter | An effect over the game screen: scanlines, LCD grid, CRT, colour tints... Never drawn over the console's case. Filter Strength sets how strong. |
+| Filter Strength | How strong the screen filter is. |
+| Duplicate & Clone Games | Hide Duplicates: hides only the games that are really the same release listed twice (e.g. two board revisions of Helmet). Nothing else changes. |
+| Time Set Mode | Manual: nothing is pressed for you - set and confirm the clock yourself, like on the real console. Applies the next time a game is loaded. |
+| Splash Screen | The short YOKOI animation with its piezo sound when the app starts. Skip it with +. |
+| Themes  > | Opens the menu themes and fonts. |
+| Music  > | Opens the background music: built-in tunes or your own from the SD card, its volume and how it dips for the beeps. |
+| Open Pause Menu | The buttons that open the pause menu during a game. They can't be given to game functions in pause menu > Controls. |
+| On-Screen Keypad | Shows the game's keypad next to the screen: tap it in handheld mode, or press R3 to use it with the controller. |
+| Background Music | Music in the game list and settings (never in game or in the pause menu). Random picks a tune each time; Custom Music plays your files from yokoi_music/. |
+| Track | Which of your files plays (.ogg or 16-bit .wav in sdmc:/switch/yokoi/yokoi_music/). All (random) plays one after another in random order. |
+| Music Volume | The music's own volume. It also follows Sound > Volume and Mute. |
+| Lower With Beeps | How much the music drops while a menu beep plays, so the two don't clash. |
+| Menu Rotation | Turns the menus (game list, settings, pause), separately from the game's own rotation. |
+| Touch Controls | Handheld: tap an item to choose it and tap it again (or a hint at the bottom) to use it; swipe left/right to go to the next one, drag up/down to move through lists. |
+| Date Format | How the game lists write a game's date: year-month-day, day/month/year or month/day/year. |
+| Screen Palette | Recolours the whole LCD at once (background and segments): backlit, Game Boy... Original keeps each game's own colours. |
+| Transition | The animation when you move from one game to the next in the one-at-a-time list and the carousel. Random changes it every time. |
+| Screen Size | How big the game is drawn. Normal is the largest size without distortion. Stretched fills the screen (distorts); Pixel Exact keeps sharp, whole pixels. |
+| Resume | Back to the game, exactly where you left it. |
+| Restart | Starts the game over, as if you switched it off and on. Whatever you haven't saved is lost; your save slots stay as they are. |
+| Sound From | You hear player 1's device (left half). Only one can play at a time. |
+| Sound Switch Button | Each press makes you hear the other device - handy docked, where there's no touch screen. If a player's function is on that button (Controls), it does that instead. |
+| Game Vibration | With Sound: the controller buzzes along with the game's buzzer. |
+| Pet Alert Vibration | Virtual pets vibrate with their beeps even when Game Vibration is off. Handy with the volume down, so you notice when they call. |
+| Menu Vibration | A short tap in the controller for each button in the menus. |
+| Vibration Strength | How strong every vibration is: Soft, Medium or Strong. |
+| Pet Alert Light | When a pet beeps on its own, the HOME light of the right Joy-Con pulses until you press any button. |
+| Pedometer: Shake the Controller | Each shake of the controller is one step (Pocket Pikachu, D-Tector, D-Power). The X button still works. |
+| Pedometer Sensitivity | How hard you have to shake for a step: High counts gentle movements, Low only strong ones. |
+| Tap Sensor: Knock the Controller | Tamagotchis with a tap sensor (Tenshitchi, Umi/Mori de Hakken, Genjintchi, TamaOtch) feel a knock on the controller or a touch on the screen. X still works. |
+| Tap Sensor Sensitivity | How hard a knock has to be: High notices light taps, Low only firm ones (so walking around doesn't trigger it). |
+| Fast-Forward | Hold this button in a game to run it faster (sound muted). Off by default. Only free buttons are offered; the game no longer gets it. |
+| Fast-Forward Speed | How much faster the game runs while you hold the fast-forward button. |
+| Button Response | As the real device: it answers a press after ~200 ms, while it finishes drawing on its slow clock. |
+| Rewind | Hold this button in a game to go back in time, step by step. Off by default. Only free buttons are offered; the game no longer gets it. |
+| Rewind Length | How far back you can rewind. Longer keeps more snapshots in memory. McDonald's games can't be rewound. |
+| IR Sensor: Joy-Con Camera | D-Tector: pass a hand in front of the right Joy-Con's IR camera (Wave) or hold it (Sensor). Auto: only in the D-Tector modes that use the sensor (and 1 min without a press). Always: all game. |
+| IR Sensor Sensitivity | How close the hand has to be: High notices it from further away, Low only very close (if light in the room sets it off). |
+| Language | The language of the menus. |
+| Save State | Saves the game right now in one of the slots, with a picture of the screen. |
+| Load State | Goes back to a saved game. The Auto save slot is the one made when you last left the game. |
+| Simulate Time | The pet lives a few hours at high speed (it ages, gets hungry...). A copy is kept first, so Undo Simulate can bring it back. |
+| Undo Simulate | Puts the pet back as it was before the last Simulate Time. |
+| Volume | The volume of everything: games, menu beeps and music. |
+| Mute | Silences everything at once without losing your volume setting. |
+| Sound Style | Clean: the buzzer as the emulator plays it, clear and smooth. |
+| Game.com Sound | Full: voices, music and tones, as in MAME. Basic: the simple buzzer. |
+| Game.com Speed | Normal: MAME's speed. +20%: closer to the real console, but some countdowns run fast. |
+| Noise Channel (approx.) | Explosions and hits on the Game.com's noise channel. An approximation: MAME doesn't have it. |
+| Game.com Palette | Real: the greys of the real screen. Green: green-tinted screen. |
+| Game.com Ghosting | The real screen is slow: moving things leave a trail. Soft or Strong imitate it and make motion look smoother. |
+| R-Zone Screen | White: crimson, lit near white. Red: dark, lit bright red. LCD (no light): plain LCD, for your own palette and colours. |
+| Adventure Vision Screen | LEDs: the rows of LEDs apart, as on the real console. Smooth: one continuous picture, no gaps. |
+| Gotchi Figure | The figure standing on the Tama-Go and its contacts (CD1 / CD2). A opens the list. |
+| Game Master Speed | Normal: MAME's speed. Fast (x2): as a real console on video. |
+| Menu Sounds | Short beeps when you move and choose in the menus. They never play in a game. |
+| Dosimeter Reading | Altair's radiation dial: the reading the game's dosimeter sees. |
+
 **Persistence is Switch-only and intentionally not shared with 3DS/Android**: `switch_settings_load()`/`switch_settings_save()` (`switch_settings.cpp`) read/write a plain-text `sdmc:/switch/yokoi/yokoi_settings.txt` (`key=value` lines: `background_color`, `segment_marking_alpha`, `rotation`, `hide_console_art`, `loadstate`, `enable_log`, `lastgameplayed`, `betagames`) instead of the binary `yokoi_gw_settings.dat` that `../source/std/settings.cpp`'s `load_settings()`/`save_settings()` write for 3DS/Android - requested explicitly so the file can be opened and edited by hand. Those shared functions are untouched; `main.cpp` just calls `switch_settings_load()` instead of `load_settings()` at startup. Screen rotation and everything below Background Color/Segments have no shared-core equivalent, so they all live in `switch_settings.h`, not in `AppSettings`.
 
 **Hidden `debug` flag**: not a settings-menu row at all - the only way to set it is hand-editing `yokoi_settings.txt` to add `debug=1`, and it's never written back once read (`switch_settings_save()` no-ops entirely while it's set, for the rest of that run). Meant for inspecting a specific on-disk configuration without the app being able to alter or "fix" it out from under you. With `debug=1`:

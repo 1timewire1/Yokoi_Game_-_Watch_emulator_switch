@@ -68,7 +68,8 @@ DRAWN_IDS = ("body", "display", "overlay")
 # Faces with more than one LCD, by file stem -> arrangement (see the module doc).
 MULTI_SCREEN_FACES = {"AnimestSpaceCobra": "horizontal", "SpicaDArtagnan": "vertical"}
 # Faces whose LCD glass has no id to look for, by file stem -> x, y, w, h.
-SCREEN_AREAS = {"HitorikkoChicken": (684.88, 1066.32, 1706, 1156)}
+# (Hitorikko Dinosaur is the same body as the Chicken.)
+SCREEN_AREAS = {"HitorikkoChicken": (684.88, 1066.32, 1706, 1156), "HitorikkoDinosaur": (684.88, 1066.32, 1706, 1156)}
 
 
 def e0c6200_segment_title(byte: int, bit: int) -> str:

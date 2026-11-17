@@ -28,22 +28,6 @@ protected:
     }
     int peek_ram(uint32_t a) const override { return a < f_RAM.size() ? (int)f_RAM[a] : -1; }
 
-public:
-    // Tamagotchi Connection V3 infrared (BrickEmuPy's CON_V3_IR: LED on
-    // PC bit 2, receiver on PB bit 2, low while it sees a carrier). Added by
-    // hand, not by brick_core_gen.py - keep it if this file is regenerated.
-    bool link_take_tx() override { const bool t = ir_toggled_; ir_toggled_ = false; return t; }
-    void link_set_rx(bool carrier) override {
-        if (carrier == ir_rx_carrier_) return;
-        ir_rx_carrier_ = carrier;
-        port_input(kPort_PB, 4, carrier ? 0 : 1);
-    }
-
-private:
-    int64_t ir_prev_ = 0;
-    bool ir_toggled_ = false;
-    bool ir_rx_carrier_ = true;  // so the first link_set_rx(false) drives the pin high
-
 private:
     enum Ports { kPort_A = 1000, kPort_BF = 1001, kPort_CF = 1002, kPort_DF = 1003, kPort_IF = 1004, kPort_LCDRAM = 1005, kPort_NF = 1006, kPort_PA = 1007, kPort_PB = 1008, kPort_PC = 1009, kPort_PC16 = 1010, kPort_PD = 1011, kPort_RAM = 1012, kPort_SFR = 1013, kPort_SP = 1014, kPort_VF = 1015, kPort_X = 1016, kPort_Y = 1017, kPort_ZF = 1018, kPort_RES = 1999 };
     struct OpEntry { int64_t (SPLB32::*fn)(int64_t); int size; };
@@ -83,6 +67,20 @@ private:
     void eeprom_port(int64_t port, int64_t value);
     std::vector<uint8_t> ee_mem_ = std::vector<uint8_t>(1024, 0);
     int64_t ee_state_ = 0, ee_bits_ = 0, ee_addr_ = 0, ee_scl_ = 1, ee_sda_ = 1, ee_ack_ = 0, ee_rx_ = 0, ee_tx_ = 0;
+public:
+    // Tamagotchi Connection V3 infrared (BrickEmuPy's CON_V3_IR: LED on
+    // PC bit 2, receiver on PB bit 2, low while it sees a carrier) - for
+    // switch/source/core/link_session.h.
+    bool link_take_tx() override { const bool t = ir_toggled_; ir_toggled_ = false; return t; }
+    void link_set_rx(bool carrier) override {
+        if (carrier == ir_rx_carrier_) return;
+        ir_rx_carrier_ = carrier;
+        port_input(kPort_PB, 4, carrier ? 0 : 1);
+    }
+private:
+    int64_t ir_prev_ = 0;
+    bool ir_toggled_ = false;
+    bool ir_rx_carrier_ = true;  // so the first link_set_rx(false) drives the pin high
     int64_t py_get_rom_addr(int64_t v_addr);
     void pyreset();
     int64_t py_port_read(int64_t v_port);

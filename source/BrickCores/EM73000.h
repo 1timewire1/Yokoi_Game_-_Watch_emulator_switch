@@ -6,7 +6,7 @@
 
 #include "BrickCore.h"
 
-// EMC EM73000, Brick Game E-33 2 in 1.
+// EMC EM73000, Brick Game E-33 2 in 1, the Hitorikko pets and Mini Pets 8 in 1.
 // Generated from BrickEmuPy's cores/EM73000.py (github.com/azya52/BrickEmuPy, CC0)
 // by CONVERT_ROM/utils/brick_core_gen.py - edit that, not this.
 class EM73000 : public BrickCore {
@@ -49,12 +49,9 @@ private:
         return ((int64_t)1 << bits) - 1;
     }
     int64_t snd_basic_div_ = 0, snd_div_ = 0, snd_mode_ = 0;
-    // Set by an interrupt, so RTI restores CF/ZF/SF only then (BrickEmuPy
-    // 71a7481). Not in save states, so older EM73000 saves still load.
-    bool f_rti_stack = false;
     void snd_update() {
         if (snd_mode_ != 0 && snd_div_ > 1 && snd_basic_div_ > 0)
-            set_tone(240000.0 / snd_basic_div_ / snd_div_ / 2, snd_mode_ != 1);  // BASIC_FREQ (BrickEmuPy 71a7481)
+            set_tone(240000.0 / snd_basic_div_ / snd_div_ / 2, snd_mode_ != 1);  // EM73000sound.py BASIC_FREQ
         else set_tone(0);
     }
     void snd_set_basic_freq_div(int64_t v) { snd_basic_div_ = v; }
@@ -192,11 +189,8 @@ private:
     static const OpEntry T_execute_math_k[16];
     static const OpEntry T_execute_io_p[4];
     static const IoEntry* find_io_tbl(int64_t addr);
-    int64_t f_P0_pullup_mask = 0;
-    int64_t f_P7_pullup_mask = 0;
-    int64_t f_P8_pullup_mask = 0;
-    int64_t f_P0_wakeup_mask = 0;
-    int64_t f_P8_wakeup_mask = 0;
+    std::map<int64_t, int64_t> f_pullup;
+    std::map<int64_t, int64_t> f_wakeup;
     int64_t f_ACC = 0;
     int64_t f_PC = 0;
     int64_t f_SP = 0;
@@ -230,5 +224,6 @@ private:
     int64_t f_timerB_counter = 0;
     int64_t f_time_base_counter = 0;
     int64_t f_ram_bank = 0;
+    int64_t f_rti_stack = 0;
     int64_t f_instr_counter = 0;
 };

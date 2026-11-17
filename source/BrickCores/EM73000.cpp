@@ -43,13 +43,11 @@ void EM73000::reset() {
 }
 
 void EM73000::init_() {
-    f_P0_pullup_mask = options().num("port_pullup.P0", 0);
-    f_P7_pullup_mask = options().num("port_pullup.P7", 0);
-    // BrickEmuPy 71a7481 ("improvement of EM73 emulation"): P8's pull-up
-    // defaults to 0xF but a .brick can now set it too.
-    f_P8_pullup_mask = options().num("port_pullup.P8", 15);
-    f_P0_wakeup_mask = options().num("port_wakeup.P0", 0);
-    f_P8_wakeup_mask = options().num("port_wakeup.P8", 0);
+    f_pullup[kPort_P0] = options().num("port_pullup.P0", 0);
+    f_pullup[kPort_P7] = options().num("port_pullup.P7", 0);
+    f_pullup[kPort_P8] = options().num("port_pullup.P8", 15);
+    f_wakeup[kPort_P0] = options().num("port_wakeup.P0", 0);
+    f_wakeup[kPort_P8] = options().num("port_wakeup.P8", 0);
     f_instr_counter = 0;
 }
 
@@ -92,11 +90,8 @@ void EM73000::port_input(int port, uint8_t mask, int level) {
 }
 
 void EM73000::serialize(BrickStateIO& io) {
-    io.pod(f_P0_pullup_mask);
-    io.pod(f_P7_pullup_mask);
-    io.pod(f_P8_pullup_mask);
-    io.pod(f_P0_wakeup_mask);
-    io.pod(f_P8_wakeup_mask);
+    for (auto& kv : f_pullup) io.pod(kv.second);
+    for (auto& kv : f_wakeup) io.pod(kv.second);
     io.pod(f_ACC);
     io.pod(f_PC);
     io.pod(f_SP);
@@ -152,12 +147,12 @@ void EM73000::py_reset() {
     f_IL = 0;
     f_IMASK = 0;
     f_RAM.assign((size_t)(384), 0);
-    f_P0 = f_P0_pullup_mask;
+    f_P0 = f_pullup[kPort_P0];
     f_P4 = 15;
     f_P5 = 0;
     f_P6 = 0;
-    f_P7 = f_P7_pullup_mask;
-    f_P8 = f_P8_pullup_mask;
+    f_P7 = f_pullup[kPort_P7];
+    f_P8 = f_pullup[kPort_P8];
     f_P9 = 0;
     f_P16 = 0;
     f_P23 = 15;
@@ -171,7 +166,7 @@ void EM73000::py_reset() {
     f_timerB_counter = 0;
     f_time_base_counter = 0;
     f_ram_bank = 0;
-    f_rti_stack = false;
+    f_rti_stack = 0;
 }
 
 void EM73000::pyreset() {
@@ -303,7 +298,7 @@ void EM73000::py_pin_set(int64_t v_port, int64_t v_pin, int64_t v_level) {
     if (((v_port == kPort_P0))) {
         v_prev_P0 = f_P0;
         f_P0 = (((~(v_pin_mask)) & f_P0) | (v_level << v_pin));
-        if (((((f_P0_wakeup_mask & v_prev_P0) & v_pin_mask)) && ((~((f_P0 & v_pin_mask)))))) {
+        if (((((f_wakeup[v_port] & v_prev_P0) & v_pin_mask)) && ((~((f_P0 & v_pin_mask)))))) {
             f_P16 &= (~(4));
         }
     } else {
@@ -313,7 +308,7 @@ void EM73000::py_pin_set(int64_t v_port, int64_t v_pin, int64_t v_level) {
             if (((v_port == kPort_P8))) {
                 v_prev_P8 = f_P8;
                 f_P8 = (((~(v_pin_mask)) & f_P8) | (v_level << v_pin));
-                if (((((f_P8_wakeup_mask & v_prev_P8) & v_pin_mask)) && ((~((f_P8 & v_pin_mask)))))) {
+                if (((((f_wakeup[v_port] & v_prev_P8) & v_pin_mask)) && ((~((f_P8 & v_pin_mask)))))) {
                     f_P16 &= (~(4));
                 }
                 if ((((v_prev_P8 & v_pin_mask)) && ((~((f_P8 & v_pin_mask)))))) {
@@ -329,22 +324,24 @@ void EM73000::py_pin_release(int64_t v_port, int64_t v_pin) {
     v_pin_mask = (1 << v_pin);
     if (((v_port == kPort_P0))) {
         v_prev_P0 = f_P0;
-        f_P0 = ((f_P0 & (~(v_pin_mask))) | (f_P0_pullup_mask & v_pin_mask));
-        if (((((f_P0_wakeup_mask & v_prev_P0) & v_pin_mask)) && ((~((f_P0 & v_pin_mask)))))) {
+        f_P0 = ((f_P0 & (~(v_pin_mask))) | (f_pullup[v_port] & v_pin_mask));
+        if (((((f_wakeup[v_port] & v_prev_P0) & v_pin_mask)) && ((~((f_P0 & v_pin_mask)))))) {
             f_P16 &= (~(4));
         }
     } else {
         if (((v_port == kPort_P7))) {
-            f_P7 = ((f_P7 & (~(v_pin_mask))) | (f_P7_pullup_mask & v_pin_mask));
+            f_P7 = ((f_P7 & (~(v_pin_mask))) | (f_pullup[v_port] & v_pin_mask));
         } else {
             if (((v_port == kPort_P8))) {
                 v_prev_P8 = f_P8;
-                f_P8 = ((f_P8 & (~(v_pin_mask))) | (f_P8_pullup_mask & v_pin_mask));
-                if (((((f_P8_wakeup_mask & v_prev_P8) & v_pin_mask)) && ((~((f_P8 & v_pin_mask)))))) {
+                f_P8 = ((f_P8 & (~(v_pin_mask))) | (f_pullup[v_port] & v_pin_mask));
+                if (((((f_wakeup[v_port] & v_prev_P8) & v_pin_mask)) && ((~((f_P8 & v_pin_mask)))))) {
                     f_P16 &= (~(4));
                 }
-            } else if (v_port == kPort_RES) {
-                py_reset();  // BrickEmuPy 71a7481: releasing RES resets the chip
+            } else {
+                if (((v_port == kPort_RES))) {
+                    py_reset();
+                }
             }
         }
     }
@@ -395,7 +392,7 @@ void EM73000::py_interrupt() {
             f_SF = 1;
             f_EI = 0;
             f_IL &= (~((32 >> v_id)));
-            f_rti_stack = true;  // RTI restores the flags only after an interrupt
+            f_rti_stack = 1;
             return;
         }
     }
@@ -420,7 +417,9 @@ int64_t EM73000::pyclock() {
 void EM73000::py_write_ram(int64_t v_i, int64_t v_value) {
     v_i &= 255;
     if (((v_i < 244))) {
-        if (f_ram_bank + v_i < 384) f_RAM[(f_ram_bank + v_i)] = v_value;
+        if ((((f_ram_bank + v_i) < 384))) {
+            f_RAM[(f_ram_bank + v_i)] = v_value;
+        }
     } else {
         if (((v_i == 244))) {
             f_TIMERA = ((f_TIMERA & 4080) | v_value);
@@ -452,7 +451,9 @@ void EM73000::py_write_ram(int64_t v_i, int64_t v_value) {
                                             if (((v_i == 255))) {
                                                 f_SP = v_value;
                                             } else {
-                                                if (f_ram_bank + v_i < 384) f_RAM[(f_ram_bank + v_i)] = v_value;
+                                                if ((((f_ram_bank + v_i) < 384))) {
+                                                    f_RAM[(f_ram_bank + v_i)] = v_value;
+                                                }
                                             }
                                         }
                                     }
@@ -468,9 +469,7 @@ void EM73000::py_write_ram(int64_t v_i, int64_t v_value) {
 
 int64_t EM73000::py_read_ram(int64_t v_i) {
     v_i &= 255;
-    if (((v_i < 244))) {
-        return (f_ram_bank + v_i < 384) ? f_RAM[(f_ram_bank + v_i)] : 0;
-    } else {
+    if (((v_i >= 244))) {
         if (((v_i == 244))) {
             return (f_TIMERA & 15);
         } else {
@@ -511,7 +510,11 @@ int64_t EM73000::py_read_ram(int64_t v_i) {
             }
         }
     }
-    return (f_ram_bank + v_i < 384) ? f_RAM[(f_ram_bank + v_i)] : 0;
+    if ((((f_ram_bank + v_i) < 384))) {
+        return f_RAM[(f_ram_bank + v_i)];
+    }
+    return 0;
+    return 0;
 }
 
 int64_t EM73000::py_sbr_a(int64_t v_opcode) {
@@ -607,7 +610,7 @@ int64_t EM73000::py_rti(int64_t v_opcode) {
     v_sp = (192 + (f_SP << 2));
     f_PC = (((((f_RAM[v_sp] & 1) << 12) | (f_RAM[(v_sp + 1)] << 8)) | (f_RAM[(v_sp + 2)] << 4)) | f_RAM[(v_sp + 3)]);
     if (f_rti_stack) {
-        f_rti_stack = false;
+        f_rti_stack = 0;
         f_CF = (((f_RAM[v_sp] & 8) > 0));
         f_ZF = (((f_RAM[v_sp] & 4) > 0));
         f_SF = (((f_RAM[v_sp] & 2) > 0));
